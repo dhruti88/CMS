@@ -10,7 +10,6 @@ const providers = [
   { id: 'google', name: 'Google' }
 ];
 
-
 const signIn = async (provider, navigate) => {
     if (provider.id === "google") {
       try {
