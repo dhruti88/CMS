@@ -18,7 +18,7 @@ const SignInPage = () => {
         align="center"
       >
         <span style={{ color: "black" }}>Page</span>
-        <span style={{ color: "blue" }}>Craft</span>
+        <span style={{ color: "#2563EB" }}>Craft</span>
       </Typography>
 
       <OAuthSignInPage />
