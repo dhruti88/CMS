@@ -4,7 +4,6 @@ import CustomButton from "../components/button/CustomButton";
 import "tailwindcss";
 import colors from "../theme/colors";
 
-
 const LandingPage = () => {
   const navigate = useNavigate();
 
@@ -16,7 +15,6 @@ const LandingPage = () => {
             <CustomButton onClick={() => navigate("/signin")}>Sign in</CustomButton>
         </div>
        </nav>
-
 
       <div className="text-center mt-10 bg-gray-100 p-30 mb-50 w-200">
         <Typography
