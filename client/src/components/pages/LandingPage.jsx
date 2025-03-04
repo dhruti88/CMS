@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { Typography, CardContent, Card, Box, Container } from '@mui/material'
-import CustomButton from "../components/button/CustomButton";
+import CustomButton from "../atoms/button/CustomButton";
 import "tailwindcss";
-import colors from "../theme/colors";
+import colors from "../../theme/colors";
 
 const LandingPage = () => {
   const navigate = useNavigate();

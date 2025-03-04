@@ -1,5 +1,5 @@
 import { Typography, CardContent, Card, Box, Container } from '@mui/material'
-import OAuthSignInPage from "../SignIn.jsx";
+import OAuthSignInPage from "../../SignIn.jsx"
 
 const SignInPage = () => {
   return (

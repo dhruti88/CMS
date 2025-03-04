@@ -1,9 +1,9 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import SignInPage from "./pages/SignInPage";
-import HomePage from "./pages/HomePage"; // Create this for the main app/dashboard
-import LandingPage from './pages/LandingPage';
-import WorkBench from './pages/workbench/WorkBench';
+import SignInPage from "./components/pages/SignInPage";
+import HomePage from "./components/pages/HomePage"; // Create this for the main app/dashboard
+import LandingPage from './components/pages/LandingPage';
+import WorkBench from './components/pages/workbench/WorkBench';
 
 function App() {
   return (
