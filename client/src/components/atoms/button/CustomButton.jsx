@@ -1,7 +1,7 @@
 import React, { Children } from "react";
 import { Button } from "@mui/material";
 import "tailwindcss";
-import colors from "../../theme/colors";
+import colors from "../../../theme/colors";
 
 const CustomButton = ({
     type = "button",

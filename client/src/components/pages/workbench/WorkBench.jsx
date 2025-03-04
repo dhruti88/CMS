@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Stage, Layer, Rect, Text, Transformer, Image as KonvaImage } from 'react-konva';
+import { Stage, Layer, Rect, Line, Text, Transformer, Image as KonvaImage } from 'react-konva';
 import useImage from 'use-image';
 import './WorkBench.css';
 
@@ -20,12 +20,15 @@ function WorkBench() {
     height: window.innerHeight,
   });
 
-
+  // Grid configuration (dynamic)
+  const [columns, setColumns] = useState(8);
+  const [rows, setRows] = useState(12);
+  const [gutterWidth, setGutterWidth] = useState(10);
+  const [showSetupForm, setShowSetupForm] = useState(true);
 
   // Workbench items and grid settings
   const [items, setItems] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
-  const [gutterWidth, setGutterWidth] = useState(10);
   const [layoutTitle, setLayoutTitle] = useState(defaultTitle);
   const [availableLayouts, setAvailableLayouts] = useState([]);
   const [showLayoutList, setShowLayoutList] = useState(false);
@@ -36,9 +39,7 @@ function WorkBench() {
   // Tool mode: "pointer" (for selecting) vs. "hand" (for panning)
   const [toolMode, setToolMode] = useState("pointer");
 
-  // Grid configuration
-  const columns = 8;
-  const rows = 12;
+  // Cell dimensions
   const cellWidth = (stageSize.width - ((columns - 1) * gutterWidth)) / columns;
   const cellHeight = stageSize.height / rows;
 
@@ -111,18 +112,18 @@ function WorkBench() {
 
 
 
-  // Adjust stage size on window resize
-  useEffect(() => {
-    const handleResize = () => {
-      setStageSize({
-        width: window.innerWidth - 320,
-        height: window.innerHeight,
-      });
+  // // Adjust stage size on window resize
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     setStageSize({
+  //       width: window.innerWidth - 320,
+  //       height: window.innerHeight,
+  //     });
     
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  },[]);
+  //   };
+  //   window.addEventListener('resize', handleResize);
+  //   return () => window.removeEventListener('resize', handleResize);
+  // },[]);
 
   // Update cursor style based on tool mode
   useEffect(() => {
@@ -167,12 +168,15 @@ function WorkBench() {
   };
 
   const loadLayoutFromSelected = (layout) => {
-    setItems(layout.items);
-    if (layout.gridSettings && layout.gridSettings.gutterWidth !== undefined) {
+    if (layout.gridSettings  && layout.gridSettings.gutterWidth !== undefined) {
+      setColumns(layout.gridSettings.columns);
+      setRows(layout.gridSettings.rows);
       setGutterWidth(layout.gridSettings.gutterWidth);
     }
+    setItems(layout.items);
     setLayoutTitle(layout.title);
     setShowLayoutList(false);
+    setShowSetupForm(false);
     console.log("Loaded layout:", layout);
   };
 
@@ -238,7 +242,7 @@ function WorkBench() {
 
   // Read image as base64
   const handleImageUpload = (e) => {
-    console.log("e- ", e);
+    // console.log("e- ", e);
     
     const file = e.target.files[0];
     if (file) {
@@ -269,7 +273,7 @@ function WorkBench() {
 
   //correct the logic, not working!!!
   const handleDragEnd = (e) => {
-    console.log("e2- ", e);
+    // console.log("e2- ", e);
     const id = e.target.id();
     const shape = e.target;
     const totalCellWidth = cellWidth + gutterWidth;
@@ -378,6 +382,8 @@ function WorkBench() {
 
   // Function to convert dataURL to Blob (for canvas uploads)
   const dataURLToBlob = (dataURL) => {
+    // console.log("this",dataURL);
+    
     const byteString = atob(dataURL.split(',')[1]);
     const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
     const ab = new ArrayBuffer(byteString.length);
@@ -414,6 +420,8 @@ function WorkBench() {
     e.evt.preventDefault();
     const stage = e.target.getStage();
     const oldScale = stage.scaleX();
+    // console.log("old-" , oldScale);
+    
     const scaleBy = 1.02;
     const pointer = stage.getPointerPosition();
     const mousePointTo = {
@@ -468,24 +476,27 @@ function WorkBench() {
       />
     );
   }
-  for (let i = 1; i < rows; i++) {
-    gridLines.push(
-      <Rect
-        key={`hline-${i}`}
-        x={0}
+  
+  // Horizontal grid lines using <Line>
+for (let i = 1; i < rows; i++) {
+  const y = i * cellHeight;
+  gridLines.push(
+    <Rect
+      key={`hline-${i}`}
+      x={0}
         y={i * cellHeight}
-        width={stageSize.width}
-        height={1}
-        fill={colors.grays[4]}
+      width={stageSize.width}
+      height={1}
+      fill={colors.grays[4]}
       />
-    );
-  }
+  );
+}
 
   const handleKeyDown = (e) => {
     //console.log("hd -", document.activeElement);
     if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId && document.activeElement === document.body) {
       deleteSelected();
-    }
+    } 
   };
 
   useEffect(() => {
@@ -495,6 +506,54 @@ function WorkBench() {
 
   return (
     <div className="cms-container">
+      {showSetupForm && (
+        <div className="setup-modal">
+          <h2>Configure Grid Layout</h2>
+          <div className="form-group">
+            <label>Layout Title:</label>
+            <input
+              type="text"
+              value={layoutTitle}
+              onChange={(e) => setLayoutTitle(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label>Columns:</label>
+            <input
+              type="number"
+              value={columns}
+              min="1"
+              onChange={(e) => setColumns(Math.max(1, parseInt(e.target.value) || 8))}
+            />
+          </div>
+          <div className="form-group">
+            <label>Rows:</label>
+            <input
+              type="number"
+              value={rows}
+              min="1"
+              onChange={(e) => setRows(Math.max(1, parseInt(e.target.value) || 12))}
+            />
+          </div>
+          <div className="form-group">
+            <label>Gutter Width:</label>
+            <input
+              type="number"
+              value={gutterWidth}
+              min="0"
+              onChange={(e) => setGutterWidth(Math.max(0, parseInt(e.target.value) || 10))}
+            />
+          </div>
+          <button 
+            className="submit-button"
+            onClick={() => setShowSetupForm(false)}
+          >
+            Create Workbench
+          </button>
+        </div>
+      )}
+
+      {!showSetupForm && (
       <div className="workbench-container" style={{ border: "2px solid black" }}>
         <div className="workbench-header">
           <h1>DB Corp CMS Workbench</h1>
@@ -526,7 +585,7 @@ function WorkBench() {
           className="konva-stage"
         >
           <Layer>
-            <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="white" />
+            <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="gray" />
             {gridLines}
             {items.map(item => {
               if (item.type === 'box') {
@@ -593,9 +652,12 @@ function WorkBench() {
               }
               return null;
             })}
+
             <Transformer
               ref={transformerRef}
               boundBoxFunc={(oldBox, newBox) => {
+                // console.log("o- ",oldBox);
+                // console.log("n- ",newBox);
                 const totalCellWidth = cellWidth + gutterWidth;
                 const colSpan = Math.round((newBox.width + gutterWidth) / totalCellWidth);
                 const snappedWidth = colSpan * cellWidth + (colSpan - 1) * gutterWidth;
@@ -615,6 +677,12 @@ function WorkBench() {
                 const node = e.target;
                 const scaleX = node.scaleX();
                 const scaleY = node.scaleY();
+
+                // console.log("nodeX ",scaleX);
+                // console.log("nodeY ",scaleY);
+                // console.log("StageX ",stageRef.current.scaleX());
+                // console.log("StageY ",stageRef.current.scaleY());
+                
                 const updatedItems = items.map(item => {
                   if (item.id === node.id()) {
                     const newWidth = item.width * scaleX;
@@ -624,6 +692,12 @@ function WorkBench() {
                     const snappedWidth = colSpan * cellWidth + (colSpan - 1) * gutterWidth;
                     const rowSpan = Math.round(newHeight / cellHeight);
                     const snappedHeight = rowSpan * cellHeight;
+                    // console.log("before return");
+                    // console.log("nodeX ",scaleX);
+                    // console.log("nodeY ",scaleY);
+                    // console.log("StageX ",stageRef.current.scaleX());
+                    // console.log("StageY ",stageRef.current.scaleY());
+                    
                     return {
                       ...item,
                       width: snappedWidth,
@@ -638,12 +712,19 @@ function WorkBench() {
                 setItems(updatedItems);
                 node.scaleX(1);
                 node.scaleY(1);
+                console.log("after return");
+                    console.log("nodeX ",node.scaleX());
+                    console.log("nodeY ",node.scaleY());
+                    console.log("StageX ",stageRef.current.scaleX());
+                    console.log("StageY ",stageRef.current.scaleY());
               }}
             />
           </Layer>
         </Stage>
       </div>
+      )}
       
+      {!showSetupForm && (
       <div className="toolbox">
         <h2 className="toolbox-header">Toolbox</h2>
         <div className="toolbox-section">
@@ -857,6 +938,7 @@ function WorkBench() {
           </ul>
         </div>
       </div>
+      )}
       
       {showLayoutList && (
         <div className="layout-list-modal">
