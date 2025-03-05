@@ -9,6 +9,12 @@ export const verifyFirebaseToken = async (req, res, next) => {
     }
 
     const decodedToken = await admin.auth().verifyIdToken(token); // Verify token
+
+     // Check if the user's email is from searce.com
+     if (!decodedToken.email || !decodedToken.email.endsWith("@searce.com")) {
+      return res.status(403).json({ error: "Access denied: Only searce.com users are allowed" });
+    }
+
     req.user = decodedToken; // Attach user data to request
     next(); // Proceed to the next middleware/controller
   } catch (error) {
