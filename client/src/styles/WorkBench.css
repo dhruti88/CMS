@@ -126,6 +126,7 @@
     margin-bottom: 15px;
   }
   
+  
   .size-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
