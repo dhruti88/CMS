@@ -15,6 +15,20 @@ const signIn = async (provider, navigate) => {
       try {
         const googleProvider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, googleProvider);
+
+        if (!result.user.email.endsWith("@searce.com")) {
+          setTimeout(()=>{
+            alert("Only searce.com email addresses are allowed.");
+          },1000)
+          await auth.signOut(); // Sign out if domain is not allowed
+
+          setTimeout(()=>{
+            navigate("/");
+          },1000)
+          
+          return;
+        }
+
         console.log("User signed in:", result.user)
 
         // Get Firebase ID Token
