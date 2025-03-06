@@ -54,6 +54,9 @@ const WorkbenchTemplate = (props) => {
     showLayoutList,
     setShowLayoutList,
     handleWheel,
+    addPredefinedBox,
+    handleDragStart,
+    handleDragMove,
   } = props;
 
   return (
@@ -101,6 +104,8 @@ const WorkbenchTemplate = (props) => {
         gutterWidth={gutterWidth}
         transformerRef={transformerRef}
         setItems={setItems}
+        handleDragStart = {handleDragStart}
+        handleDragMove = {handleDragMove}
         handleTransformEnd={handleTransformEnd}
       />
     </div>
@@ -129,6 +134,7 @@ const WorkbenchTemplate = (props) => {
             setShowLayoutList={setShowLayoutList}
             cellWidth = {cellWidth}
             cellHeight = {cellHeight}
+            addPredefinedBox = {addPredefinedBox}
           />
         </>
       )}

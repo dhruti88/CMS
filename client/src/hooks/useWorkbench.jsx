@@ -111,7 +111,7 @@ const useWorkbench = () => {
 
   // Item addition functions
   const addBox = (size) => {
-    const box = {
+    return {
       id: 'box-' + Date.now(),
       type: 'box',
       x: 0,
@@ -123,13 +123,13 @@ const useWorkbench = () => {
       strokeWidth: 1,
       draggable: true,
       sizeInfo: size,
+      gridX: 0,
+      gridY: 0
     };
-    setItems(prev => [...prev, box]);
-    setSelectedId(box.id);
   };
-
+  
   const addTextBox = (size) => {
-    const textBox = {
+    return {
       id: 'text-' + Date.now(),
       type: 'text',
       x: 0,
@@ -147,14 +147,13 @@ const useWorkbench = () => {
       backgroundFill: 'white',
       draggable: true,
       sizeInfo: size,
+      gridX: 0,
+      gridY: 0
     };
-    setItems(prev => [...prev, textBox]);
-    setSelectedId(textBox.id);
-    setTextValue('Add your text here');
   };
-
+  
   const addImageItem = (size) => {
-    const imageItem = {
+    return {
       id: 'image-' + Date.now(),
       type: 'image',
       x: 0,
@@ -164,11 +163,11 @@ const useWorkbench = () => {
       src: 'https://konvajs.org/assets/lion.png',
       draggable: true,
       sizeInfo: size,
+      gridX: 0,
+      gridY: 0
     };
-    setItems(prev => [...prev, imageItem]);
-    setSelectedId(imageItem.id);
   };
-
+  
   // Image upload handler
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -177,42 +176,15 @@ const useWorkbench = () => {
       reader.onloadend = () => {
         const base64data = reader.result;
         const defaultSize = { cols: 2, rows: 2, label: '2×2' };
-        const imageItem = {
-          id: 'image-' + Date.now(),
-          type: 'image',
-          x: 0,
-          y: 0,
-          width: defaultSize.cols * cellWidth + (defaultSize.cols - 1) * gutterWidth,
-          height: defaultSize.rows * cellHeight,
-          src: base64data,
-          draggable: true,
-          sizeInfo: defaultSize,
-        };
+        const imageItem = addImageItem(defaultSize);
+        imageItem.src = base64data; // Set uploaded image source
         setItems(prev => [...prev, imageItem]);
         setSelectedId(imageItem.id);
       };
       reader.readAsDataURL(file);
     }
   };
-
-  // Drag end handler (snapping)
-  const handleDragEnd = (e) => {
-    const id = e.target.id();
-    const shape = e.target;
-    const totalCellWidth = cellWidth + gutterWidth;
-    const colIndex = Math.round(shape.x() / totalCellWidth);
-    const rowIndex = Math.round(shape.y() / cellHeight);
-    const maxColIndex = columns - (items.find(i => i.id === id)?.sizeInfo?.cols || 1);
-    const boundedColIndex = Math.min(Math.max(0, colIndex), maxColIndex);
-    const boundedX = boundedColIndex * totalCellWidth;
-    const maxRowIndex = rows - (items.find(i => i.id === id)?.sizeInfo?.rows || 1);
-    const boundedRowIndex = Math.min(Math.max(0, rowIndex), maxRowIndex);
-    const boundedY = boundedRowIndex * cellHeight;
-    const updatedItems = items.map(item =>
-      item.id === id ? { ...item, x: boundedX, y: boundedY } : item
-    );
-    setItems(updatedItems);
-  };
+  
 
   // Text change handler for text boxes
   const handleTextChange = (e) => {
@@ -323,8 +295,10 @@ const useWorkbench = () => {
   // Upload canvas image
   const uploadCanvasImage = () => {
     const stage = stageRef.current;
+    console.log(stage);
     if (stage) {
       const dataURL = stage.toDataURL();
+      console.log("dataURL",dataURL);
       const blob = dataURLToBlob(dataURL);
       const formData = new FormData();
       formData.append("image", blob, "canvas-image.png");
@@ -344,7 +318,7 @@ const useWorkbench = () => {
     e.evt.preventDefault();
     const stage = e.target.getStage();
     const oldScale = stage.scaleX();
-    // console.log("old-" , oldScale);
+    //console.log("old-" , oldScale);
     
     const scaleBy = 1.02;
     const pointer = stage.getPointerPosition();
@@ -464,6 +438,355 @@ const useWorkbench = () => {
       }
     }, [toolMode]);
 
+// Check if two grid rectangles overlap
+const rectanglesOverlap = (boxA, boxB) => {
+  //console.log("boxA -",boxA," BoxB - ",boxB);
+  return (
+    boxA.gridX < boxB.gridX + boxB.sizeInfo.cols &&
+    boxA.gridX + boxA.sizeInfo.cols > boxB.gridX &&
+    boxA.gridY < boxB.gridY + boxB.sizeInfo.rows &&
+    boxA.gridY + boxA.sizeInfo.rows > boxB.gridY
+  );  
+};
+
+const findBestPositionForBox = (item, fixedItems, columns, rows, originalPosition) => {
+  if (originalPosition) {
+    let conflict = false;
+    for (let other of fixedItems) {
+      if (rectanglesOverlap({ ...item, gridX: originalPosition.gridX, gridY: originalPosition.gridY }, other)) {
+        conflict = true;
+        break;
+      }
+    }
+    if (!conflict) return originalPosition;
+  }
+
+  const possiblePositions = [];
+  
+  // Use `item.sizeInfo.cols` and `item.sizeInfo.rows` instead of `item.width` & `item.height`
+  console.log("size : -",item.sizeInfo);
+  for (let y = 0; y <= rows - item.sizeInfo.rows; y++) {
+    for (let x = 0; x <= columns - item.sizeInfo.cols; x++) {
+      let conflict = false;
+      for (let other of fixedItems) {
+        if (rectanglesOverlap({ ...item, gridX: x, gridY: y }, other)) {
+          conflict = true;
+          break;
+        }
+      }
+      if (!conflict) {
+        let distance = originalPosition
+          ? Math.sqrt(Math.pow(x - originalPosition.gridX, 2) + Math.pow(y - originalPosition.gridY, 2))
+          : x + y;
+        possiblePositions.push({ gridX: x, gridY: y, distance });
+      }
+    }
+  }
+
+  possiblePositions.sort((a, b) => a.distance - b.distance);
+  return possiblePositions.length > 0 ? possiblePositions[0] : null;
+};
+
+
+
+
+// addBox function for predefined sizes
+const addPredefinedBox = (size,type) => {
+  // if (!newBoxContent && newBoxType === 'text') {
+  //   alert('Please enter text content for the new box');
+  //   return;
+  // }
+  let newItem;
+  if(type == "box")
+  newItem = addBox(size);
+  else if(type == "text")
+  newItem = addTextBox(size);
+  else
+  newItem = addImageItem(size);
+
+  const position = findBestPositionForBox(newItem, items, columns, rows);
+  if (!position) {
+    alert('No space available for new box');
+    return;
+  }
+  console.log("position: - ",position);
+  newItem.gridX = position.gridX;
+  newItem.gridY = position.gridY;
+  newItem.x = newItem.gridX * cellWidth + (newItem.gridX) * gutterWidth;
+  newItem.y = newItem.gridY * cellHeight;
+  setItems(prev => [...prev, newItem]);
+  setSelectedId(newItem.id);
+  
+};
+
+
+// Cascade reposition all boxes that would be displaced
+const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) => {
+  const result = { success: false, newPositions: {} };
+  const fixedBoxes = [];
+  const boxesToProcess = [...allItems];
+
+  const movingBoxWithNewPos = { ...movingItem, gridX: targetPosition.gridX, gridY: targetPosition.gridY };
+  fixedBoxes.push(movingBoxWithNewPos);
+  result.newPositions[movingItem.id] = { gridX: targetPosition.gridX, gridY: targetPosition.gridY };
+
+  const index = boxesToProcess.findIndex(b => b.id === movingItem.id);
+  if (index !== -1) boxesToProcess.splice(index, 1);
+
+  let overlappingBoxes = boxesToProcess.filter(box => rectanglesOverlap(movingBoxWithNewPos, box));
+
+  const processBox = (box, remainingBoxes, processedBoxes = new Set()) => {
+    if (processedBoxes.has(box.id)) return true;
+    processedBoxes.add(box.id);
+    const originalPos = { gridX: box.gridX, gridY: box.gridY };
+    const newPos = findBestPositionForBox(box, fixedBoxes, columns, rows, originalPos);
+    if (!newPos) return false;
+    const boxWithNewPos = { ...box, gridX: newPos.gridX, gridY: newPos.gridY };
+    fixedBoxes.push(boxWithNewPos);
+    result.newPositions[box.id] = { gridX: newPos.gridX, gridY: newPos.gridY };
+
+    const newOverlappingBoxes = remainingBoxes.filter(b => b.id !== box.id && rectanglesOverlap(boxWithNewPos, b));
+    for (const overlappingBox of newOverlappingBoxes) {
+      const success = processBox(overlappingBox, remainingBoxes.filter(b => b.id !== overlappingBox.id), processedBoxes);
+      if (!success) return false;
+    }
+    return true;
+  };
+
+  let remainingToProcess = [...boxesToProcess];
+  for (const overlappingBox of overlappingBoxes) {
+    const success = processBox(overlappingBox, remainingToProcess.filter(b => b.id !== overlappingBox.id));
+    if (!success) return result;
+    remainingToProcess = remainingToProcess.filter(b => b.id !== overlappingBox.id);
+  }
+  result.success = true;
+  return result;
+};
+
+
+  const [draggingBox, setDraggingBox] = useState(null);
+  const [dragPreviewPosition, setDragPreviewPosition] = useState(null);
+  const [dragStatus, setDragStatus] = useState(null);
+  const [snapLines, setSnapLines] = useState([]);
+
+  const snapToGrid = (pixelPosition) => {
+    const gridX = Math.round(pixelPosition.x / (cellWidth + gutterWidth));
+    const gridY = Math.round(pixelPosition.y / cellHeight);
+  
+    return {
+      gridX: Math.max(0, Math.min(gridX, columns - 1)),
+      gridY: Math.max(0, Math.min(gridY, rows - 1))
+    };
+  };
+  
+  const generateSnapLines = (currentBox, gridPos) => {
+    if (!currentBox) return [];
+  
+    const lines = [];
+    const leftX = gridPos.gridX * (cellWidth + gutterWidth);
+    const rightX = leftX + (currentBox.sizeInfo.cols * cellWidth) + ((currentBox.sizeInfo.cols - 1) * gutterWidth);
+    const topY = gridPos.gridY * cellHeight;
+    const bottomY = topY + (currentBox.sizeInfo.rows * cellHeight);
+  
+    lines.push({ points: [leftX, 0, leftX, stageSize.height], stroke: '#2196F3', strokeWidth: 1, dash: [5, 5] });
+    lines.push({ points: [rightX, 0, rightX, stageSize.height], stroke: '#2196F3', strokeWidth: 1, dash: [5, 5] });
+    lines.push({ points: [0, topY, stageSize.width, topY], stroke: '#2196F3', strokeWidth: 1, dash: [5, 5] });
+    lines.push({ points: [0, bottomY, stageSize.width, bottomY], stroke: '#2196F3', strokeWidth: 1, dash: [5, 5] });
+  
+    return lines;
+  };
+  
+  const handleDragStart = (e, id) => {
+    setDraggingBox(id);
+    setDragStatus(null);
+    const currentBox = items.find(b => b.id === id);
+    if (!currentBox) return;
+    setSnapLines(generateSnapLines(currentBox, { gridX: currentBox.gridX, gridY: currentBox.gridY }));
+  };
+  
+  const handleDragMove = (e, id) => {
+    if (!draggingBox) return;
+    const shape = e.target;
+    const pixelPosition = { x: shape.x(), y: shape.y() };
+    const gridPosition = snapToGrid(pixelPosition);
+    const currentBox = items.find(b => b.id === id);
+    if (!currentBox) return;
+  
+    const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), columns - currentBox.sizeInfo.cols);
+    const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), rows - currentBox.sizeInfo.rows);
+  
+    setSnapLines(generateSnapLines(currentBox, { gridX: clampedGridX, gridY: clampedGridY }));
+    shape.position({
+      x: clampedGridX * (cellWidth + gutterWidth),
+      y: clampedGridY * cellHeight
+    });
+    setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
+  };
+  
+  const handleDragEnd = (e, id) => {
+    setSnapLines([]);
+    const currentBox = items.find(b => b.id === id);
+    if (!currentBox || !dragPreviewPosition) {
+      resetDragState();
+      return;
+    }
+  
+    const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
+    if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
+      resetDragState();
+      return;
+    }
+  
+    const repositionResult = repositionBoxes(currentBox, { gridX: newGridX, gridY: newGridY }, items, columns, rows);
+    if (repositionResult.success) {
+      setItems(prevBoxes =>
+        prevBoxes.map(box => repositionResult.newPositions[box.id] ? {
+          ...box,
+          gridX: repositionResult.newPositions[box.id].gridX,
+          gridY: repositionResult.newPositions[box.id].gridY,
+          x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
+          y: repositionResult.newPositions[box.id].gridY * cellHeight,
+        } : box)
+      );
+    } else {
+      resetBoxPosition(id, currentBox);
+    }
+    resetDragState();
+  };
+  
+  const resetDragState = () => {
+    setDraggingBox(null);
+    setDragPreviewPosition(null);
+    setDragStatus(null);
+  };
+  
+  const resetBoxPosition = (id, currentBox) => {
+    const stageNode = e.target.getStage();
+    const layer = stageNode.findOne('Layer');
+    const group = layer.findOne(`#${id}`);
+    if (group) {
+      group.to({
+        x: currentBox.gridX * (cellWidth + gutterWidth),
+        y: currentBox.gridY * cellHeight,
+        duration: 0.3
+      });
+    }
+  };
+  
+  // Drag end handler (snapping)
+  // const handleDragEnd = (e) => {
+  //   const id = e.target.id();
+  //   const shape = e.target;
+  //   const totalCellWidth = cellWidth + gutterWidth;
+  //   const colIndex = Math.round(shape.x() / totalCellWidth);
+  //   const rowIndex = Math.round(shape.y() / cellHeight);
+  //   const maxColIndex = columns - (items.find(i => i.id === id)?.sizeInfo?.cols || 1);
+  //   const boundedColIndex = Math.min(Math.max(0, colIndex), maxColIndex);
+  //   const boundedX = boundedColIndex * totalCellWidth;
+  //   const maxRowIndex = rows - (items.find(i => i.id === id)?.sizeInfo?.rows || 1);
+  //   const boundedRowIndex = Math.min(Math.max(0, rowIndex), maxRowIndex);
+  //   const boundedY = boundedRowIndex * cellHeight;
+  //   const updatedItems = items.map(item =>
+  //     item.id === id ? { ...item, x: boundedX, y: boundedY} : item
+  //   );
+  //   setItems(updatedItems);
+  // };
+
+  // const handleDragEnd = (e, id) => {
+  //   setSnapLines([]); // Clear snap lines
+    
+  //   const currentBox = items.find(b => b.id === id);
+  //   if (!currentBox || !dragPreviewPosition) {
+  //     setDraggingBox(null);
+  //     setDragPreviewPosition(null);
+  //     setDragStatus(null);
+  //     return;
+  //   }
+  
+  //   const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
+    
+  //   // No movement, just reset
+  //   if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
+  //     setDraggingBox(null);
+  //     setDragPreviewPosition(null);
+  //     setDragStatus(null);
+  //     return;
+  //   }
+  
+  //   // Try repositioning
+  //   const repositionResult = repositionBoxes(
+  //     currentBox,
+  //     { gridX: newGridX, gridY: newGridY },
+  //     items,
+  //     columns,
+  //     rows
+  //   );
+  
+  //   if (repositionResult.success) {
+  //     // Update the state with new positions
+  //     setItems(prevBoxes =>
+  //       prevBoxes.map(box => {
+  //         if (repositionResult.newPositions[box.id]) {
+  //           return {
+  //             ...box,
+  //             gridX: repositionResult.newPositions[box.id].gridX,
+  //             gridY: repositionResult.newPositions[box.id].gridY,
+  //             x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
+  //             y: repositionResult.newPositions[box.id].gridY * cellHeight,
+  //           };
+  //         }
+  //         return box;
+  //       })
+  //     );
+  //   } else {
+  //     // If invalid, reset position visually
+  //     const stageNode = e.target.getStage();
+  //     const layer = stageNode.findOne('Layer');
+  //     const group = layer.findOne(`#${id}`);
+  
+  //     if (group) {
+  //       group.to({
+  //         x: currentBox.gridX * (cellWidth + gutterWidth),
+  //         y: currentBox.gridY * cellHeight,
+  //         duration: 0.3
+  //       });
+  //     }
+  //   }
+  
+  //   setDraggingBox(null);
+  //   setDragPreviewPosition(null);
+  //   setDragStatus(null);
+  // };
+  
+
+
+
+// // addCustomBox uses custom inputs for width/height
+// const addCustomBox = () => {
+//   // if (!newBoxContent && newBoxType === 'text') {
+//   //   alert('Please enter text content for the new box');
+//   //   return;
+//   // }
+//   const newBox = {
+//     id: `box${boxes.length + 1}`,
+//     width: newBoxWidth,
+//     height: newBoxHeight,
+//     type: newBoxType,
+//     text: newBoxType === 'text' ? newBoxContent : 'Image'
+//   };
+//   const position = findBestPositionForBox(newBox, boxes, columns, rows);
+//   if (!position) {
+//     alert('No space available for new box');
+//     return;
+//   }
+//   newBox.gridX = position.gridX;
+//   newBox.gridY = position.gridY;
+//   setBoxes([...boxes, newBox]);
+//   setNewBoxContent('');
+// };
+
+
+
   return {
     userId,
     showSetupForm,
@@ -513,6 +836,9 @@ const useWorkbench = () => {
     loadLayoutFromSelected,
     cellWidth,
     cellHeight,
+    addPredefinedBox,
+    handleDragStart,
+    handleDragMove,
   };
 };
 

@@ -29,7 +29,8 @@ const Toolbox = ({
   showLayoutList,
   setShowLayoutList,
   cellWidth,
-  cellHeight
+  cellHeight,
+  addPredefinedBox
 }) => {
   const selectedItem = items.find(i => i.id === selectedId);
   return (
@@ -42,7 +43,7 @@ const Toolbox = ({
             {itemSizes.map(size => (
               <Button
                 key={`text-${size.label}`}
-                onClick={() => addTextBox(size)}
+                onClick={() => addPredefinedBox(size,"text")}
                 className="size-button"
               >
                 {size.label}
@@ -56,7 +57,7 @@ const Toolbox = ({
             {itemSizes.map(size => (
               <Button
                 key={`box-${size.label}`}
-                onClick={() => addBox(size)}
+                onClick={() => addPredefinedBox(size,"box")}
                 className="size-button"
               >
                 {size.label}
@@ -70,7 +71,7 @@ const Toolbox = ({
             {itemSizes.map(size => (
               <Button
                 key={`image-${size.label}`}
-                onClick={() => addImageItem(size)}
+                onClick={() => addPredefinedBox(size,"image")}
                 className="size-button"
               >
                 {size.label}
