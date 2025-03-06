@@ -79,8 +79,8 @@ const Toolbox = ({
             ))}
           </div>
         </div>
-        <div className="toolbox-section">
-          <h3>Upload Image</h3>
+        <div className="size-section">
+          <h4>Upload Image</h4>
           <input type="file" accept="image/*" onChange={handleImageUpload} />
         </div>
       </ToolboxSection>

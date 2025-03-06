@@ -297,8 +297,9 @@ const useWorkbench = () => {
     const stage = stageRef.current;
     console.log(stage);
     if (stage) {
+      console.log("stage : -",stage);
       const dataURL = stage.toDataURL();
-      console.log("dataURL",dataURL);
+      console.log("dataURL : -",dataURL);
       const blob = dataURLToBlob(dataURL);
       const formData = new FormData();
       formData.append("image", blob, "canvas-image.png");

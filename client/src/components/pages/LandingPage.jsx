@@ -1,57 +1,49 @@
 import { useNavigate } from "react-router-dom";
-import { Typography, CardContent, Card, Box, Container } from '@mui/material'
+import { Typography } from "@mui/material";
 import CustomButton from "../atoms/button/CustomButton";
-import "tailwindcss";
 import colors from "../../theme/colors";
+import "../../styles/LandingPage.css" // Import CSS file
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center text-white relative">
-       <nav className="absolute top-0 right-0 w-full flex justify-between items-center p-5 px-10">
-
-      <div className="ml-auto">
-            <CustomButton onClick={() => navigate("/signin")}>Sign in</CustomButton>
+    <div className="landing-container">
+      {/* Navigation Bar */}
+      <nav className="navbar">
+      <Typography variant="h4" fontWeight="bold" align="left">
+          <span className="text-black">Page</span>
+          <span style={{ color: colors.primary }}>Craft</span>
+        </Typography>
+        <div className="nav-button">
+          <CustomButton onClick={() => navigate("/signin")}>Sign in</CustomButton>
         </div>
-       </nav>
+      </nav>
 
-      <div className="text-center mt-10 bg-gray-100 p-30 mb-50 w-200">
-        <Typography
-            variant="h4"
-            fontWeight="bold"
-            align="center"
-        >
-            <span style={{ color: "black" }}>Page</span>
-            <span style={{ color:  colors.primary  }}>Craft</span>
-            </Typography>
-        <Typography
-            variant="h6"
-            align="center"
-        >
-            <p className="text-black mt-2">Fresh new way to create and manage your content!</p>
-      
+      {/* Main Content */}
+      <div className="content-box">
+        <Typography variant="h4" fontWeight="bold" align="center">
+          <span className="text-black">Page</span>
+          <span style={{ color: colors.primary }}>Craft</span>
+        </Typography>
+        <Typography variant="h6" align="center" className="subtext">
+          Fresh new way to create and manage your content!
         </Typography>
 
-        <div className="mt-3">
-      
-         <CustomButton onClick={() => navigate("/signin")}>Get Started!</CustomButton>
-
+        <div className="button-container">
+          <CustomButton onClick={() => navigate("/signin")}>Get Started!</CustomButton>
         </div>
-       
       </div>
 
-      <div className="absolute bottom-0 left-0 w-full mt-5" style={{ backgroundColor: colors.primary }}>
-        <svg viewBox="0 0 1440 320" className="w-full">
+      {/* Bottom Decorative Wave */}
+      <div className="wave-container">
+        <svg viewBox="0 0 1440 320" className="wave-svg">
           <path
-            fill="#ffffff"
-            d="M0,160L48,149.3C96,139,192,117,288,106.7C384,96,480,96,576,117.3C672,139,768,181,864,192C960,203,1056,181,1152,165.3C1248,149,1344,139,1392,133.3L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
+            fill="#2563EB"
+            fill-opacity="1" d="M0,192L48,176C96,160,192,128,288,122.7C384,117,480,139,576,160C672,181,768,203,864,218.7C960,235,1056,245,1152,240C1248,235,1344,213,1392,202.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
           ></path>
         </svg>
       </div>
-
-   
-
     </div>
   );
 };
