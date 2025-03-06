@@ -5,7 +5,7 @@ import { Stage, Layer, Rect, Text, Group, Line } from 'react-konva';
 
 // Check if two grid rectangles overlap
 const rectanglesOverlap = (boxA, boxB) => {
-  //console.log("boxA -",boxA," BoxB - ",boxB);
+  console.log("boxA -",boxA," BoxB - ",boxB);
   return (
     boxA.gridX < boxB.gridX + boxB.width &&
     boxA.gridX + boxA.width > boxB.gridX &&
@@ -16,6 +16,8 @@ const rectanglesOverlap = (boxA, boxB) => {
 
 // Find the best position for a displaced box
 const findBestPositionForBox = (box, fixedBoxes, columns, rows, originalPosition) => {
+  console.log("orignal : -", originalPosition);
+  console.log("Box : - ",box);
   if (originalPosition) {
     let conflict = false;
     for (let other of fixedBoxes) {
@@ -188,6 +190,7 @@ const GridEditor = () => {
 
   // ------------------- Drag/Drop Functions -------------------
   const snapToGrid = (pixelPosition) => {
+    //console.log("pixelPosition : - ",pixelPosition);
     const totalCell = cellWidth + gutterWidth;
     const gridX = Math.round(pixelPosition.x / totalCell);
     const gridY = Math.round(pixelPosition.y / cellHeight);
@@ -199,6 +202,8 @@ const GridEditor = () => {
     const lines = [];
     const leftX = gridPos.gridX * (cellWidth + gutterWidth);
     const rightX = leftX + currentBox.width * cellWidth + (currentBox.width - 1) * gutterWidth;
+    console.log("leftX",leftX);
+    console.log("rightX",rightX);
     lines.push({
       points: [leftX, 0, leftX, stageSize.height],
       stroke: '#2196F3',
@@ -213,6 +218,7 @@ const GridEditor = () => {
     });
     const topY = gridPos.gridY * cellHeight;
     const bottomY = topY + currentBox.height * cellHeight;
+    //console.log("height : -",currentBox.height);
     lines.push({
       points: [0, topY, stageSize.width, topY],
       stroke: '#2196F3',
@@ -237,6 +243,7 @@ const GridEditor = () => {
   };
 
   const handleDragMove = (e, id) => {
+    console.log("handledragmove : -",e);
     if (!draggingBox) return;
     const shape = e.target;
     const pixelPosition = { x: shape.x(), y: shape.y() };

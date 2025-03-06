@@ -19,6 +19,8 @@ const WorkbenchCanvas = ({
   transformerRef,
   setItems,
   handleTransformEnd,
+  handleDragStart,
+  handleDragMove,
 }) => {
   // Build grid lines using the helper
   const gridLines = getGridLines(
@@ -66,7 +68,9 @@ const WorkbenchCanvas = ({
                   draggable
                   onClick={() => setSelectedId(item.id)}
                   onTap={() => setSelectedId(item.id)}
-                  onDragEnd={handleDragEnd}
+                  onDragStart={(e) => { handleDragStart(e, item.id); setSelectedId(item.id); }}
+                  onDragMove={(e) => handleDragMove(e, item.id)}
+                  onDragEnd={(e) => handleDragEnd(e, item.id)}
                   perfectDrawEnabled={false}
                 />
               );
@@ -90,7 +94,9 @@ const WorkbenchCanvas = ({
                   draggable
                   onClick={() => setSelectedId(item.id)}
                   onTap={() => setSelectedId(item.id)}
-                  onDragEnd={handleDragEnd}
+                  onDragStart={(e) => { handleDragStart(e, item.id); setSelectedId(item.id); }}
+                  onDragMove={(e) => handleDragMove(e, item.id)}
+                  onDragEnd={(e) => handleDragEnd(e, item.id)}
                   textDecoration={item.textDecoration}
                   perfectDrawEnabled={false}
                 />
@@ -108,7 +114,9 @@ const WorkbenchCanvas = ({
                   draggable
                   onClick={() => setSelectedId(item.id)}
                   onTap={() => setSelectedId(item.id)}
-                  onDragEnd={handleDragEnd}
+                  onDragStart={(e) => { handleDragStart(e, item.id); setSelectedId(item.id); }}
+                  onDragMove={(e) => handleDragMove(e, item.id)}
+                  onDragEnd={(e) => handleDragEnd(e, item.id)}
                   perfectDrawEnabled={false}
                 />
               );
