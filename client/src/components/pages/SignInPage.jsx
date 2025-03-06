@@ -1,15 +1,18 @@
-import { Typography, CardContent, Card, Box, Container } from '@mui/material'
+import { Typography, CardContent, Card, Box, Container, colors } from '@mui/material'
 import OAuthSignInPage from "../../SignIn.jsx"
+import { blue } from '@mui/material/colors'
 
 const SignInPage = () => {
   return (
-    <Container maxWidth="xs"
+    <Container maxWidth={false}
         sx={{
+          width:"800px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          height: "100vh"
+          height: "100vh",
+          background: "#fffff",
         }}
     >
       <Typography
