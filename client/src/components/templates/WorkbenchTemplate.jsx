@@ -60,7 +60,6 @@ const WorkbenchTemplate = (props) => {
     handleDragMove,
   } = props;
   
-  const layerRef = useRef(null);
 
   return (
     <div className="cms-container">
@@ -111,7 +110,6 @@ const WorkbenchTemplate = (props) => {
         handleDragStart = {handleDragStart}
         handleDragMove = {handleDragMove}
         handleTransformEnd={handleTransformEnd}
-        layerRef={layerRef}
       />
     </div>
           <Toolbox

@@ -21,7 +21,6 @@ const WorkbenchCanvas = ({
   handleTransformEnd,
   handleDragStart,
   handleDragMove,
-  layerRef
 }) => {
   // Build grid lines using the helper
   const gridLines = getGridLines(
@@ -50,7 +49,7 @@ const WorkbenchCanvas = ({
         }}
         className="konva-stage"
       >
-        <Layer ref={layerRef}>
+        <Layer>
           <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="gray" />
           {gridLines}
           {items.map((item) => {
