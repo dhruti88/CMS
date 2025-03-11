@@ -2,3 +2,14 @@
 [2025-03-05T15:22:48.987] [INFO] default - Connected to Database
 [2025-03-05T15:47:21.350] [INFO] default - Server running on http://localhost:5000
 [2025-03-05T15:47:21.841] [INFO] default - Connected to Database
+[2025-03-11T15:01:36.844] [INFO] default - Server running on http://localhost:5000
+[2025-03-11T15:01:37.510] [INFO] default - Connected to Database
+[2025-03-11T15:01:47.127] [INFO] default - [POST] /api/users/save
+[2025-03-11T15:01:48.221] [INFO] default - User authenticated: kaushal.prajapati@searce.com
+[2025-03-11T15:01:48.222] [INFO] default - POST /save - Request from kaushal.prajapati@searce.com
+[2025-03-11T15:01:48.277] [WARN] default - User already exists: kaushal.prajapati@searce.com
+[2025-03-11T15:48:16.958] [INFO] default - [POST] /upload
+[2025-03-11T15:49:30.374] [INFO] default - [POST] /api/users/save
+[2025-03-11T15:49:30.426] [INFO] default - User authenticated: kaushal.prajapati@searce.com
+[2025-03-11T15:49:30.426] [INFO] default - POST /save - Request from kaushal.prajapati@searce.com
+[2025-03-11T15:49:30.473] [WARN] default - User already exists: kaushal.prajapati@searce.com

@@ -7,14 +7,12 @@ import Input from '../atoms/Input';
 
 const Toolbox = ({
   itemSizes,
-  addBox,
-  addTextBox,
-  addImageItem,
+  addNewSection,
+  addItemToSection,
   handleImageUpload,
   selectedId,
-  items,
-  changeItemColor,
-  deleteSelected,
+  sectionId,
+  sections,
   textFormatting,
   toggleFormat,
   changeFontSize,
@@ -30,74 +28,68 @@ const Toolbox = ({
   setShowLayoutList,
   cellWidth,
   cellHeight,
-  addPredefineditem,
-  addNewSection,
-  sectionId,
-  addItemToSection,
-  sections
+  deleteSelected,
+  changeItemColor
 }) => {
-  const findItem = (sectionId, itemId) => {
-    const section = sections.find(sec => sec.id === sectionId);
-    if (!section) return null; // Section not found
-    return section.items.find(item => item.id === itemId) || null;
-  };
   
-  const selectedItem = findItem(sectionId,selectedId);
-  
+  // Find selected section
+  const selectedSection = sections.find(section => section.id === selectedId);
+
+  // Find selected item inside a section
+  const selectedItem = sections
+    .flatMap(section => section.items)
+    .find(item => item.id === selectedId);
+
   return (
     <div className="toolbox">
       <h2 className="toolbox-header">Tool Box</h2>
+
+      {/* Add Sections */}
       <ToolboxSection title="Add Sections">
-      <div className="size-section">
+        <div className="size-section">
           <h4>Sections</h4>
           <div className="size-grid">
             {itemSizes.map(size => (
-              <Button
-                key={`box-${size.label}`}
-                onClick={() => addNewSection(size)}
-                className="size-button"
-              >
+              <Button key={`box-${size.label}`} onClick={() => addNewSection(size)} className="size-button">
                 {size.label}
               </Button>
             ))}
           </div>
         </div>
       </ToolboxSection>
+
+      {/* Add Elements */}
       <ToolboxSection title="Add Elements">
         <div className="size-section">
           <h4>Text Boxes</h4>
           <div className="size-grid">
             {itemSizes.map(size => (
-              <Button
-                key={`text-${size.label}`}
-                onClick={() => addItemToSection(sectionId,size,"text")}
-                className="size-button"
-              >
+              <Button key={`text-${size.label}`} onClick={() => addItemToSection(sectionId, size, "text")} className="size-button">
                 {size.label}
               </Button>
             ))}
           </div>
         </div>
+
         <div className="size-section">
           <h4>Images</h4>
           <div className="size-grid">
             {itemSizes.map(size => (
-              <Button
-                key={`image-${size.label}`}
-                onClick={() => addItemToSection(sectionId,size,"image")}
-                className="size-button"
-              >
+              <Button key={`image-${size.label}`} onClick={() => addItemToSection(sectionId, size, "image")} className="size-button">
                 {size.label}
               </Button>
             ))}
           </div>
         </div>
+
         <div className="size-section">
           <h4>Upload Image</h4>
           <input type="file" accept="image/*" onChange={handleImageUpload} />
         </div>
       </ToolboxSection>
-      {selectedId && selectedItem?.type === 'text' && (
+
+      {/* Text Formatting Tools (only for text items) */}
+      {selectedItem?.type === 'text' && (
         <ToolboxSection title="Text Formatting">
           <TextFormattingTools
             textFormatting={textFormatting}
@@ -109,58 +101,73 @@ const Toolbox = ({
           />
         </ToolboxSection>
       )}
+
+      {/* Item Properties (for sections & items) */}
       <ToolboxSection title="Item Properties">
         {selectedId ? (
           <>
             <div className="property-group">
-              <label>Item ID:</label>
+              <label>ID:</label>
               <span>{selectedId}</span>
             </div>
+
             <div className="property-group">
               <label>Type:</label>
-              <span>{selectedItem?.type || 'Unknown'}</span>
+              <span>{selectedItem?.type || (selectedSection ? 'Section' : 'Unknown')}</span>
             </div>
+
             <div className="property-group">
               <label>Position:</label>
               <span>
-                  {`Col: ${Math.round(sections.find(i => i.id === selectedId)?.x / (cellWidth + gutterWidth)) || 0}, 
-                     Row: ${Math.round(sections.find(i => i.id === selectedId)?.y / cellHeight) || 0}`}
-                </span>
+                {selectedSection
+                  ? `Col: ${selectedSection.gridX}, Row: ${selectedSection.gridY}`
+                  : `Col: ${Math.round(selectedItem?.x / (cellWidth + gutterWidth)) || 0}, 
+                     Row: ${Math.round(selectedItem?.y / cellHeight) || 0}`}
+              </span>
             </div>
+
             <div className="property-group">
               <label>Size:</label>
-              <span>{`${selectedItem?.sizeInfo?.cols || 1} × ${selectedItem?.sizeInfo?.rows || 1}`}</span>
+              <span>
+                {selectedSection
+                  ? `${selectedSection.sizeInfo.cols} × ${selectedSection.sizeInfo.rows}`
+                  : `${selectedItem?.sizeInfo?.cols || 1} × ${selectedItem?.sizeInfo?.rows || 1}`}
+              </span>
             </div>
-            {selectedId && selectedItem?.type === 'text' && (<div className="color-palette">
-              <h4>Color</h4>
-              <div className="color-buttons">
-                {colors.primary.map((color, index) => (
-                  <ColorButton
-                    key={`primary-${index}`}
-                    color={color}
-                    onClick={changeItemColor}
-                    title={`Primary ${index + 1}`}
-                  />
-                ))}
-                {colors.accent.map((color, index) => (
-                  <ColorButton
-                    key={`accent-${index}`}
-                    color={color}
-                    onClick={changeItemColor}
-                    title={`Accent ${index + 1}`}
-                  />
-                ))}
-                {colors.grays.map((color, index) => (
-                  <ColorButton
-                    key={`gray-${index}`}
-                    color={color}
-                    onClick={changeItemColor}
-                    title={`Gray ${index + 1}`}
-                  />
-                ))}
+
+            {/* Text Formatting for Selected Text Items */}
+            {selectedItem?.type === 'text' && (
+              <div className="color-palette">
+                <h4>Color</h4>
+                <div className="color-buttons">
+                  {colors.primary.map((color, index) => (
+                    <ColorButton
+                      key={`primary-${index}`}
+                      color={color}
+                      onClick={() => changeItemColor(color)}
+                      title={`Primary ${index + 1}`}
+                    />
+                  ))}
+                  {colors.accent.map((color, index) => (
+                    <ColorButton
+                      key={`accent-${index}`}
+                      color={color}
+                      onClick={() => changeItemColor(color)}
+                      title={`Accent ${index + 1}`}
+                    />
+                  ))}
+                  {colors.grays.map((color, index) => (
+                    <ColorButton
+                      key={`gray-${index}`}
+                      color={color}
+                      onClick={() => changeItemColor(color)}
+                      title={`Gray ${index + 1}`}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
             )}
+
             <Button className="delete-button" onClick={deleteSelected} title="Delete selected item">
               Delete Item
             </Button>
@@ -169,16 +176,8 @@ const Toolbox = ({
           <p className="no-selection">No item selected. Click on an item to view its properties.</p>
         )}
       </ToolboxSection>
-      {/* <ToolboxSection title="Grid Settings">
-        <div className="property-group">
-          <label>Gutter Width (px):</label>
-          <Input
-            type="number"
-            value={gutterWidth}
-            onChange={(e) => setGutterWidth(parseInt(e.target.value) || 0)}
-          />
-        </div>
-      </ToolboxSection> */}
+
+      {/* Keyboard Shortcuts */}
       <ToolboxSection title="Keyboard Shortcuts">
         <ul className="shortcuts-list">
           <li><span className="shortcut-key">Delete</span> Remove selected item</li>
@@ -186,6 +185,8 @@ const Toolbox = ({
           <li><span className="shortcut-key">Click</span> Select item</li>
         </ul>
       </ToolboxSection>
+
+      {/* Layout Selection */}
       {showLayoutList && (
         <ToolboxSection title="Select Layout to Edit">
           {availableLayouts.length > 0 ? (
