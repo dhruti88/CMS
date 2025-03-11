@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useRef} from 'react';
 import { Stage, Layer, Rect, Text, Transformer } from 'react-konva';
 import URLImage from '../atoms/URLImage';
 import { getGridLines } from '../../utils/gridHelpers';
@@ -21,6 +21,7 @@ const WorkbenchCanvas = ({
   handleTransformEnd,
   handleDragStart,
   handleDragMove,
+  layerRef
 }) => {
   // Build grid lines using the helper
   const gridLines = getGridLines(
@@ -49,7 +50,7 @@ const WorkbenchCanvas = ({
         }}
         className="konva-stage"
       >
-        <Layer>
+        <Layer ref={layerRef}>
           <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="gray" />
           {gridLines}
           {items.map((item) => {

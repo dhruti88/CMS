@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../atoms/Button';
+import { downloadStageAsPDF } from '../../utils/pdfUtils';
 
 const WorkbenchActions = ({
   uploadCanvasImage,
@@ -13,6 +14,7 @@ const WorkbenchActions = ({
   setShowLayoutList,
   availableLayouts,
   loadLayoutFromSelected, 
+  stageRef, // Add stageRef to props
 }) => {
   return (
     <div className="workbench-header">
@@ -62,6 +64,9 @@ const WorkbenchActions = ({
         </Button>
         <Button onClick={() => zoomBy(1 / 1.1)} className="action-button">
           Zoom Out
+        </Button>
+        <Button onClick={() => downloadStageAsPDF(stageRef)} className="action-button">
+          Download as PDF
         </Button>
       </div>
     </div>

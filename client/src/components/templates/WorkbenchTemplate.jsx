@@ -3,6 +3,7 @@ import SetupModal from '../organisms/SetupModal';
 import WorkbenchActions from '../organisms/WorkbenchActions';
 import WorkbenchCanvas from '../organisms/WorkbenchCanvas';
 import Toolbox from '../organisms/Toolbox';
+import { useState, useRef, useEffect } from 'react';
 
 const WorkbenchTemplate = (props) => {
   const {
@@ -58,6 +59,8 @@ const WorkbenchTemplate = (props) => {
     handleDragStart,
     handleDragMove,
   } = props;
+  
+  const layerRef = useRef(null);
 
   return (
     <div className="cms-container">
@@ -88,6 +91,7 @@ const WorkbenchTemplate = (props) => {
         setShowLayoutList = {setShowLayoutList}
         availableLayouts = {availableLayouts}
         loadLayoutFromSelected = {loadLayoutFromSelected}
+        stageRef={stageRef}
       />
       <WorkbenchCanvas
         stageSize={stageSize}
@@ -107,6 +111,7 @@ const WorkbenchTemplate = (props) => {
         handleDragStart = {handleDragStart}
         handleDragMove = {handleDragMove}
         handleTransformEnd={handleTransformEnd}
+        layerRef={layerRef}
       />
     </div>
           <Toolbox
