@@ -157,6 +157,7 @@ const WorkbenchTemplate = () => {
             sectionId = {sectionId}
             addItemToSection = {addItemToSection}
             sections = {sections}
+            setSections = {setSections}
           />
         </>
       )}

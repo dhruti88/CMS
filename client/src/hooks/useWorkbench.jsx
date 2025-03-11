@@ -522,38 +522,50 @@ const deleteSelected = () => {
 
 
   // Update transformer when selection changes
-  useEffect(() => {
-    // console.log("sel id - ",selectedId);
-    // console.log("tran id - ", transformerRef);
-      
-    if (selectedId && transformerRef.current) {
-      
-      const selectedNode = transformerRef.current.getStage().findOne('#' + selectedId);
-      // console.log("sel node ", selectedNode);
+ // Update transformer when selection changes
+useEffect(() => {
+  if (!selectedId || !transformerRef.current) {
+    transformerRef.current?.nodes([]);
+    transformerRef.current?.getLayer()?.batchDraw();
+    return;
+  }
 
-      if (selectedNode) {
-        transformerRef.current.nodes([selectedNode]);
-        transformerRef.current.getLayer().batchDraw();
+  // Find selected item inside sections
+  let selectedItem = null;
+  let selectedSection = null;
 
-        const item = sections.find(i => i.id === selectedId);
-
-        if (item && item.type === 'text') {
-          setTextValue(item.text);
-          setTextFormatting({
-            bold: item.fontStyle?.includes('bold') || false,
-            italic: item.fontStyle?.includes('italic') || false,
-            underline: item.textDecoration === 'underline' || false,
-            fontSize: item.fontSize || 16,
-            align: item.align || 'left',
-            fontFamily: item.fontFamily || 'Arial'
-          });
-        }
-      }
-    } else if (transformerRef.current) {
-      transformerRef.current.nodes([]);
-      transformerRef.current.getLayer().batchDraw();
+  for (const section of sections) {
+    const item = section.items.find(i => i.id === selectedId);
+    if (item) {
+      selectedItem = item;
+      selectedSection = section;
+      break; // Stop searching once found
     }
-  }, [selectedId, sections]);
+  }
+
+  if (!selectedItem) return;
+
+  // Find the corresponding node in the Konva stage
+  const selectedNode = transformerRef.current.getStage().findOne(`#${selectedId}`);
+
+  if (selectedNode) {
+    transformerRef.current.nodes([selectedNode]);
+    transformerRef.current.getLayer().batchDraw();
+    
+    if (selectedItem.type === 'text') {
+      setTextValue(selectedItem.text);
+      setTextFormatting({
+        bold: selectedItem.fontStyle?.includes('bold') || false,
+        italic: selectedItem.fontStyle?.includes('italic') || false,
+        underline: selectedItem.textDecoration === 'underline' || false,
+        fontSize: selectedItem.fontSize || 16,
+        align: selectedItem.align || 'left',
+        fontFamily: selectedItem.fontFamily || 'Arial'
+      });
+    }
+  }
+}, [selectedId, sections]);
+
 
   // Global keydown handler for Delete key
   useEffect(() => {
@@ -567,7 +579,8 @@ const deleteSelected = () => {
   }, [selectedId]);
   
     useEffect(() => {
-      // console.log("s-",stageRef);   
+      console.log("s-",stageRef);
+      
       const container = stageRef.current && stageRef.current.container();
       if (container) {
         container.style.cursor = toolMode === "hand" ? "grab" : "default";
