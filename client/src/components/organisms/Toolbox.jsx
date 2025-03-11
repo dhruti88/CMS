@@ -30,20 +30,31 @@ const Toolbox = ({
   setShowLayoutList,
   cellWidth,
   cellHeight,
-  addPredefinedBox
+  addPredefineditem,
+  addNewSection,
+  sectionId,
+  addItemToSection,
+  sections
 }) => {
-  const selectedItem = items.find(i => i.id === selectedId);
+  const findItem = (sectionId, itemId) => {
+    const section = sections.find(sec => sec.id === sectionId);
+    if (!section) return null; // Section not found
+    return section.items.find(item => item.id === itemId) || null;
+  };
+  
+  const selectedItem = findItem(sectionId,selectedId);
+  
   return (
     <div className="toolbox">
       <h2 className="toolbox-header">Tool Box</h2>
-      <ToolboxSection title="Add Elements">
-        <div className="size-section">
-          <h4>Text Boxes</h4>
+      <ToolboxSection title="Add Sections">
+      <div className="size-section">
+          <h4>Sections</h4>
           <div className="size-grid">
             {itemSizes.map(size => (
               <Button
-                key={`text-${size.label}`}
-                onClick={() => addPredefinedBox(size,"text")}
+                key={`box-${size.label}`}
+                onClick={() => addNewSection(size)}
                 className="size-button"
               >
                 {size.label}
@@ -51,13 +62,15 @@ const Toolbox = ({
             ))}
           </div>
         </div>
+      </ToolboxSection>
+      <ToolboxSection title="Add Elements">
         <div className="size-section">
-          <h4>Boxes</h4>
+          <h4>Text Boxes</h4>
           <div className="size-grid">
             {itemSizes.map(size => (
               <Button
-                key={`box-${size.label}`}
-                onClick={() => addPredefinedBox(size,"box")}
+                key={`text-${size.label}`}
+                onClick={() => addItemToSection(sectionId,size,"text")}
                 className="size-button"
               >
                 {size.label}
@@ -71,7 +84,7 @@ const Toolbox = ({
             {itemSizes.map(size => (
               <Button
                 key={`image-${size.label}`}
-                onClick={() => addPredefinedBox(size,"image")}
+                onClick={() => addItemToSection(sectionId,size,"image")}
                 className="size-button"
               >
                 {size.label}
@@ -110,8 +123,8 @@ const Toolbox = ({
             <div className="property-group">
               <label>Position:</label>
               <span>
-                  {`Col: ${Math.round(items.find(i => i.id === selectedId)?.x / (cellWidth + gutterWidth)) || 0}, 
-                     Row: ${Math.round(items.find(i => i.id === selectedId)?.y / cellHeight) || 0}`}
+                  {`Col: ${Math.round(sections.find(i => i.id === selectedId)?.x / (cellWidth + gutterWidth)) || 0}, 
+                     Row: ${Math.round(sections.find(i => i.id === selectedId)?.y / cellHeight) || 0}`}
                 </span>
             </div>
             <div className="property-group">

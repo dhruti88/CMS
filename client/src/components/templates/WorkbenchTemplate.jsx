@@ -3,8 +3,11 @@ import SetupModal from '../organisms/SetupModal';
 import WorkbenchActions from '../organisms/WorkbenchActions';
 import WorkbenchCanvas from '../organisms/WorkbenchCanvas';
 import Toolbox from '../organisms/Toolbox';
+import { WorkbenchContext } from '../../context/WorkbenchContext';
+import { useContext } from 'react';
 
-const WorkbenchTemplate = (props) => {
+const WorkbenchTemplate = () => {
+  const workbenchProps = useContext(WorkbenchContext);
   const {
     showSetupForm,
     layoutTitle,
@@ -54,10 +57,19 @@ const WorkbenchTemplate = (props) => {
     showLayoutList,
     setShowLayoutList,
     handleWheel,
-    addPredefinedBox,
+    addPredefineditem,
     handleDragStart,
     handleDragMove,
-  } = props;
+    addNewSection,
+    addItemToSection,
+    sectionId,
+    setSectionId,
+    sections,
+    handleItemDragEnd,
+    handleItemDragStart,
+    handleItemDragMove,
+    setSections
+  } = workbenchProps;
 
   return (
     <div className="cms-container">
@@ -104,9 +116,14 @@ const WorkbenchTemplate = (props) => {
         gutterWidth={gutterWidth}
         transformerRef={transformerRef}
         setItems={setItems}
+        handleItemDragStart = {handleItemDragStart}
+        handleItemDragMove = {handleItemDragMove}
+        handleItemDragEnd={handleItemDragEnd}
         handleDragStart = {handleDragStart}
         handleDragMove = {handleDragMove}
-        handleTransformEnd={handleTransformEnd}
+        setSectionId = {setSectionId}
+        sections = {sections}
+        setSections={setSections}
       />
     </div>
           <Toolbox
@@ -134,7 +151,11 @@ const WorkbenchTemplate = (props) => {
             setShowLayoutList={setShowLayoutList}
             cellWidth = {cellWidth}
             cellHeight = {cellHeight}
-            addPredefinedBox = {addPredefinedBox}
+            addPredefineditem = {addPredefineditem}
+            addNewSection = {addNewSection}
+            sectionId = {sectionId}
+            addItemToSection = {addItemToSection}
+            sections = {sections}
           />
         </>
       )}
