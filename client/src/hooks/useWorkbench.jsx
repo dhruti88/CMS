@@ -567,8 +567,7 @@ const deleteSelected = () => {
   }, [selectedId]);
   
     useEffect(() => {
-      console.log("s-",stageRef);
-      
+      // console.log("s-",stageRef);   
       const container = stageRef.current && stageRef.current.container();
       if (container) {
         container.style.cursor = toolMode === "hand" ? "grab" : "default";

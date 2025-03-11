@@ -100,6 +100,7 @@ const WorkbenchTemplate = () => {
         setShowLayoutList = {setShowLayoutList}
         availableLayouts = {availableLayouts}
         loadLayoutFromSelected = {loadLayoutFromSelected}
+        stageRef={stageRef}
       />
       <WorkbenchCanvas
         stageSize={stageSize}
