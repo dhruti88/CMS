@@ -14,7 +14,141 @@ const useWorkbench = () => {
   const [gutterWidth, setGutterWidth] = useState(10);
 
   // Workbench items and layout state
-  const [items, setItems] = useState([]);
+  //const [items, setSections] = useState([]);
+  const [sections, setSections] = useState([]);
+  const [sectionId, setSectionId] = useState(''); // Ensure ID type matches
+  
+    const addSection = (size) => 
+    {
+      return {
+        id: 'box-' + Date.now(),  // Ensuring ID remains a string
+        type: 'section',
+        x: 0,
+        y: 0,
+        width: size.cols * cellWidth + (size.cols - 1) * gutterWidth,
+        height: size.rows * cellHeight,
+        fill: colors.grays[4],
+        stroke: colors.grays[2],
+        strokeWidth: 1,
+        draggable: true,
+        sizeInfo: size,
+        gridX: 0,
+        gridY: 0,
+        items: [],
+      };
+    };
+  // Item addition function
+  const addBox = (size) => {
+    return {
+      id: 'box-' + Date.now(),
+      type: 'box',
+      x: 0,
+      y: 0,
+      width: size.cols * cellWidth + (size.cols - 1) * gutterWidth,
+      height: size.rows * cellHeight,
+      fill: colors.grays[4],
+      stroke: colors.grays[2],
+      strokeWidth: 1,
+      draggable: true,
+      sizeInfo: size,
+      gridX: 0,
+      gridY: 0
+    };
+  };
+  
+  
+  const addItemToSection = (sectionId, size,type) => {
+    setSections(prevSections =>
+      prevSections.map(section => {
+        if (section.id !== sectionId) return section; // Skip if it's not the target section
+  
+        let newItem;
+        if(type == "text")
+        newItem = addTextBox(size);
+        else
+        newItem = addImageItem(size);
+
+        const bestPosition = findBestPositionForItem(newItem, section.items, section.sizeInfo);
+  
+        if (!bestPosition) {
+          alert('No space available in section!');
+          return section;
+        }
+  
+        newItem.gridX = bestPosition.gridX;
+        newItem.gridY = bestPosition.gridY;
+        newItem.x = newItem.gridX * cellWidth + newItem.gridX * gutterWidth;
+        newItem.y = newItem.gridY * cellHeight;
+  
+        return { ...section, items: [...section.items, newItem] };
+      })
+    );
+  };
+  
+  const addNewSection = (size) => {
+    // if (!newBoxContent && newBoxType === 'text') {
+    //   alert('Please enter text content for the new box');
+    //   return;
+    // }
+    const newSection = addSection(size)
+  
+    const position = findBestPositionForBox(newSection, sections, columns, rows);
+    if (!position) {
+      alert('No space available for new box');
+      return;
+    }
+    console.log("position: - ",position);
+    newSection.gridX = position.gridX;
+    newSection.gridY = position.gridY;
+    newSection.x = newSection.gridX * cellWidth + (newSection.gridX) * gutterWidth;
+    newSection.y = newSection.gridY * cellHeight;
+    setSections(prev => [...prev, newSection]);
+    setSelectedId(newSection.id);
+    
+  };
+  
+  
+  // Debugging useEffect to log sections when they change
+  useEffect(() => {
+    console.log("Updated sections:", sections);
+  }, [sections]);
+  
+
+  const itemsOverlap = (itemA, itemB) => {
+    return (
+      itemA.gridX < itemB.gridX + itemB.sizeInfo.cols &&
+      itemA.gridX + itemA.sizeInfo.cols > itemB.gridX &&
+      itemA.gridY < itemB.gridY + itemB.sizeInfo.rows &&
+      itemA.gridY + itemA.sizeInfo.rows > itemB.gridY
+    );
+  };
+  
+  // Find the best position for an item inside a section
+  const findBestPositionForItem = (item, sectionItems, sectionSize, originalPosition = null) => {
+
+    console.log(sectionSize);
+    if (originalPosition) {
+      let conflict = sectionItems.some(other => itemsOverlap({ ...item, gridX: originalPosition.gridX, gridY: originalPosition.gridY }, other));
+      if (!conflict) return originalPosition;
+    }
+  
+    const possiblePositions = [];
+    for (let y = 0; y <= sectionSize.rows - item.sizeInfo.rows; y++) {
+      for (let x = 0; x <= sectionSize.cols - item.sizeInfo.cols; x++) {
+        let conflict = sectionItems.some(other => itemsOverlap({ ...item, gridX: x, gridY: y }, other));
+        if (!conflict) {
+          let distance = originalPosition
+            ? Math.sqrt(Math.pow(x - originalPosition.gridX, 2) + Math.pow(y - originalPosition.gridY, 2))
+            : x + y;
+          possiblePositions.push({ gridX: x, gridY: y, distance });
+        }
+      }
+    }
+  
+    possiblePositions.sort((a, b) => a.distance - b.distance);
+    return possiblePositions.length > 0 ? possiblePositions[0] : null;
+  };
+  
   const [selectedId, setSelectedId] = useState(null);
   const [availableLayouts, setAvailableLayouts] = useState([]);
   const [showLayoutList, setShowLayoutList] = useState(false);
@@ -102,31 +236,13 @@ const useWorkbench = () => {
       setRows(layout.gridSettings.rows);
       setGutterWidth(layout.gridSettings.gutterWidth);
     }
-    setItems(layout.items);
+    setSections(layout.items);
     setLayoutTitle(layout.title);
     setShowLayoutList(false);
     setShowSetupForm(false);
     console.log("Loaded layout:", layout);
   };
 
-  // Item addition functions
-  const addBox = (size) => {
-    return {
-      id: 'box-' + Date.now(),
-      type: 'box',
-      x: 0,
-      y: 0,
-      width: size.cols * cellWidth + (size.cols - 1) * gutterWidth,
-      height: size.rows * cellHeight,
-      fill: colors.grays[4],
-      stroke: colors.grays[2],
-      strokeWidth: 1,
-      draggable: true,
-      sizeInfo: size,
-      gridX: 0,
-      gridY: 0
-    };
-  };
   
   const addTextBox = (size) => {
     return {
@@ -170,6 +286,7 @@ const useWorkbench = () => {
   
   // Image upload handler
   const handleImageUpload = (e) => {
+    console.log("image : -",e);
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -178,107 +295,126 @@ const useWorkbench = () => {
         const defaultSize = { cols: 2, rows: 2, label: '2×2' };
         const imageItem = addImageItem(defaultSize);
         imageItem.src = base64data; // Set uploaded image source
-        setItems(prev => [...prev, imageItem]);
+        setSections(prevSections =>
+          prevSections.map(section => 
+            section.id === sectionId  // Ensure you're adding image inside the correct section
+              ? { ...section, items: [...section.items, imageItem] }
+              : section
+          )
+        );
+        
         setSelectedId(imageItem.id);
       };
       reader.readAsDataURL(file);
     }
   };
   
+// Helper function to update sections
+const updateSections = (selectedId, sections, updateFn) => {
+  return sections.map(section => ({
+    ...section,
+    items: section.items.map(item => 
+      item.id === selectedId && item.type === 'text'
+        ? updateFn(item)
+        : item
+    )
+  }));
+};
 
-  // Text change handler for text boxes
-  const handleTextChange = (e) => {
-    console.log(e);
-    
-    const newText = e.target.value;
-    setTextValue(newText);
+// Text change handler for text boxes
+const handleTextChange = (e) => {
+  const newText = e.target.value;
+  setTextValue(newText);
+
+  if (selectedId) {
+    setSections(prevSections => updateSections(selectedId, prevSections, item => ({
+      ...item,
+      text: newText
+    })));
+  }
+};
+
+// Toggle text formatting
+const toggleFormat = (format) => {
+  if (format === 'align') {
+    const alignments = ['left', 'center', 'right'];
+    const currentIndex = alignments.indexOf(textFormatting.align);
+    const nextIndex = (currentIndex + 1) % alignments.length;
+
+    setTextFormatting(prev => ({ ...prev, align: alignments[nextIndex] }));
+
     if (selectedId) {
-      const updatedItems = items.map(item =>
-        item.id === selectedId && item.type === 'text'
-          ? { ...item, text: newText }
-          : item
-      );
-      setItems(updatedItems);
+      setSections(prevSections => updateSections(selectedId, prevSections, item => ({
+        ...item,
+        align: alignments[nextIndex]
+      })));
     }
-  };
+    return;
+  }
 
+  setTextFormatting(prev => {
+    const updated = { ...prev, [format]: !prev[format] };
 
-  // Toggle text formatting
-  const toggleFormat = (format) => {
-    if (format === 'align') {
-      const alignments = ['left', 'center', 'right'];
-      const currentIndex = alignments.indexOf(textFormatting.align);
-      const nextIndex = (currentIndex + 1) % alignments.length;
-      setTextFormatting(prev => ({ ...prev, align: alignments[nextIndex] }));
-      if (selectedId) {
-        const updatedItems = items.map(item =>
-          item.id === selectedId && item.type === 'text'
-            ? { ...item, align: alignments[nextIndex] }
-            : item
-        );
-        setItems(updatedItems);
-      }
-      return;
-    }
-    setTextFormatting(prev => {
-      // console.log("pre- ",prev);
-      // console.log(format);
-      const updated = { ...prev, [format]: !prev[format] };
-      if (selectedId) {
-        const updatedItems = items.map(item => {
-          if (item.id === selectedId && item.type === 'text') {
-            let fontStyle = '';
-            let textDecoration = '';
-            if (updated.bold) fontStyle += 'bold ';
-            if (updated.italic) fontStyle += 'italic ';
-            if (updated.underline) textDecoration = 'underline';
-            return { ...item, fontStyle: fontStyle.trim(), textDecoration };
-          }
-          return item;
-        });
-        setItems(updatedItems);
-        // console.log("new- ",updatedItems);
-        
-      }
-      return updated;
-    });
-  };
-
-
-  // Change font size handler
-  const changeFontSize = (change) => {
-    setTextFormatting(prev => {
-      const newSize = Math.max(8, Math.min(72, prev.fontSize + change));
-      const updated = { ...prev, fontSize: newSize };
-      if (selectedId) {
-        const updatedItems = items.map(item =>
-          item.id === selectedId && item.type === 'text'
-            ? { ...item, fontSize: newSize }
-            : item
-        );
-        setItems(updatedItems);
-      }
-      return updated;
-    });
-  };
-
-  // Change color for selected item
-  const changeItemColor = (color) => {
     if (selectedId) {
-      const updatedItems = items.map(item =>
-        item.id === selectedId ? { ...item, fill: color } : item
-      );
-      setItems(updatedItems);
-    }
-  };
+      setSections(prevSections => updateSections(selectedId, prevSections, item => {
+        const fontStyle = [
+          updated.bold ? 'bold' : '',
+          updated.italic ? 'italic' : ''
+        ].join(' ').trim();
 
-  // Delete selected item
-  const deleteSelected = () => {
-    if (selectedId) {
-      setItems(items.filter(item => item.id !== selectedId));
-      setSelectedId(null);
+        const textDecoration = updated.underline ? 'underline' : '';
+
+        return { ...item, fontStyle, textDecoration };
+      }));
     }
-  };
+
+    return updated;
+  });
+};
+
+// Change font size handler
+const changeFontSize = (change) => {
+  setTextFormatting(prev => {
+    const newSize = Math.max(8, Math.min(72, prev.fontSize + change));
+    const updated = { ...prev, fontSize: newSize };
+
+    if (selectedId) {
+      setSections(prevSections => updateSections(selectedId, prevSections, item => ({
+        ...item,
+        fontSize: newSize
+      })));
+    }
+
+    return updated;
+  });
+};
+
+// Change color for selected item
+const changeItemColor = (color) => {
+  if (selectedId) {
+    setSections(prevSections => updateSections(selectedId, prevSections, item => ({
+      ...item,
+      fill: color
+    })));
+  }
+};
+
+// Delete selected section or item
+const deleteSelected = () => {
+  if (!selectedId) return;
+
+  setSections(prevSections => 
+    prevSections
+      .map(section => {
+        if (section.id === selectedId) return null; // Remove section
+        return { ...section, items: section.items.filter(item => item.id !== selectedId) }; // Filter out item
+      })
+      .filter(Boolean) // Remove null values (deleted sections)
+  );
+
+  setSelectedId(null);
+};
+
 
   // Convert dataURL to Blob
   const dataURLToBlob = (dataURL) => {
@@ -370,7 +506,7 @@ const useWorkbench = () => {
     const snappedWidth = colSpan * cellWidth + (colSpan - 1) * gutterWidth;
     const rowSpan = Math.round(newHeight / cellHeight);
     const snappedHeight = rowSpan * cellHeight;
-    setItems(prev => prev.map(item =>
+    setSections(prev => prev.map(item =>
       item.id === node.id() ? {
         ...item,
         width: snappedWidth,
@@ -399,7 +535,7 @@ const useWorkbench = () => {
         transformerRef.current.nodes([selectedNode]);
         transformerRef.current.getLayer().batchDraw();
 
-        const item = items.find(i => i.id === selectedId);
+        const item = sections.find(i => i.id === selectedId);
 
         if (item && item.type === 'text') {
           setTextValue(item.text);
@@ -417,7 +553,7 @@ const useWorkbench = () => {
       transformerRef.current.nodes([]);
       transformerRef.current.getLayer().batchDraw();
     }
-  }, [selectedId, items]);
+  }, [selectedId, sections]);
 
   // Global keydown handler for Delete key
   useEffect(() => {
@@ -491,7 +627,7 @@ const findBestPositionForBox = (item, fixedItems, columns, rows, originalPositio
 
 
 // addBox function for predefined sizes
-const addPredefinedBox = (size,type) => {
+const addPredefineditem = (size,type) => {
   // if (!newBoxContent && newBoxType === 'text') {
   //   alert('Please enter text content for the new box');
   //   return;
@@ -514,7 +650,7 @@ const addPredefinedBox = (size,type) => {
   newItem.gridY = position.gridY;
   newItem.x = newItem.gridX * cellWidth + (newItem.gridX) * gutterWidth;
   newItem.y = newItem.gridY * cellHeight;
-  setItems(prev => [...prev, newItem]);
+  setSections(prev => [...prev, newItem]);
   setSelectedId(newItem.id);
   
 };
@@ -569,24 +705,162 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
   const [dragStatus, setDragStatus] = useState(null);
   const [snapLines, setSnapLines] = useState([]);
 
+  const repositionItemsInSection = (movingItem, targetPosition, section) => {
+    const result = { success: false, newPositions: {} };
+    const fixedItems = [];
+    const itemsToProcess = [...section.items];
+  
+    // Update the position of the moving item
+    const movingItemWithNewPos = { ...movingItem, gridX: targetPosition.gridX, gridY: targetPosition.gridY };
+    fixedItems.push(movingItemWithNewPos);
+    result.newPositions[movingItem.id] = { gridX: targetPosition.gridX, gridY: targetPosition.gridY };
+  
+    // Remove moving item from the processing list
+    const index = itemsToProcess.findIndex(item => item.id === movingItem.id);
+    if (index !== -1) itemsToProcess.splice(index, 1);
+  
+    let overlappingItems = itemsToProcess.filter(item => itemsOverlap(movingItemWithNewPos, item));
+  
+    const processItem = (item, remainingItems, processedItems = new Set()) => {
+      if (processedItems.has(item.id)) return true;
+      processedItems.add(item.id);
+      
+      const originalPos = { gridX: item.gridX, gridY: item.gridY };
+      const newPos = findBestPositionForItem(item, fixedItems, section.sizeInfo, originalPos);
+      
+      if (!newPos) return false; // No space found
+  
+      const itemWithNewPos = { ...item, gridX: newPos.gridX, gridY: newPos.gridY };
+      fixedItems.push(itemWithNewPos);
+      result.newPositions[item.id] = { gridX: newPos.gridX, gridY: newPos.gridY };
+  
+      // Check for overlapping items after moving
+      const newOverlappingItems = remainingItems.filter(
+        b => b.id !== item.id && itemsOverlap(itemWithNewPos, b)
+      );
+      
+      for (const overlappingItem of newOverlappingItems) {
+        const success = processItem(overlappingItem, remainingItems.filter(b => b.id !== overlappingItem.id), processedItems);
+        if (!success) return false;
+      }
+      return true;
+    };
+  
+    let remainingToProcess = [...itemsToProcess];
+    for (const overlappingItem of overlappingItems) {
+      const success = processItem(overlappingItem, remainingToProcess.filter(b => b.id !== overlappingItem.id));
+      if (!success) return result;
+      remainingToProcess = remainingToProcess.filter(b => b.id !== overlappingItem.id);
+    }
+  
+    result.success = true;
+    return result;
+  };
+  
+  // Handle item drag inside a section
+  const handleItemDragEnd = (e, itemId, sectionId) => {
+    setSections(prevSections =>
+      prevSections.map(section => {
+        if (section.id !== sectionId) return section; // Ignore other sections
+  
+        const currentItem = section.items.find(item => item.id === itemId);
+        if (!currentItem || !dragPreviewPosition) {
+          resetDragState();
+          return section;
+        }
+  
+        const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
+        if (newGridX === currentItem.gridX && newGridY === currentItem.gridY) {
+          resetDragState();
+          return section;
+        }
+  
+        // Reposition items inside the section
+        const repositionResult = repositionItemsInSection(currentItem, { gridX: newGridX, gridY: newGridY }, section);
+        
+        if (repositionResult.success) {
+          return {
+            ...section,
+            items: section.items.map(item =>
+              repositionResult.newPositions[item.id]
+                ? {
+                    ...item,
+                    gridX: repositionResult.newPositions[item.id].gridX,
+                    gridY: repositionResult.newPositions[item.id].gridY,
+                    x: repositionResult.newPositions[item.id].gridX * cellWidth + repositionResult.newPositions[item.id].gridX * gutterWidth,
+                    y: repositionResult.newPositions[item.id].gridY * cellHeight
+                  }
+                : item
+            )
+          };
+        } else {
+          resetItemPosition(itemId, currentItem);
+          return section;
+        }
+      })
+    );
+  
+    resetDragState();
+  };
+  
+  // Reset item position if movement is invalid
+  const resetItemPosition = (id, currentItem) => {
+    const stageNode = e.target.getStage();
+    const layer = stageNode.findOne('Layer');
+    const group = layer.findOne(`#${id}`);
+    if (group) {
+      group.to({
+        x: currentItem.gridX * (cellWidth + gutterWidth),
+        y: currentItem.gridY * cellHeight,
+        duration: 0.3
+      });
+    }
+  };
+  
+  // Handle item dragging
+  const handleItemDragMove = (e, itemId, sectionId) => {
+    if (!draggingBox) return;
+    const shape = e.target;
+    const pixelPosition = { x: shape.x(), y: shape.y() };
+    const gridPosition = snapToGrid(pixelPosition);
+  
+    const currentSection = sections.find(section => section.id === sectionId);
+    if (!currentSection) return;
+    
+    const currentItem = currentSection.items.find(item => item.id === itemId);
+    if (!currentItem) return;
+  
+    const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), currentSection.sizeInfo.cols - currentItem.sizeInfo.cols);
+    const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), currentSection.sizeInfo.rows - currentItem.sizeInfo.rows);
+  
+    setSnapLines(generateSnapLines(currentItem, { gridX: clampedGridX, gridY: clampedGridY }));
+    shape.position({
+      x: clampedGridX * (cellWidth + gutterWidth),
+      y: clampedGridY * cellHeight
+    });
+    setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
+  };
+  
+  // Snap to grid logic for sections
   const snapToGrid = (pixelPosition) => {
     const gridX = Math.round(pixelPosition.x / (cellWidth + gutterWidth));
     const gridY = Math.round(pixelPosition.y / cellHeight);
   
     return {
-      gridX: Math.max(0, Math.min(gridX, columns - 1)),
-      gridY: Math.max(0, Math.min(gridY, rows - 1))
+      gridX: Math.max(0, gridX),
+      gridY: Math.max(0, gridY)
     };
   };
   
-  const generateSnapLines = (currentBox, gridPos) => {
-    if (!currentBox) return [];
+  // Generate snapping lines
+  const generateSnapLines = (currentItem, gridPos) => {
+    if (!currentItem) return [];
   
     const lines = [];
     const leftX = gridPos.gridX * (cellWidth + gutterWidth);
-    const rightX = leftX + (currentBox.sizeInfo.cols * cellWidth) + ((currentBox.sizeInfo.cols - 1) * gutterWidth);
+    const rightX = leftX + (currentItem.sizeInfo.cols * cellWidth) + ((currentItem.sizeInfo.cols - 1) * gutterWidth);
     const topY = gridPos.gridY * cellHeight;
-    const bottomY = topY + (currentBox.sizeInfo.rows * cellHeight);
+    const bottomY = topY + (currentItem.sizeInfo.rows * cellHeight);
   
     lines.push({ points: [leftX, 0, leftX, stageSize.height], stroke: '#2196F3', strokeWidth: 1, dash: [5, 5] });
     lines.push({ points: [rightX, 0, rightX, stageSize.height], stroke: '#2196F3', strokeWidth: 1, dash: [5, 5] });
@@ -596,83 +870,98 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
     return lines;
   };
   
-  const handleDragStart = (e, id) => {
-    setDraggingBox(id);
-    setDragStatus(null);
-    const currentBox = items.find(b => b.id === id);
-    if (!currentBox) return;
-    setSnapLines(generateSnapLines(currentBox, { gridX: currentBox.gridX, gridY: currentBox.gridY }));
-  };
-  
-  const handleDragMove = (e, id) => {
-    if (!draggingBox) return;
-    const shape = e.target;
-    const pixelPosition = { x: shape.x(), y: shape.y() };
-    const gridPosition = snapToGrid(pixelPosition);
-    const currentBox = items.find(b => b.id === id);
-    if (!currentBox) return;
-  
-    const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), columns - currentBox.sizeInfo.cols);
-    const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), rows - currentBox.sizeInfo.rows);
-  
-    setSnapLines(generateSnapLines(currentBox, { gridX: clampedGridX, gridY: clampedGridY }));
-    shape.position({
-      x: clampedGridX * (cellWidth + gutterWidth),
-      y: clampedGridY * cellHeight
-    });
-    setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
-  };
-  
-  const handleDragEnd = (e, id) => {
-    setSnapLines([]);
-    const currentBox = items.find(b => b.id === id);
-    if (!currentBox || !dragPreviewPosition) {
-      resetDragState();
-      return;
-    }
-  
-    const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
-    if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
-      resetDragState();
-      return;
-    }
-  
-    const repositionResult = repositionBoxes(currentBox, { gridX: newGridX, gridY: newGridY }, items, columns, rows);
-    if (repositionResult.success) {
-      setItems(prevBoxes =>
-        prevBoxes.map(box => repositionResult.newPositions[box.id] ? {
-          ...box,
-          gridX: repositionResult.newPositions[box.id].gridX,
-          gridY: repositionResult.newPositions[box.id].gridY,
-          x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
-          y: repositionResult.newPositions[box.id].gridY * cellHeight,
-        } : box)
-      );
-    } else {
-      resetBoxPosition(id, currentBox);
-    }
-    resetDragState();
-  };
-  
+  // Reset drag state
   const resetDragState = () => {
     setDraggingBox(null);
     setDragPreviewPosition(null);
     setDragStatus(null);
   };
+  const handleItemDragStart = (e, itemId, sectionId) => {
+    setDraggingBox(itemId);
+    setDragStatus(null);
   
-  const resetBoxPosition = (id, currentBox) => {
-    const stageNode = e.target.getStage();
-    const layer = stageNode.findOne('Layer');
-    const group = layer.findOne(`#${id}`);
-    if (group) {
-      group.to({
-        x: currentBox.gridX * (cellWidth + gutterWidth),
-        y: currentBox.gridY * cellHeight,
-        duration: 0.3
-      });
-    }
+    // Find the section and item being dragged
+    const section = sections.find(sec => sec.id === sectionId);
+    if (!section) return;
+  
+    const currentItem = section.items.find(item => item.id === itemId);
+    if (!currentItem) return;
+  
+    // Generate snap lines within the section boundaries
+    setSnapLines(generateSnapLines(currentItem, { gridX: currentItem.gridX, gridY: currentItem.gridY }));
   };
-  
+    
+    const handleDragStart = (e, id) => {
+      setDraggingBox(id);
+      setDragStatus(null);
+      const currentBox = sections.find(b => b.id === id);
+      if (!currentBox) return;
+      setSnapLines(generateSnapLines(currentBox, { gridX: currentBox.gridX, gridY: currentBox.gridY }));
+    };
+    
+    const handleDragMove = (e, id) => {
+      if (!draggingBox) return;
+      const shape = e.target;
+      const pixelPosition = { x: shape.x(), y: shape.y() };
+      const gridPosition = snapToGrid(pixelPosition);
+      const currentBox = sections.find(b => b.id === id);
+      if (!currentBox) return;
+    
+      const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), columns - currentBox.sizeInfo.cols);
+      const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), rows - currentBox.sizeInfo.rows);
+    
+      setSnapLines(generateSnapLines(currentBox, { gridX: clampedGridX, gridY: clampedGridY }));
+      shape.position({
+        x: clampedGridX * (cellWidth + gutterWidth),
+        y: clampedGridY * cellHeight
+      });
+      setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
+    };
+    
+    const handleDragEnd = (e, id) => {
+      setSnapLines([]);
+      const currentBox = sections.find(b => b.id === id);
+      if (!currentBox || !dragPreviewPosition) {
+        resetDragState();
+        return;
+      }
+    
+      const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
+      if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
+        resetDragState();
+        return;
+      }
+    
+      const repositionResult = repositionBoxes(currentBox, { gridX: newGridX, gridY: newGridY }, sections, columns, rows);
+      if (repositionResult.success) {
+        setSections(prevBoxes =>
+          prevBoxes.map(box => repositionResult.newPositions[box.id] ? {
+            ...box,
+            gridX: repositionResult.newPositions[box.id].gridX,
+            gridY: repositionResult.newPositions[box.id].gridY,
+            x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
+            y: repositionResult.newPositions[box.id].gridY * cellHeight,
+          } : box)
+        );
+      } else {
+        resetBoxPosition(id, currentBox);
+      }
+      resetDragState();
+    };
+    const resetBoxPosition = (id, currentBox) => {
+      const stageNode = e.target.getStage();
+      const layer = stageNode.findOne('Layer');
+      const group = layer.findOne(`#${id}`);
+      if (group) {
+        group.to({
+          x: currentBox.gridX * (cellWidth + gutterWidth),
+          y: currentBox.gridY * cellHeight,
+          duration: 0.3
+        });
+      }
+    }; 
+
+    
   // Drag end handler (snapping)
   // const handleDragEnd = (e) => {
   //   const id = e.target.id();
@@ -689,7 +978,7 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
   //   const updatedItems = items.map(item =>
   //     item.id === id ? { ...item, x: boundedX, y: boundedY} : item
   //   );
-  //   setItems(updatedItems);
+  //   setSections(updatedItems);
   // };
 
   // const handleDragEnd = (e, id) => {
@@ -724,7 +1013,7 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
   
   //   if (repositionResult.success) {
   //     // Update the state with new positions
-  //     setItems(prevBoxes =>
+  //     setSections(prevBoxes =>
   //       prevBoxes.map(box => {
   //         if (repositionResult.newPositions[box.id]) {
   //           return {
@@ -803,7 +1092,6 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
     stageScale,
     toolMode,
     setToolMode,
-    items,
     selectedId,
     setSelectedId,
     availableLayouts,
@@ -826,7 +1114,6 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
     addTextBox,
     addImageItem,
     handleImageUpload,
-    handleDragEnd,
     handleTextChange,
     toggleFormat,
     changeFontSize,
@@ -836,9 +1123,19 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
     loadLayoutFromSelected,
     cellWidth,
     cellHeight,
-    addPredefinedBox,
+    addPredefineditem,
+    addNewSection,
+    addItemToSection,
+    setSectionId,
+    sectionId,
+    sections,
+    handleItemDragEnd,
+    handleItemDragStart,
+    handleItemDragMove,
     handleDragStart,
+    handleDragEnd,
     handleDragMove,
+    addNewSection
   };
 };
 
