@@ -68,7 +68,8 @@ const WorkbenchTemplate = () => {
     handleItemDragEnd,
     handleItemDragStart,
     handleItemDragMove,
-    setSections
+    setSections,
+    exportToCMYKPDF,
   } = workbenchProps;
 
   return (
@@ -100,6 +101,7 @@ const WorkbenchTemplate = () => {
         setShowLayoutList = {setShowLayoutList}
         availableLayouts = {availableLayouts}
         loadLayoutFromSelected = {loadLayoutFromSelected}
+        exportToCMYKPDF = {exportToCMYKPDF}
         stageRef={stageRef}
       />
       <WorkbenchCanvas

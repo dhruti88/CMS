@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { getCellDimensions } from '../utils/gridHelpers';
+import { saveAs } from "file-saver";
 
 const useWorkbench = () => {
   // Constants
@@ -445,6 +446,31 @@ const deleteSelected = () => {
         .then(response => response.json())
         .then(data => console.log("Upload successful:", data))
         .catch(error => console.error("Error uploading:", error));
+    }
+  };
+
+  const exportToCMYKPDF = async () => {
+    const stage = stageRef.current;
+    console.log(stage);
+    const dataURL = stage.toDataURL({ pixelRatio: 3 }); // High-resolution
+
+    const response = await fetch(dataURL);
+    const imageBlob = await response.blob();
+    const formData = new FormData();
+    formData.append("image", imageBlob, "konva_image.png");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/pdf/convert-cmyk", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Failed to generate PDF");
+
+      const blob = await res.blob();
+      saveAs(blob, "CMYK_Newspaper_Export.pdf");
+    } catch (error) {
+      console.error("PDF conversion failed:", error);
     }
   };
 
@@ -1147,7 +1173,8 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
     handleDragStart,
     handleDragEnd,
     handleDragMove,
-    addNewSection
+    addNewSection,
+    exportToCMYKPDF,
   };
 };
 
