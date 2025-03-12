@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { useTheme } from '@mui/material/styles';
 import app, {auth} from './firebase/fireBaseConfig';
 import {signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword }  from "firebase/auth"
 import { useNavigate } from "react-router-dom";
 import { SERVER_URL } from './Urls';
-import { Button, Stack } from '@mui/material';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import colors from './theme/colors';
 
@@ -14,7 +12,7 @@ const providers = [
 ];
 
 
-const signIn = async (provider, navigate) => {
+const signIn = async (provider, navigate, email, password) => {
     if (provider.id === "google") {
       try {
         const googleProvider = new GoogleAuthProvider();
@@ -62,6 +60,9 @@ const signIn = async (provider, navigate) => {
         } else {
           console.error("Error storing user:", data);
         }
+
+        console.log("Signed in successfully:", result.user);
+        
         // Redirect to Home Page after successful login
         navigate("/home");
 
@@ -70,81 +71,85 @@ const signIn = async (provider, navigate) => {
         console.error("Google Sign-In Error:", error);
         return { error: error.message };
       }
-    } else if (provider.id === "email") {
+    } else if (provider.id === "credentials") {
       try {
+        if (!email || !password) {
+          alert("Please enter both email and password.");
+          return;
+        }  
+
+     
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         const idToken = await user.getIdToken();
+        console.log("Bearer Token: ",idToken);
 
-        await fetch(`${SERVER_URL}/api/users/save`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({
-            uid: user.uid,
-            name: user.email.split("@")[0], 
-            email: user.email,
-            photoURL: "", 
-          }),
-        });
+        //Save in database while signUP only, No need to save while signIN
+        
+        // const response = await fetch(`${SERVER_URL}/api/users/save`, {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //     "Authorization": `Bearer ${idToken}`,
+        //   },
+        //   body: JSON.stringify({
+        //     uid: user.uid,
+        //     name: user.email.split("@")[0], 
+        //     email: user.email,
+        //     photoURL: "", 
+        //   }),
+        // });
 
+        console.log("Signed in successfully:", user);
         navigate("/home");
         return { user };
+
       } catch (error) {
         console.error("Email Sign-In Error:", error);
         return { error: error.message };
       }
     }
   };
-
-  const signUp = async (email, password, navigate) => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const idToken = await user.getIdToken();
+  export default function SignIn() {
+    const navigate = useNavigate();
+    const [email, setEmail] = React.useState("");
+    const [password, setPassword] = React.useState("");
   
-      await fetch(`${SERVER_URL}/api/users/save`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({
-          uid: user.uid,
-          name: user.email.split("@")[0], 
-          email: user.email,
-          photoURL: "",
-        }),
-      });
-  
-      navigate("/home");
-      return { user };
-  
-    } catch (error) {
-      console.error("Sign-Up Error:", error);
-      return { error: error.message };
-    }
-  };
-  
-
-export default function SignIn() {
-  const navigate = useNavigate();
-  return (
+    return (
       <SignInPage
-  signIn={(provider) => signIn(provider, navigate)}
-  providers={providers}
-  slotProps={{
-    form: { noValidate: true },
-    submitButton: { sx: { backgroundColor: colors.primary , '&:hover': { backgroundColor: '#1444b5'}, marginTop: '10px'  } }
-  }}
-  sx={{
-    marginTop: '5vh',
-    minHeight: '30vh',
-  }}
-/>
-
-
-  );
-}
+        signIn={(provider) => signIn(provider, navigate, email, password)}
+        providers={providers}
+        slotProps={{
+          form: {
+            noValidate: true,
+            onSubmit: (e) => e.preventDefault(), // Prevent default form submission
+          },
+          emailField: {
+            label: "Email",
+            value: email,
+            onChange: (e) => setEmail(e.target.value),
+            required: true,
+          },
+          passwordField: {
+            label: "Password",
+            type: "password",
+            value: password,
+            onChange: (e) => setPassword(e.target.value),
+            required: true,
+          },
+          submitButton: {
+            children: "Sign In",
+            sx: {
+              backgroundColor: colors.primary,
+              '&:hover': { backgroundColor: '#1444b5' },
+              marginTop: '10px',
+            },
+          }
+        }}
+        sx={{
+          marginTop: '5vh',
+          minHeight: '30vh',
+        }}
+      />
+    );
+  }
