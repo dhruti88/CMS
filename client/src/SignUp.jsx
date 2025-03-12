@@ -47,7 +47,7 @@ const SignUp = () => {
         }),
       });
       
-      console.log("Signed up successfully:", user);
+      console.log("Signed up successfully!! :", user);
 
       const data = await response.json();
         
