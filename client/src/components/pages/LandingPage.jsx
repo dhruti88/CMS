@@ -9,7 +9,6 @@ const LandingPage = () => {
 
   return (
     <div className="landing-container">
-      {/* Navigation Bar */}
       <nav className="navbar">
       <Typography variant="h4" fontWeight="bold" align="left">
           <span className="text-black">Page</span>
