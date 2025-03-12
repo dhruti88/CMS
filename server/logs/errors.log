@@ -1,0 +1,1 @@
+[2025-03-12T12:24:07.011] [ERROR] error - Error saving user: E11000 duplicate key error collection: mydb1.users index: email_1 dup key: { email: "dhruti.bhimani@searce.com" }
