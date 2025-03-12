@@ -13,3 +13,39 @@
 [2025-03-11T15:49:30.426] [INFO] default - User authenticated: kaushal.prajapati@searce.com
 [2025-03-11T15:49:30.426] [INFO] default - POST /save - Request from kaushal.prajapati@searce.com
 [2025-03-11T15:49:30.473] [WARN] default - User already exists: kaushal.prajapati@searce.com
+[2025-03-12T22:31:49.161] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T22:31:50.681] [INFO] default - Connected to Database
+[2025-03-12T22:33:24.017] [INFO] default - [POST] /convert-cmyk
+[2025-03-12T22:34:26.747] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T22:34:28.836] [INFO] default - Connected to Database
+[2025-03-12T22:34:49.961] [INFO] default - [POST] /api/pdf
+[2025-03-12T22:37:19.038] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-12T22:39:17.737] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T22:39:19.314] [INFO] default - Connected to Database
+[2025-03-12T22:39:21.718] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T22:39:22.860] [INFO] default - Connected to Database
+[2025-03-12T22:39:24.464] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-12T22:41:13.552] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T22:41:15.940] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T22:41:19.646] [INFO] default - Connected to Database
+[2025-03-12T22:41:29.901] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T22:41:31.002] [INFO] default - Connected to Database
+[2025-03-12T22:41:37.097] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-12T22:43:53.321] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T22:43:53.756] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-12T22:43:54.905] [INFO] default - Connected to Database
+[2025-03-12T22:47:16.833] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T22:47:20.896] [INFO] default - Connected to Database
+[2025-03-12T22:47:31.796] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-12T22:48:20.699] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-12T22:48:45.239] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-12T22:50:52.565] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-12T22:59:22.715] [INFO] default - [GET] /api/layouts?userId=60d21b4667d0d8992e610c85
+[2025-03-12T22:59:39.832] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-12T23:00:28.003] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-12T23:00:35.184] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-12T23:02:07.638] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T23:02:09.975] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T23:02:11.706] [INFO] default - Connected to Database
+[2025-03-12T23:02:17.677] [INFO] default - Server running on http://localhost:5000
+[2025-03-12T23:02:20.640] [INFO] default - Connected to Database
