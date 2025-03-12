@@ -173,13 +173,12 @@ const useWorkbench = () => {
   const transformerRef = useRef(null);
 
   // Stage dimensions (minus toolbox width)
+const cellWidth = 100;
+const cellHeight = 50;
   const [stageSize, setStageSize] = useState({
-    width: window.innerWidth - 320,
-    height: window.innerHeight,
+    width: columns * cellWidth + (columns - 1) * gutterWidth,
+    height: rows * cellHeight,
   });
-
-  // Calculate cell dimensions using a helper
-  const { cellWidth, cellHeight } = getCellDimensions(stageSize.width, stageSize.height, columns, rows, gutterWidth);
 
   // Available item sizes
   const itemSizes = [

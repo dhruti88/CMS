@@ -31,10 +31,9 @@ const WorkbenchCanvas = ({
   const [draggingItem, setDraggingItem] = useState(false); // Track if an item is being dragged
 
   const gridLines = getGridLines(
+    8,12,
     stageSize.width,
     stageSize.height,
-    cellWidth,
-    cellHeight,
     gutterWidth,
     { grays: ['#202124', '#3c4043', '#5f6368', '#dadce0', '#f1f3f4'] }
   );

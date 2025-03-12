@@ -2,22 +2,18 @@ import React from "react";
 import { Rect } from "react-konva"; // Import Rect properly
 
 // Compute grid cell dimensions
-export const getCellDimensions = (stageWidth, stageHeight, columns, rows, gutterWidth) => {
-  const cellWidth = (stageWidth - (columns - 1) * gutterWidth) / columns;
-  const cellHeight = stageHeight / rows;
+const cellWidth = 100;
+const cellHeight = 50;
+export const getCellDimensions = () => {
   return { cellWidth, cellHeight };
 };
 
 // Create grid lines for the Konva stage
-export const getGridLines = (stageWidth, stageHeight, cellWidth, cellHeight, gutterWidth, colors) => {
+export const getGridLines = (columns, rows,stageWidth,stageHeight, gutterWidth, colors) => {
   const lines = [];
   
-  // Get column and row count
-  const columns = columnsFromWidth(stageWidth, cellWidth, gutterWidth);
-  const rows = rowsFromHeight(stageHeight, cellHeight);
-  
   // Vertical grid lines (gutters)
-  for (let i = 1; i <= columns; i++) {
+  for (let i = 1; i < columns; i++) {
     const x = i * cellWidth + (i - 1) * gutterWidth;
     lines.push(
       <Rect
@@ -47,13 +43,4 @@ export const getGridLines = (stageWidth, stageHeight, cellWidth, cellHeight, gut
     );
   }
   return lines;
-};
-
-// Helpers to calculate number of columns and rows from dimensions
-const columnsFromWidth = (width, cellWidth, gutterWidth) => {
-  return Math.floor(width / (cellWidth + gutterWidth)); // Adjust for gutters
-};
-
-const rowsFromHeight = (height, cellHeight) => {
-  return Math.floor(height / cellHeight);
 };
