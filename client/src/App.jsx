@@ -4,7 +4,8 @@ import SignInPage from "./components/pages/SignInPage";
 import HomePage from "./components/pages/HomePage"; // Create this for the main app/dashboard
 import LandingPage from './components/pages/LandingPage';
 import WorkBench from './components/pages/WorkBench';
-import GridEditor from './components/pages/GridEditor'
+import GridEditor from './components/pages/GridEditor';
+import MyLayout from './components/pages/MyLayouts/MyLayout';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/workbench" element={<WorkBench/>} />
         <Route path="/grideditor" element={<GridEditor/>} />
+        <Route path='/mylayout' element={<MyLayout />} />
       </Routes>
     </Router>
   );
