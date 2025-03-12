@@ -2,14 +2,11 @@ import Navbar from "../../components/atoms/navbar/NavBar"
 
 const HomePage = () => {
     return (
-      <>
-      <Navbar />
-      <div>
-        
-        It is Home page!!!
-        
+      <div> 
+      <Navbar/>
+      This is HomePage!!!
       </div>
-      </>
+     
     );
   };
   

@@ -1,31 +1,41 @@
-import { Typography, CardContent, Card, Box, Container, colors } from '@mui/material'
-import OAuthSignInPage from "../../SignIn.jsx"
-import { blue } from '@mui/material/colors'
+import { Typography, Card, Container } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // Import navigate
+import SignIn from '../../SignIn.jsx';
+import CustomButton from '../atoms/button/CustomButton.jsx'; // Ensure this is imported
+import colors from '../../theme/colors.jsx';
 
 const SignInPage = () => {
+  const navigate = useNavigate(); // Initialize navigate function
+
   return (
-    <Container maxWidth={false}
+    <div className="landing-container">
+      <Container
+        maxWidth="sm"
         sx={{
-          width:"800px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
-          background: "#fffff",
+          background: "#ffffff",
+          paddingTop: "80px",
         }}
-    >
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        align="center"
       >
-        <span style={{ color: "black" }}>Page</span>
-        <span style={{ color: "#2563EB" }}>Craft</span>
-      </Typography>
 
-      <OAuthSignInPage />
-    </Container>
+<nav className="navbar">
+      <Typography variant="h4" fontWeight="bold" align="left">
+          <span className="text-black">Page</span>
+          <span style={{ color: colors.primary }}>Craft</span>
+        </Typography>
+        <div className="nav-button">
+          <CustomButton onClick={() => navigate("/signup")}>Sign up</CustomButton>
+        </div>
+      </nav>
+
+
+        <SignIn />
+      </Container>
+    </div>
   );
 };
 
