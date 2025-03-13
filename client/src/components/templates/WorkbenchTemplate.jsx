@@ -68,7 +68,9 @@ const WorkbenchTemplate = () => {
     handleItemDragEnd,
     handleItemDragStart,
     handleItemDragMove,
-    setSections
+    setSections,
+    addEmbeddedLayout, 
+    embeddedLayouts
   } = workbenchProps;
 
   return (
@@ -125,6 +127,8 @@ const WorkbenchTemplate = () => {
         setSectionId = {setSectionId}
         sections = {sections}
         setSections={setSections}
+        rows = {rows}
+        columns = {columns}
       />
     </div>
           <Toolbox
@@ -157,6 +161,8 @@ const WorkbenchTemplate = () => {
             sectionId = {sectionId}
             addItemToSection = {addItemToSection}
             sections = {sections}
+            addEmbeddedLayout={addEmbeddedLayout}  
+            embeddedLayouts={embeddedLayouts} 
           />
         </>
       )}
