@@ -17,26 +17,26 @@ const useWorkbench = () => {
   //const [items, setSections] = useState([]);
   const [sections, setSections] = useState([]);
   const [sectionId, setSectionId] = useState(''); // Ensure ID type matches
-  
-    const addSection = (size) => 
-    {
-      return {
-        id: 'box-' + Date.now(),  // Ensuring ID remains a string
-        type: 'section',
-        x: 0,
-        y: 0,
-        width: size.cols * cellWidth + (size.cols - 1) * gutterWidth,
-        height: size.rows * cellHeight,
-        fill: colors.grays[4],
-        stroke: colors.grays[2],
-        strokeWidth: 1,
-        draggable: true,
-        sizeInfo: size,
-        gridX: 0,
-        gridY: 0,
-        items: [],
-      };
+  const [embeddedLayouts, setEmbeddedLayouts] = useState([]);
+  const addSection = (size) => {
+    return {
+      id: 'box-' + Date.now(), // Ensuring ID remains a string
+      sectionType: 'defaulti',  // Added required field
+      x: 0,
+      y: 0,
+      width: size.cols * cellWidth + (size.cols - 1) * gutterWidth,
+      height: size.rows * cellHeight,
+      fill: colors.grays[4],
+      stroke: colors.grays[2],
+      strokeWidth: 1,
+      draggable: true,
+      sizeInfo: size,
+      gridX: 0,
+      gridY: 0,
+      items: [],
     };
+  };
+  
   // Item addition function
   const addBox = (size) => {
     return {
@@ -112,6 +112,7 @@ const useWorkbench = () => {
   useEffect(() => {
     console.log("Updated sections:", sections);
   }, [sections]);
+  
   
 
   const itemsOverlap = (itemA, itemB) => {
@@ -199,7 +200,7 @@ const useWorkbench = () => {
   };
 
   // Layout endpoints
-  const saveLayout = async () => {
+  const saveLayout1 = async () => {
     try {
       const gridSettings = { columns, rows, gutterWidth };
       const response = await fetch('http://localhost:5000/api/layout', {
@@ -230,7 +231,7 @@ const useWorkbench = () => {
     }
   };
 
-  const loadLayoutFromSelected = (layout) => {
+  const loadLayoutFromSelected1 = (layout) => {
     if (layout.gridSettings && layout.gridSettings.gutterWidth !== undefined) {
       setColumns(layout.gridSettings.columns);
       setRows(layout.gridSettings.rows);
@@ -974,6 +975,125 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
       }
     }; 
 
+
+// New function to add an embedded layout
+const addEmbeddedLayout = (layoutToEmbed, sectionId) => {
+  setSections(prevSections =>
+    prevSections.map(section => {
+      if (section.id !== sectionId) return section; // Skip if it's not the target section
+
+      const newEmbedded = {
+        layoutId: layoutToEmbed._id,
+        title: layoutToEmbed.title,
+        gridSettings: layoutToEmbed.gridSettings,
+        sections: layoutToEmbed.sections.map(sec => ({
+          ...sec,
+          id: `${sec.id}-${Date.now()}`, // Ensure unique ID
+        })),
+      };
+
+      return { ...section, embeddedLayouts: [...(section.embeddedLayouts || []), newEmbedded] };
+    })
+  );
+};
+
+// Update saveLayout to include embeddedLayouts (stored as previousLayouts)
+// Update saveLayout to include embeddedLayouts (stored as previousLayouts)
+// const saveLayout = async () => {
+//   try {
+//     const gridSettings = { columns, rows, gutterWidth };
+//     const response = await fetch('http://localhost:5000/api/layout', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify({ userId, title: layoutTitle, items: sections, gridSettings, previousLayouts: embeddedLayouts }),
+//     });
+//     const data = await response.json();
+//     console.log('Layout saved successfully', data);
+//   } catch (error) {
+//     console.error('Error saving layout:', error);
+//   }
+// };
+
+// Update saveLayout to validate sections before saving (if needed)
+const saveLayout = async () => {
+  try {
+    const gridSettings = { columns, rows, gutterWidth };
+    // Validate that every section has sectionType.
+    const validatedSections = sections.map(section => ({
+      ...section,
+      sectionType: section.sectionType || 'default'
+    }));
+    console.log('[useWorkbench] Saving layout with gridSettings:', gridSettings);
+    console.log('[useWorkbench] Embedded layouts:', embeddedLayouts);
+    console.log('[useWorkbench] Sections:', validatedSections);
+    
+    const response = await fetch('http://localhost:5000/api/layout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, title: layoutTitle, items: validatedSections, gridSettings, previousLayouts: embeddedLayouts }),
+    });
+    const data = await response.json();
+    console.log('[useWorkbench] Layout saved successfully', data);
+  } catch (error) {
+    console.error('[useWorkbench] Error saving layout:', error);
+  }
+};
+//NEW:: Embed a layout into the currently selected section
+const embedLayoutInSection = (layoutToEmbed) => {
+  if (!sectionId) {
+    alert("Please select a section to embed the layout.");
+    return;
+  }
+  console.log('[useWorkbench] Attempting to embed layout into section:', layoutToEmbed, sectionId);
+
+  // Check if the layout has sections
+  if (!layoutToEmbed.items || layoutToEmbed.items.length === 0) {
+    console.log('[useWorkbench] Selected layout has no sections.');
+    alert("Selected layout has no sections to embed.");
+    return;
+  }
+  
+  // Gather all items from all sections in the selected layout.
+  let embeddedItems = [];
+  layoutToEmbed.items.forEach(sec => {
+    if (sec.items && sec.items.length > 0) {
+      embeddedItems = embeddedItems.concat(sec.items);
+    }
+  });
+
+  if (embeddedItems.length === 0) {
+    console.log('[useWorkbench] Selected layout has sections but no items.');
+    alert("Selected layout has sections but no items to embed.");
+    return;
+  }
+  
+  // Merge these embedded items into the currently selected section.
+  setSections(prevSections =>
+    prevSections.map(section => {
+      if (section.id === sectionId) {
+        const mergedItems = [...section.items, ...embeddedItems];
+        console.log('[useWorkbench] Merging embedded items into section:', section.id, mergedItems);
+        return { ...section, items: mergedItems };
+      }
+      return section;
+    })
+  );
+};
+
+  // Update loadLayoutFromSelected to restore embedded layouts
+const loadLayoutFromSelected = (layout) => {
+  if (layout.gridSettings && layout.gridSettings.gutterWidth !== undefined) {
+    setColumns(layout.gridSettings.columns);
+    setRows(layout.gridSettings.rows);
+    setGutterWidth(layout.gridSettings.gutterWidth);
+  }
+  setSections(layout.items);
+  if (layout.previousLayouts) setEmbeddedLayouts(layout.previousLayouts);
+  setLayoutTitle(layout.title);
+  setShowLayoutList(false);
+  console.log("Loaded layout:", layout);
+};
+
     
   // Drag end handler (snapping)
   // const handleDragEnd = (e) => {
@@ -1091,6 +1211,10 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
 
   return {
     userId,
+    embeddedLayouts,
+    addEmbeddedLayout: embedLayoutInSection,
+    saveLayout,
+  // loadLayoutFromSelected,
     showSetupForm,
     setShowSetupForm,
     layoutTitle,
@@ -1119,7 +1243,7 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
     itemSizes,
     colors,
     uploadCanvasImage,
-    saveLayout,
+    // saveLayout,
     fetchAvailableLayouts,
     zoomBy,
     handleWheel,
@@ -1148,7 +1272,7 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
     handleDragStart,
     handleDragEnd,
     handleDragMove,
-    addNewSection
+    // addNewSection
   };
 };
 

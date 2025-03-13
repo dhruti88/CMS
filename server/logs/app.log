@@ -28,3 +28,5 @@
 [2025-03-12T14:43:01.927] [INFO] default - User authenticated: dhruti.bhimani@searce.com
 [2025-03-12T14:43:01.927] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
 [2025-03-12T14:43:01.976] [WARN] default - User already exists: dhruti.bhimani@searce.com
+[2025-03-11T14:52:25.516] [INFO] default - Server running on http://localhost:8000
+[2025-03-11T14:52:26.618] [INFO] default - Connected to Database
