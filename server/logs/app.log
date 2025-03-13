@@ -13,3 +13,18 @@
 [2025-03-11T15:49:30.426] [INFO] default - User authenticated: kaushal.prajapati@searce.com
 [2025-03-11T15:49:30.426] [INFO] default - POST /save - Request from kaushal.prajapati@searce.com
 [2025-03-11T15:49:30.473] [WARN] default - User already exists: kaushal.prajapati@searce.com
+[2025-03-12T14:38:11.793] [INFO] default - [POST] /api/users/save
+[2025-03-12T14:38:31.231] [INFO] default - Server running on http://localhost:8000
+[2025-03-12T14:38:31.870] [INFO] default - Connected to Database
+[2025-03-12T14:40:20.810] [INFO] default - [POST] /api/users/save
+[2025-03-12T14:40:21.667] [INFO] default - User authenticated: kaushal@searce.com
+[2025-03-12T14:40:21.667] [INFO] default - POST /save - Request from kaushal@searce.com
+[2025-03-12T14:40:21.775] [INFO] default - New user saved: kaushal@searce.com
+[2025-03-12T14:42:22.740] [INFO] default - [POST] /api/users/save
+[2025-03-12T14:42:22.741] [INFO] default - User authenticated: kaushal.p@searce.com
+[2025-03-12T14:42:22.741] [INFO] default - POST /save - Request from kaushal.p@searce.com
+[2025-03-12T14:42:22.827] [INFO] default - New user saved: kaushal.p@searce.com
+[2025-03-12T14:43:01.925] [INFO] default - [POST] /api/users/save
+[2025-03-12T14:43:01.927] [INFO] default - User authenticated: dhruti.bhimani@searce.com
+[2025-03-12T14:43:01.927] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
+[2025-03-12T14:43:01.976] [WARN] default - User already exists: dhruti.bhimani@searce.com
