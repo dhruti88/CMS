@@ -30,3 +30,29 @@
 [2025-03-12T14:43:01.976] [WARN] default - User already exists: dhruti.bhimani@searce.com
 [2025-03-11T14:52:25.516] [INFO] default - Server running on http://localhost:8000
 [2025-03-11T14:52:26.618] [INFO] default - Connected to Database
+[2025-03-13T14:27:50.558] [INFO] default - Server running on http://localhost:8000
+[2025-03-13T14:27:53.323] [INFO] default - Connected to Database
+[2025-03-13T14:31:40.761] [INFO] default - [POST] /api/users/save
+[2025-03-13T14:31:41.882] [INFO] default - User authenticated: dhruti.bhimani@searce.com
+[2025-03-13T14:31:41.883] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
+[2025-03-13T14:31:41.935] [WARN] default - User already exists: dhruti.bhimani@searce.com
+[2025-03-13T14:32:01.471] [INFO] default - [POST] /api/users/save
+[2025-03-13T14:32:01.473] [INFO] default - User authenticated: dhrutiii.bhimani@searce.com
+[2025-03-13T14:32:01.473] [INFO] default - POST /save - Request from dhrutiii.bhimani@searce.com
+[2025-03-13T14:32:01.573] [INFO] default - New user saved: dhrutiii.bhimani@searce.com
+[2025-03-13T22:35:20.334] [INFO] default - [POST] /api/users/save
+[2025-03-13T22:35:20.541] [INFO] default - User authenticated: review2@searce.com
+[2025-03-13T22:35:20.542] [INFO] default - POST /save - Request from review2@searce.com
+[2025-03-13T22:35:20.862] [INFO] default - New user saved: review2@searce.com
+[2025-03-13T22:36:02.215] [INFO] default - [POST] /api/users/save
+[2025-03-13T22:36:02.216] [INFO] default - User authenticated: review2nu@searce.com
+[2025-03-13T22:36:02.217] [INFO] default - POST /save - Request from review2nu@searce.com
+[2025-03-13T22:36:02.288] [INFO] default - New user saved: review2nu@searce.com
+[2025-03-13T22:37:50.449] [INFO] default - [POST] /api/users/save
+[2025-03-13T22:37:50.520] [INFO] default - User authenticated: dhruti.bhimani@searce.com
+[2025-03-13T22:37:50.521] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
+[2025-03-13T22:37:50.561] [WARN] default - User already exists: dhruti.bhimani@searce.com
+[2025-03-13T22:38:16.508] [INFO] default - [POST] /api/users/save
+[2025-03-13T22:38:16.584] [INFO] default - User authenticated: dhruti.bhimani@searce.com
+[2025-03-13T22:38:16.584] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
+[2025-03-13T22:38:16.618] [WARN] default - User already exists: dhruti.bhimani@searce.com

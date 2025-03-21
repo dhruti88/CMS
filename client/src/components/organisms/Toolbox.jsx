@@ -7,12 +7,14 @@ import Input from '../atoms/Input';
 
 const Toolbox = ({
   itemSizes,
-  addNewSection,
-  addItemToSection,
+  addBox,
+  addTextBox,
+  addImageItem,
   handleImageUpload,
   selectedId,
-  sectionId,
-  sections,
+  items,
+  changeItemColor,
+  deleteSelected,
   textFormatting,
   toggleFormat,
   changeFontSize,
@@ -153,7 +155,6 @@ const Toolbox = ({
             ))}
           </div>
         </div>
-
         <div className="size-section">
           <h4>Images</h4>
           <div className="size-grid">
@@ -171,7 +172,6 @@ const Toolbox = ({
             ))}
           </div>
         </div>
-
         <div className="size-section">
           <h4>Upload Image</h4>
           <input type="file" accept="image/*" onChange={handleImageUpload} />
@@ -195,15 +195,13 @@ const Toolbox = ({
         {selectedId ? (
           <>
             <div className="property-group">
-              <label>ID:</label>
+              <label>Item ID:</label>
               <span>{selectedId}</span>
             </div>
-
             <div className="property-group">
               <label>Type:</label>
-              <span>{selectedItem?.type || (selectedSection ? 'Section' : 'Unknown')}</span>
+              <span>{selectedItem?.type || 'Unknown'}</span>
             </div>
-
             <div className="property-group">
               <label>Position:</label>
               <span>
@@ -211,14 +209,9 @@ const Toolbox = ({
                 Row: ${Math.round(sections.find(i => i.id === selectedId)?.y / cellHeight) || 0}`}
               </span>
             </div>
-
             <div className="property-group">
               <label>Size:</label>
-              <span>
-                {selectedSection
-                  ? `${selectedSection.sizeInfo.cols} × ${selectedSection.sizeInfo.rows}`
-                  : `${selectedItem?.sizeInfo?.cols || 1} × ${selectedItem?.sizeInfo?.rows || 1}`}
-              </span>
+              <span>{`${selectedItem?.sizeInfo?.cols || 1} × ${selectedItem?.sizeInfo?.rows || 1}`}</span>
             </div>
             {selectedId && selectedItem?.type === 'text' && (
               <div className="color-palette">
@@ -251,7 +244,6 @@ const Toolbox = ({
                 </div>
               </div>
             )}
-
             <Button className="delete-button" onClick={deleteSelected} title="Delete selected item">
               Delete Item
             </Button>
