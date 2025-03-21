@@ -5,6 +5,8 @@ import mongoose from "mongoose";
 import { logger, errorLogger } from "./utils/logger.js"; 
 // Import and use user routes
 import userRoutes from "./routes/userRoutes.js";
+import pdfRoutes from "./controllers/pdfDownload.js";
+
 
 
 dotenv.config(); // Load environment variables
@@ -40,6 +42,7 @@ mongoose.connect(MONGO_URL,{
 })
 
 app.use("/api/users", userRoutes);
+app.use("/api/pdf", pdfRoutes);
 
 // Export the configured Express app
 export default app;

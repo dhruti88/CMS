@@ -15,6 +15,7 @@ const WorkbenchActions = ({
   availableLayouts,
   loadLayoutFromSelected, 
   stageRef, // Add stageRef to props
+  exportToCMYKPDF,
 }) => {
   return (
     <div className="workbench-header">
@@ -65,7 +66,7 @@ const WorkbenchActions = ({
         <Button onClick={() => zoomBy(1 / 1.1)} className="action-button">
           Zoom Out
         </Button>
-        <Button onClick={() => downloadStageAsPDF(stageRef)} className="action-button">
+        <Button onClick={() => exportToCMYKPDF()} className="action-button">
           Download as PDF
         </Button>
       </div>

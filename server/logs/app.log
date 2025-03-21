@@ -56,3 +56,17 @@
 [2025-03-13T22:38:16.584] [INFO] default - User authenticated: dhruti.bhimani@searce.com
 [2025-03-13T22:38:16.584] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
 [2025-03-13T22:38:16.618] [WARN] default - User already exists: dhruti.bhimani@searce.com
+[2025-03-21T14:22:12.190] [INFO] default - Server running on http://localhost:5000
+[2025-03-21T14:22:12.933] [INFO] default - Connected to Database
+[2025-03-21T14:22:17.449] [INFO] default - [GET] /api/layouts?userId=60d21b4667d0d8992e610c85
+[2025-03-21T14:23:22.547] [INFO] default - [GET] /api/layouts?userId=60d21b4667d0d8992e610c85
+[2025-03-21T15:04:46.999] [INFO] default - Server running on http://localhost:5000
+[2025-03-21T15:04:47.902] [INFO] default - Connected to Database
+[2025-03-21T15:08:41.090] [INFO] default - [GET] /api/layouts?userId=60d21b4667d0d8992e610c85
+[2025-03-21T15:08:51.857] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-21T15:09:15.629] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-21T15:17:42.427] [INFO] default - Server running on http://localhost:5000
+[2025-03-21T15:17:43.020] [INFO] default - Connected to Database
+[2025-03-21T15:17:48.024] [INFO] default - [GET] /api/layouts?userId=60d21b4667d0d8992e610c85
+[2025-03-21T15:17:48.682] [INFO] default - [GET] /api/layouts?userId=60d21b4667d0d8992e610c85
+[2025-03-21T15:17:54.611] [INFO] default - [POST] /api/pdf/convert-cmyk

@@ -1207,6 +1207,30 @@ const loadLayoutFromSelected = (layout) => {
 //   setNewBoxContent('');
 // };
 
+const exportToCMYKPDF = async () => {
+  const stage = stageRef.current;
+  console.log(stage);
+  const dataURL = stage.toDataURL({ pixelRatio: 3 }); // High-resolution
+
+  const response = await fetch(dataURL);
+  const imageBlob = await response.blob();
+  const formData = new FormData();
+  formData.append("image", imageBlob, "konva_image.png");
+
+  try {
+    const res = await fetch("http://localhost:5000/api/pdf/convert-cmyk", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) throw new Error("Failed to generate PDF");
+
+    const blob = await res.blob();
+    saveAs(blob, "CMYK_Newspaper_Export.pdf");
+  } catch (error) {
+    console.error("PDF conversion failed:", error);
+  }
+};
 
 
   return {
@@ -1272,6 +1296,7 @@ const loadLayoutFromSelected = (layout) => {
     handleDragStart,
     handleDragEnd,
     handleDragMove,
+    exportToCMYKPDF,
     // addNewSection
   };
 };

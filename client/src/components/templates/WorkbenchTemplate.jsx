@@ -70,7 +70,8 @@ const WorkbenchTemplate = () => {
     handleItemDragMove,
     setSections,
     addEmbeddedLayout, 
-    embeddedLayouts
+    embeddedLayouts,
+    exportToCMYKPDF,
   } = workbenchProps;
 
   return (
@@ -103,6 +104,7 @@ const WorkbenchTemplate = () => {
         availableLayouts = {availableLayouts}
         loadLayoutFromSelected = {loadLayoutFromSelected}
         stageRef={stageRef}
+        exportToCMYKPDF = {exportToCMYKPDF}
       />
       <WorkbenchCanvas
         stageSize={stageSize}
