@@ -49,3 +49,17 @@
 [2025-03-12T23:02:11.706] [INFO] default - Connected to Database
 [2025-03-12T23:02:17.677] [INFO] default - Server running on http://localhost:5000
 [2025-03-12T23:02:20.640] [INFO] default - Connected to Database
+[2025-03-24T11:28:05.869] [INFO] default - Server running on http://localhost:8000
+[2025-03-24T11:28:06.830] [INFO] default - Connected to Database
+[2025-03-24T11:28:26.884] [INFO] default - [POST] /api/users/save
+[2025-03-24T11:28:27.831] [INFO] default - User authenticated: dhruti.bhimani@searce.com
+[2025-03-24T11:28:27.832] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
+[2025-03-24T11:28:27.860] [WARN] default - User already exists: dhruti.bhimani@searce.com
+[2025-03-24T11:31:26.487] [INFO] default - [POST] /api/users/save
+[2025-03-24T11:31:26.507] [INFO] default - User authenticated: dhruti.bhimani@searce.com
+[2025-03-24T11:31:26.507] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
+[2025-03-24T11:31:26.533] [WARN] default - User already exists: dhruti.bhimani@searce.com
+[2025-03-24T12:33:45.529] [INFO] default - [POST] /api/users/save
+[2025-03-24T12:33:45.530] [INFO] default - User authenticated: dhruti.bhimani@searce.com
+[2025-03-24T12:33:45.550] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
+[2025-03-24T12:33:45.858] [WARN] default - User already exists: dhruti.bhimani@searce.com

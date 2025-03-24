@@ -64,7 +64,7 @@ const signIn = async (provider, navigate, email, password) => {
         console.log("Signed in successfully:", result.user);
         
         // Redirect to Home Page after successful login
-        navigate("/home");
+        navigate("/workbench");
 
         return { user: result.user };
       } catch (error) {
@@ -101,7 +101,7 @@ const signIn = async (provider, navigate, email, password) => {
         // });
 
         console.log("Signed in successfully:", user);
-        navigate("/home");
+        navigate("/workbench");
         return { user };
 
       } catch (error) {

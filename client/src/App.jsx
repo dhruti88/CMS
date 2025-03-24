@@ -7,21 +7,29 @@ import LandingPage from './components/pages/LandingPage';
 import WorkBench from './components/pages/WorkBench';
 import GridEditor from './components/pages/GridEditor';
 import MyLayout from './components/pages/MyLayouts/MyLayout';
+import ProtectedRoute from './hooks/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 
 
 function App() {
   return (
+    <AuthProvider>
     <Router>
+      
       <Routes>
+       
         <Route path="/" element={<LandingPage/>}/>
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/workbench" element={<WorkBench/>} />
-        <Route path="/grideditor" element={<GridEditor/>} />
-        <Route path='/mylayout' element={<MyLayout />} />
+        <Route path="/workbench" element={
+          <ProtectedRoute><WorkBench/></ProtectedRoute>} />
+        {/* <Route path="/home" element={<HomePage />} />
+            <Route path="/grideditor" element={<GridEditor/>} />
+        <Route path='/mylayout' element={<MyLayout />} /> */}
+       
       </Routes>
     </Router>
+    </AuthProvider>
   );
 }
 
