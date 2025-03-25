@@ -245,4 +245,3 @@ const LayoutSchema = new Schema({
 
 const Layout = mongoose.model('Layout', LayoutSchema);
 export default Layout;
-
