@@ -7,6 +7,7 @@ import LandingPage from './components/pages/LandingPage';
 import WorkBench from './components/pages/WorkBench';
 import ProtectedRoute from './hooks/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
+import MyLayouts from './components/pages/MyLayouts'
 
 function App() {
   return (
@@ -19,8 +20,8 @@ function App() {
         <Route path="/workbench" element={
           <ProtectedRoute><WorkBench/></ProtectedRoute>} />
         {/* <Route path="/home" element={<HomePage />} />
-            <Route path="/grideditor" element={<GridEditor/>} />
-        <Route path='/mylayout' element={<MyLayout />} /> */}
+            <Route path="/grideditor" element={<GridEditor/>} />*/}
+        <Route path='/mylayout' element={<MyLayouts />} /> 
        
       </Routes>
     </Router>

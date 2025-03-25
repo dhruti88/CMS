@@ -7,6 +7,13 @@ const useWorkbench = () => {
   const userId = "60d21b4667d0d8992e610c85"; // example ObjectId
   const defaultTitle = "default";
 
+
+//city,dueDate,Status,layoutType
+const [city, setCity] = useState("Chicago");
+const [dueDate, setDueDate] = useState("");
+const [taskStatus, setTaskStatus] = useState("");
+const [layoutType, setLayoutType] = useState("");
+
   // Setup & grid configuration
   const [showSetupForm, setShowSetupForm] = useState(true);
   const [layoutTitle, setLayoutTitle] = useState(defaultTitle);
@@ -1269,6 +1276,15 @@ return {
   // addNewSection,
   exportToCMYKPDF,
     fitStageToScreen,
+    city,
+    setCity,
+    dueDate,
+    setDueDate,
+    taskStatus,
+    setTaskStatus,
+    layoutType,
+    setLayoutType,
+  
 };
 };
 
