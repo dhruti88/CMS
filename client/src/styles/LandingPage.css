@@ -7,19 +7,20 @@
     justify-content: center;
     position: relative;
     background-color: #ffffff;
-  }
+  }/* Navigation bar */
   
-  /* Navigation bar */
-  .navbar {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    padding: 20px 40px;
-    background:#f8f9fa;
-  }
+.navbar {
+  position: absolute;
+  top: 0;
+  left: 0; /* Ensure it starts from the left */
+  width: 100%;
+  display: flex;
+  justify-content: space-between; /* Align items to both ends */
+  align-items: center; /* Vertically center the items */
+  padding: 20px 40px;
+  background: #f8f9fa;
+}
+
   
   /* Navigation button container */
   .nav-button {

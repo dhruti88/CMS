@@ -1,10 +1,16 @@
 import { Link } from "react-router-dom";
 import colors from "../../../theme/colors";
-import { Typography, CardContent, Card, Box, Container } from '@mui/material';
+import { Typography } from '@mui/material';
 
-const Navbar = () => {
+const Navbar = ({ children }) => {
   return (
-   <div>Create Nav Bar!!</div>
+    <nav className="navbar">
+      <Typography variant="h4" fontWeight="bold" align="left">
+        <span className="text-black">Page</span>
+        <span style={{ color: colors.primary }}>Craft</span>
+      </Typography>
+      <div className="nav-button">{children}</div>
+    </nav>
   );
 };
 

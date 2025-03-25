@@ -35,7 +35,7 @@ const signIn = async (provider, navigate, email, password) => {
 
         // Get Firebase ID Token
         const idToken = await result.user.getIdToken();
-        
+        localStorage.setItem("token", idToken);
         console.log("Bearer Token: ",idToken);
         
         // Send user data to backend
@@ -64,7 +64,7 @@ const signIn = async (provider, navigate, email, password) => {
         console.log("Signed in successfully:", result.user);
         
         // Redirect to Home Page after successful login
-        navigate("/workbench");
+        navigate("/home");
 
         return { user: result.user };
       } catch (error) {
@@ -82,6 +82,7 @@ const signIn = async (provider, navigate, email, password) => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         const idToken = await user.getIdToken();
+        localStorage.setItem("token", idToken);
         console.log("Bearer Token: ",idToken);
 
         //Save in database while signUP only, No need to save while signIN
@@ -101,7 +102,7 @@ const signIn = async (provider, navigate, email, password) => {
         // });
 
         console.log("Signed in successfully:", user);
-        navigate("/workbench");
+        navigate("/home");
         return { user };
 
       } catch (error) {
