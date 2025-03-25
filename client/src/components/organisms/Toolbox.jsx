@@ -76,7 +76,7 @@ const Toolbox = ({
           <h4>Images</h4>
           <div className="size-grid">
             {itemSizes.map(size => (
-              <Button key={`image-${size.label}`} onClick={() => addItemToSection(sectionId, size, "image")} className="size-button">
+              <Button key={`image-${size.label}`} onClick={() => addItemToSection(sectionId, size, "dimage")} className="size-button">
                 {size.label}
               </Button>
             ))}
@@ -85,7 +85,7 @@ const Toolbox = ({
 
         <div className="size-section">
           <h4>Upload Image</h4>
-          <input type="file" accept="image/*" onChange={handleImageUpload} />
+          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(sectionId, e)}/>
         </div>
       </ToolboxSection>
 

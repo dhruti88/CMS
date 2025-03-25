@@ -22,7 +22,7 @@ const useWorkbench = () => {
     const addSection = (size) => 
     {
       return {
-        id: 'box-' + Date.now(),  // Ensuring ID remains a string
+        id: 'section-' + Date.now(),  // Ensuring ID remains a string
         type: 'section',
         sectionType: 'section',
         x: 0,
@@ -57,9 +57,52 @@ const useWorkbench = () => {
       gridY: 0
     };
   };
+
+    // Image upload handler
+    const handleImageUpload = (sectionId, e) => {
+      console.log("image : -", e);
+      const file = e.target.files[0];
+    
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64data = reader.result;
+          const defaultSize = { cols: 2, rows: 2, label: '2×2' };
+          const imageItem = addImageItem(defaultSize);
+          imageItem.src = base64data; // Set uploaded image source
+    
+          setSections(prevSections =>
+            prevSections.map(section => {
+              if (section.id !== sectionId) return section; // Skip if not the correct section
+    
+              // Check available space before adding the image
+              const bestPosition = findBestPositionForItem(imageItem, section.items, section.sizeInfo);
+              if (!bestPosition) {
+                alert("No space available in section!");
+                return section;
+              }
+    
+              // Assign correct position before adding the image
+              imageItem.gridX = bestPosition.gridX;
+              imageItem.gridY = bestPosition.gridY;
+              imageItem.x = imageItem.gridX * (cellWidth + gutterWidth);
+              imageItem.y = imageItem.gridY * cellHeight;
+    
+              return { ...section, items: [...section.items, imageItem] };
+            })
+          );
+    
+          setSelectedId(imageItem.id);
+        };
+    
+        reader.readAsDataURL(file);
+      }
+    };
+    
   
   
-  const addItemToSection = (sectionId, size,type) => {
+  const addItemToSection = (sectionId, size,type,e = null) => {
+    
     setSections(prevSections =>
       prevSections.map(section => {
         if (section.id !== sectionId) return section; // Skip if it's not the target section
@@ -69,6 +112,7 @@ const useWorkbench = () => {
         newItem = addTextBox(size);
         else
         newItem = addImageItem(size);
+
 
         const bestPosition = findBestPositionForItem(newItem, section.items, section.sizeInfo);
   
@@ -298,30 +342,7 @@ const cellHeight = 50;
     };
   };
   
-  // Image upload handler
-  const handleImageUpload = (e) => {
-    console.log("image : -",e);
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64data = reader.result;
-        const defaultSize = { cols: 2, rows: 2, label: '2×2' };
-        const imageItem = addImageItem(defaultSize);
-        imageItem.src = base64data; // Set uploaded image source
-        setSections(prevSections =>
-          prevSections.map(section => 
-            section.id === sectionId  // Ensure you're adding image inside the correct section
-              ? { ...section, items: [...section.items, imageItem] }
-              : section
-          )
-        );
-        
-        setSelectedId(imageItem.id);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+
   
 // Helper function to update sections
 const updateSections = (selectedId, sections, updateFn) => {
@@ -533,9 +554,24 @@ const deleteSelected = () => {
     stage.batchDraw();
   };
 
-// Transformer onTransformEnd handler
-  const handleTransformEnd = (e) => {
-    const node = e.target;
+  const fitStageToScreen = () => {
+    if (!stageRef.current) return;
+  
+    const stage = stageRef.current;
+  
+    // Reset scale
+    setStageScale(1);
+    stage.scale({ x: 1, y: 1 });
+  
+    // Reset position
+    stage.position({ x: 0, y: 0 });
+  
+    // Redraw the stage
+    stage.batchDraw();
+  };
+  
+
+  const handleTransformEndHelper = (node, cellWidth, gutterWidth, cellHeight, stageSize) => {
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
     const newWidth = node.width() * scaleX;
@@ -545,20 +581,62 @@ const deleteSelected = () => {
     const snappedWidth = colSpan * cellWidth + (colSpan - 1) * gutterWidth;
     const rowSpan = Math.round(newHeight / cellHeight);
     const snappedHeight = rowSpan * cellHeight;
-    setSections(prev => prev.map(item =>
-      item.id === node.id() ? {
-        ...item,
-        width: snappedWidth,
-        height: snappedHeight,
-        scaleX: 1,
-        scaleY: 1,
-        sizeInfo: { cols: colSpan, rows: rowSpan },
-      } : item
-    ));
-    node.scaleX(1);
-    node.scaleY(1);
+    return { snappedWidth, snappedHeight, colSpan, rowSpan };
   };
 
+
+
+// Transformer onTransformEnd handler
+const handleTransformEnd = (e) => {
+  console.log("end : - ");
+  const node = e.target;
+  if (!selectedId || !sectionId) return;
+
+  const section = sections.find(sec => sec.id === sectionId);
+  if (!section) return;
+
+  const { snappedWidth, snappedHeight, colSpan, rowSpan } = handleTransformEndHelper(
+    node,
+    cellWidth,
+    gutterWidth,
+    cellHeight,
+    stageSize
+  );
+
+  // Compute new gridX, gridY inside section
+  const newGridX = Math.round((node.x() - section.x) / (cellWidth + gutterWidth));
+  const newGridY = Math.round((node.y() - section.y) / cellHeight);
+
+  // Ensure grid position doesn't exceed section boundaries
+  const maxGridX = (section.width - snappedWidth) / (cellWidth + gutterWidth);
+  const maxGridY = (section.height - snappedHeight) / cellHeight;
+
+  setSections(prevSections =>
+    prevSections.map(sec =>
+      sec.id === sectionId
+        ? {
+            ...sec,
+            items: sec.items.map(item =>
+              item.id === selectedId
+                ? {
+                    ...item,
+                    width: snappedWidth,
+                    height: snappedHeight,
+                    gridX: Math.max(0, Math.min(maxGridX, newGridX)),
+                    gridY: Math.max(0, Math.min(maxGridY, newGridY)),
+                    sizeInfo: { cols: colSpan, rows: rowSpan },
+                  }
+                : item
+            ),
+          }
+        : sec
+    )
+  );
+
+  // Reset transformation
+  node.scaleX(1);
+  node.scaleY(1);
+};
 
   // Update transformer when selection changes
  // Update transformer when selection changes
@@ -931,86 +1009,88 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
   const handleItemDragStart = (e, itemId, sectionId) => {
     setDraggingBox(itemId);
     setDragStatus(null);
-  // Find the section and item being dragged
-  const section = sections.find(sec => sec.id === sectionId);
-  if (!section) return;
-
-  const currentItem = section.items.find(item => item.id === itemId);
-  if (!currentItem) return;
-
-  // Generate snap lines within the section boundaries
-  setSnapLines(generateSnapLines(currentItem, { gridX: currentItem.gridX, gridY: currentItem.gridY }));
-};
   
-  const handleDragStart = (e, id) => {
-    setDraggingBox(id);
-    setDragStatus(null);
-    const currentBox = sections.find(b => b.id === id);
-    if (!currentBox) return;
-    setSnapLines(generateSnapLines(currentBox, { gridX: currentBox.gridX, gridY: currentBox.gridY }));
+    // Find the section and item being dragged
+    const section = sections.find(sec => sec.id === sectionId);
+    if (!section) return;
+  
+    const currentItem = section.items.find(item => item.id === itemId);
+    if (!currentItem) return;
+  
+    // Generate snap lines within the section boundaries
+    setSnapLines(generateSnapLines(currentItem, { gridX: currentItem.gridX, gridY: currentItem.gridY }));
   };
-  
-  const handleDragMove = (e, id) => {
-    if (!draggingBox) return;
-    const shape = e.target;
-    const pixelPosition = { x: shape.x(), y: shape.y() };
-    const gridPosition = snapToGrid(pixelPosition);
-    const currentBox = sections.find(b => b.id === id);
-    if (!currentBox) return;
-  
-    const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), columns - currentBox.sizeInfo.cols);
-    const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), rows - currentBox.sizeInfo.rows);
-  
-    setSnapLines(generateSnapLines(currentBox, { gridX: clampedGridX, gridY: clampedGridY }));
-    shape.position({
-      x: clampedGridX * (cellWidth + gutterWidth),
-      y: clampedGridY * cellHeight
-    });
-    setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
-  };
-  
-  const handleDragEnd = (e, id) => {
-    setSnapLines([]);
-    const currentBox = sections.find(b => b.id === id);
-    if (!currentBox || !dragPreviewPosition) {
-      resetDragState();
-      return;
-    }
-  
-    const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
-    if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
-      resetDragState();
-      return;
-    }
-  
-    const repositionResult = repositionBoxes(currentBox, { gridX: newGridX, gridY: newGridY }, sections, columns, rows);
-    if (repositionResult.success) {
-      setSections(prevBoxes =>
-        prevBoxes.map(box => repositionResult.newPositions[box.id] ? {
-          ...box,
-          gridX: repositionResult.newPositions[box.id].gridX,
-          gridY: repositionResult.newPositions[box.id].gridY,
-          x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
-          y: repositionResult.newPositions[box.id].gridY * cellHeight,
-        } : box)
-      );
-    } else {
-      resetBoxPosition(id, currentBox);
-    }
-    resetDragState();
-  };
-  const resetBoxPosition = (id, currentBox) => {
-    const stageNode = e.target.getStage();
-    const layer = stageNode.findOne('Layer');
-    const group = layer.findOne(`#${id}`);
-    if (group) {
-      group.to({
-        x: currentBox.gridX * (cellWidth + gutterWidth),
-        y: currentBox.gridY * cellHeight,
-        duration: 0.3
+    
+    const handleDragStart = (e, id) => {
+      setDraggingBox(id);
+      setDragStatus(null);
+      const currentBox = sections.find(b => b.id === id);
+      if (!currentBox) return;
+      setSnapLines(generateSnapLines(currentBox, { gridX: currentBox.gridX, gridY: currentBox.gridY }));
+      //setSelectedId(id);
+    };
+    
+    const handleDragMove = (e, id) => {
+      if (!draggingBox) return;
+      const shape = e.target;
+      const pixelPosition = { x: shape.x(), y: shape.y() };
+      const gridPosition = snapToGrid(pixelPosition);
+      const currentBox = sections.find(b => b.id === id);
+      if (!currentBox) return;
+    
+      const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), columns - currentBox.sizeInfo.cols);
+      const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), rows - currentBox.sizeInfo.rows);
+    
+      setSnapLines(generateSnapLines(currentBox, { gridX: clampedGridX, gridY: clampedGridY }));
+      shape.position({
+        x: clampedGridX * (cellWidth + gutterWidth),
+        y: clampedGridY * cellHeight
       });
-    }
-  }; 
+      setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
+    };
+    
+    const handleDragEnd = (e, id) => {
+      setSnapLines([]);
+      const currentBox = sections.find(b => b.id === id);
+      if (!currentBox || !dragPreviewPosition) {
+        resetDragState();
+        return;
+      }
+    
+      const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
+      if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
+        resetDragState();
+        return;
+      }
+    
+      const repositionResult = repositionBoxes(currentBox, { gridX: newGridX, gridY: newGridY }, sections, columns, rows);
+      if (repositionResult.success) {
+        setSections(prevBoxes =>
+          prevBoxes.map(box => repositionResult.newPositions[box.id] ? {
+            ...box,
+            gridX: repositionResult.newPositions[box.id].gridX,
+            gridY: repositionResult.newPositions[box.id].gridY,
+            x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
+            y: repositionResult.newPositions[box.id].gridY * cellHeight,
+          } : box)
+        );
+      } else {
+        resetBoxPosition(id, currentBox);
+      }
+      resetDragState();
+    };
+    const resetBoxPosition = (id, currentBox) => {
+      const stageNode = e.target.getStage();
+      const layer = stageNode.findOne('Layer');
+      const group = layer.findOne(`#${id}`);
+      if (group) {
+        group.to({
+          x: currentBox.gridX * (cellWidth + gutterWidth),
+          y: currentBox.gridY * cellHeight,
+          duration: 0.3
+        });
+      }
+    }; 
 
   
 // Drag end handler (snapping)
@@ -1188,6 +1268,7 @@ return {
   handleDragMove,
   // addNewSection,
   exportToCMYKPDF,
+    fitStageToScreen,
 };
 };
 
