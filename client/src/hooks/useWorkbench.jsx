@@ -24,6 +24,7 @@ const useWorkbench = () => {
       return {
         id: 'box-' + Date.now(),  // Ensuring ID remains a string
         type: 'section',
+        sectionType: 'section',
         x: 0,
         y: 0,
         width: size.cols * cellWidth + (size.cols - 1) * gutterWidth,
@@ -180,6 +181,12 @@ const cellHeight = 50;
     width: columns * cellWidth + (columns - 1) * gutterWidth,
     height: rows * cellHeight,
   });
+  useEffect(() => {
+    setStageSize({
+      width: columns * cellWidth + (columns - 1) * gutterWidth,
+      height: rows * cellHeight,
+    });
+  }, [columns, rows, gutterWidth, cellWidth, cellHeight]);
 
   // Available item sizes
   const itemSizes = [
@@ -205,7 +212,7 @@ const cellHeight = 50;
       const response = await fetch('http://localhost:5000/api/layout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, title: layoutTitle, items, gridSettings }),
+        body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings }),
       });
       const data = await response.json();
       console.log('Layout saved successfully', data);
@@ -236,7 +243,14 @@ const cellHeight = 50;
       setRows(layout.gridSettings.rows);
       setGutterWidth(layout.gridSettings.gutterWidth);
     }
-    setSections(layout.items);
+    const recalculatedSections = layout.sections.map(section => ({
+      ...section,
+      x: section.gridX * cellWidth + (section.gridX * gutterWidth),
+      y: section.gridY * cellHeight 
+    }));
+
+    setSections(recalculatedSections);
+    console.log("Sections array:", layout.sections);
     setLayoutTitle(layout.title);
     setShowLayoutList(false);
     setShowSetupForm(false);
@@ -917,174 +931,173 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
   const handleItemDragStart = (e, itemId, sectionId) => {
     setDraggingBox(itemId);
     setDragStatus(null);
+  // Find the section and item being dragged
+  const section = sections.find(sec => sec.id === sectionId);
+  if (!section) return;
+
+  const currentItem = section.items.find(item => item.id === itemId);
+  if (!currentItem) return;
+
+  // Generate snap lines within the section boundaries
+  setSnapLines(generateSnapLines(currentItem, { gridX: currentItem.gridX, gridY: currentItem.gridY }));
+};
   
-    // Find the section and item being dragged
-    const section = sections.find(sec => sec.id === sectionId);
-    if (!section) return;
-  
-    const currentItem = section.items.find(item => item.id === itemId);
-    if (!currentItem) return;
-  
-    // Generate snap lines within the section boundaries
-    setSnapLines(generateSnapLines(currentItem, { gridX: currentItem.gridX, gridY: currentItem.gridY }));
+  const handleDragStart = (e, id) => {
+    setDraggingBox(id);
+    setDragStatus(null);
+    const currentBox = sections.find(b => b.id === id);
+    if (!currentBox) return;
+    setSnapLines(generateSnapLines(currentBox, { gridX: currentBox.gridX, gridY: currentBox.gridY }));
   };
-    
-    const handleDragStart = (e, id) => {
-      setDraggingBox(id);
-      setDragStatus(null);
-      const currentBox = sections.find(b => b.id === id);
-      if (!currentBox) return;
-      setSnapLines(generateSnapLines(currentBox, { gridX: currentBox.gridX, gridY: currentBox.gridY }));
-    };
-    
-    const handleDragMove = (e, id) => {
-      if (!draggingBox) return;
-      const shape = e.target;
-      const pixelPosition = { x: shape.x(), y: shape.y() };
-      const gridPosition = snapToGrid(pixelPosition);
-      const currentBox = sections.find(b => b.id === id);
-      if (!currentBox) return;
-    
-      const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), columns - currentBox.sizeInfo.cols);
-      const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), rows - currentBox.sizeInfo.rows);
-    
-      setSnapLines(generateSnapLines(currentBox, { gridX: clampedGridX, gridY: clampedGridY }));
-      shape.position({
-        x: clampedGridX * (cellWidth + gutterWidth),
-        y: clampedGridY * cellHeight
-      });
-      setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
-    };
-    
-    const handleDragEnd = (e, id) => {
-      setSnapLines([]);
-      const currentBox = sections.find(b => b.id === id);
-      if (!currentBox || !dragPreviewPosition) {
-        resetDragState();
-        return;
-      }
-    
-      const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
-      if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
-        resetDragState();
-        return;
-      }
-    
-      const repositionResult = repositionBoxes(currentBox, { gridX: newGridX, gridY: newGridY }, sections, columns, rows);
-      if (repositionResult.success) {
-        setSections(prevBoxes =>
-          prevBoxes.map(box => repositionResult.newPositions[box.id] ? {
-            ...box,
-            gridX: repositionResult.newPositions[box.id].gridX,
-            gridY: repositionResult.newPositions[box.id].gridY,
-            x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
-            y: repositionResult.newPositions[box.id].gridY * cellHeight,
-          } : box)
-        );
-      } else {
-        resetBoxPosition(id, currentBox);
-      }
+  
+  const handleDragMove = (e, id) => {
+    if (!draggingBox) return;
+    const shape = e.target;
+    const pixelPosition = { x: shape.x(), y: shape.y() };
+    const gridPosition = snapToGrid(pixelPosition);
+    const currentBox = sections.find(b => b.id === id);
+    if (!currentBox) return;
+  
+    const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), columns - currentBox.sizeInfo.cols);
+    const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), rows - currentBox.sizeInfo.rows);
+  
+    setSnapLines(generateSnapLines(currentBox, { gridX: clampedGridX, gridY: clampedGridY }));
+    shape.position({
+      x: clampedGridX * (cellWidth + gutterWidth),
+      y: clampedGridY * cellHeight
+    });
+    setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
+  };
+  
+  const handleDragEnd = (e, id) => {
+    setSnapLines([]);
+    const currentBox = sections.find(b => b.id === id);
+    if (!currentBox || !dragPreviewPosition) {
       resetDragState();
-    };
-    const resetBoxPosition = (id, currentBox) => {
-      const stageNode = e.target.getStage();
-      const layer = stageNode.findOne('Layer');
-      const group = layer.findOne(`#${id}`);
-      if (group) {
-        group.to({
-          x: currentBox.gridX * (cellWidth + gutterWidth),
-          y: currentBox.gridY * cellHeight,
-          duration: 0.3
-        });
-      }
-    }; 
+      return;
+    }
+  
+    const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
+    if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
+      resetDragState();
+      return;
+    }
+  
+    const repositionResult = repositionBoxes(currentBox, { gridX: newGridX, gridY: newGridY }, sections, columns, rows);
+    if (repositionResult.success) {
+      setSections(prevBoxes =>
+        prevBoxes.map(box => repositionResult.newPositions[box.id] ? {
+          ...box,
+          gridX: repositionResult.newPositions[box.id].gridX,
+          gridY: repositionResult.newPositions[box.id].gridY,
+          x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
+          y: repositionResult.newPositions[box.id].gridY * cellHeight,
+        } : box)
+      );
+    } else {
+      resetBoxPosition(id, currentBox);
+    }
+    resetDragState();
+  };
+  const resetBoxPosition = (id, currentBox) => {
+    const stageNode = e.target.getStage();
+    const layer = stageNode.findOne('Layer');
+    const group = layer.findOne(`#${id}`);
+    if (group) {
+      group.to({
+        x: currentBox.gridX * (cellWidth + gutterWidth),
+        y: currentBox.gridY * cellHeight,
+        duration: 0.3
+      });
+    }
+  }; 
 
-    
-  // Drag end handler (snapping)
-  // const handleDragEnd = (e) => {
-  //   const id = e.target.id();
-  //   const shape = e.target;
-  //   const totalCellWidth = cellWidth + gutterWidth;
-  //   const colIndex = Math.round(shape.x() / totalCellWidth);
-  //   const rowIndex = Math.round(shape.y() / cellHeight);
-  //   const maxColIndex = columns - (items.find(i => i.id === id)?.sizeInfo?.cols || 1);
-  //   const boundedColIndex = Math.min(Math.max(0, colIndex), maxColIndex);
-  //   const boundedX = boundedColIndex * totalCellWidth;
-  //   const maxRowIndex = rows - (items.find(i => i.id === id)?.sizeInfo?.rows || 1);
-  //   const boundedRowIndex = Math.min(Math.max(0, rowIndex), maxRowIndex);
-  //   const boundedY = boundedRowIndex * cellHeight;
-  //   const updatedItems = items.map(item =>
-  //     item.id === id ? { ...item, x: boundedX, y: boundedY} : item
-  //   );
-  //   setSections(updatedItems);
-  // };
+  
+// Drag end handler (snapping)
+// const handleDragEnd = (e) => {
+//   const id = e.target.id();
+//   const shape = e.target;
+//   const totalCellWidth = cellWidth + gutterWidth;
+//   const colIndex = Math.round(shape.x() / totalCellWidth);
+//   const rowIndex = Math.round(shape.y() / cellHeight);
+//   const maxColIndex = columns - (items.find(i => i.id === id)?.sizeInfo?.cols || 1);
+//   const boundedColIndex = Math.min(Math.max(0, colIndex), maxColIndex);
+//   const boundedX = boundedColIndex * totalCellWidth;
+//   const maxRowIndex = rows - (items.find(i => i.id === id)?.sizeInfo?.rows || 1);
+//   const boundedRowIndex = Math.min(Math.max(0, rowIndex), maxRowIndex);
+//   const boundedY = boundedRowIndex * cellHeight;
+//   const updatedItems = items.map(item =>
+//     item.id === id ? { ...item, x: boundedX, y: boundedY} : item
+//   );
+//   setSections(updatedItems);
+// };
 
-  // const handleDragEnd = (e, id) => {
-  //   setSnapLines([]); // Clear snap lines
-    
-  //   const currentBox = items.find(b => b.id === id);
-  //   if (!currentBox || !dragPreviewPosition) {
-  //     setDraggingBox(null);
-  //     setDragPreviewPosition(null);
-  //     setDragStatus(null);
-  //     return;
-  //   }
+// const handleDragEnd = (e, id) => {
+//   setSnapLines([]); // Clear snap lines
   
-  //   const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
-    
-  //   // No movement, just reset
-  //   if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
-  //     setDraggingBox(null);
-  //     setDragPreviewPosition(null);
-  //     setDragStatus(null);
-  //     return;
-  //   }
+//   const currentBox = items.find(b => b.id === id);
+//   if (!currentBox || !dragPreviewPosition) {
+//     setDraggingBox(null);
+//     setDragPreviewPosition(null);
+//     setDragStatus(null);
+//     return;
+//   }
+
+//   const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
   
-  //   // Try repositioning
-  //   const repositionResult = repositionBoxes(
-  //     currentBox,
-  //     { gridX: newGridX, gridY: newGridY },
-  //     items,
-  //     columns,
-  //     rows
-  //   );
-  
-  //   if (repositionResult.success) {
-  //     // Update the state with new positions
-  //     setSections(prevBoxes =>
-  //       prevBoxes.map(box => {
-  //         if (repositionResult.newPositions[box.id]) {
-  //           return {
-  //             ...box,
-  //             gridX: repositionResult.newPositions[box.id].gridX,
-  //             gridY: repositionResult.newPositions[box.id].gridY,
-  //             x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
-  //             y: repositionResult.newPositions[box.id].gridY * cellHeight,
-  //           };
-  //         }
-  //         return box;
-  //       })
-  //     );
-  //   } else {
-  //     // If invalid, reset position visually
-  //     const stageNode = e.target.getStage();
-  //     const layer = stageNode.findOne('Layer');
-  //     const group = layer.findOne(`#${id}`);
-  
-  //     if (group) {
-  //       group.to({
-  //         x: currentBox.gridX * (cellWidth + gutterWidth),
-  //         y: currentBox.gridY * cellHeight,
-  //         duration: 0.3
-  //       });
-  //     }
-  //   }
-  
-  //   setDraggingBox(null);
-  //   setDragPreviewPosition(null);
-  //   setDragStatus(null);
-  // };
-  
+//   // No movement, just reset
+//   if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
+//     setDraggingBox(null);
+//     setDragPreviewPosition(null);
+//     setDragStatus(null);
+//     return;
+//   }
+
+//   // Try repositioning
+//   const repositionResult = repositionBoxes(
+//     currentBox,
+//     { gridX: newGridX, gridY: newGridY },
+//     items,
+//     columns,
+//     rows
+//   );
+
+//   if (repositionResult.success) {
+//     // Update the state with new positions
+//     setSections(prevBoxes =>
+//       prevBoxes.map(box => {
+//         if (repositionResult.newPositions[box.id]) {
+//           return {
+//             ...box,
+//             gridX: repositionResult.newPositions[box.id].gridX,
+//             gridY: repositionResult.newPositions[box.id].gridY,
+//             x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
+//             y: repositionResult.newPositions[box.id].gridY * cellHeight,
+//           };
+//         }
+//         return box;
+//       })
+//     );
+//   } else {
+//     // If invalid, reset position visually
+//     const stageNode = e.target.getStage();
+//     const layer = stageNode.findOne('Layer');
+//     const group = layer.findOne(`#${id}`);
+
+//     if (group) {
+//       group.to({
+//         x: currentBox.gridX * (cellWidth + gutterWidth),
+//         y: currentBox.gridY * cellHeight,
+//         duration: 0.3
+//       });
+//     }
+//   }
+
+//   setDraggingBox(null);
+//   setDragPreviewPosition(null);
+//   setDragStatus(null);
+// };
+
 
 
 
@@ -1114,68 +1127,68 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
 
 
 
-  return {
-    userId,
-    showSetupForm,
-    setShowSetupForm,
-    layoutTitle,
-    setLayoutTitle,
-    columns,
-    setColumns,
-    rows,
-    setRows,
-    gutterWidth,
-    setGutterWidth,
-    stageSize,
-    stageScale,
-    toolMode,
-    setToolMode,
-    selectedId,
-    setSelectedId,
-    availableLayouts,
-    showLayoutList,
-    setShowLayoutList,
-    textValue,
-    setTextValue,
-    textFormatting,
-    setTextFormatting,
-    stageRef,
-    transformerRef,
-    itemSizes,
-    colors,
-    uploadCanvasImage,
-    saveLayout,
-    fetchAvailableLayouts,
-    zoomBy,
-    handleWheel,
-    addBox,
-    addTextBox,
-    addImageItem,
-    handleImageUpload,
-    handleTextChange,
-    toggleFormat,
-    changeFontSize,
-    changeItemColor,
-    deleteSelected,
-    handleTransformEnd,
-    loadLayoutFromSelected,
-    cellWidth,
-    cellHeight,
-    addPredefineditem,
-    addNewSection,
-    addItemToSection,
-    setSectionId,
-    sectionId,
-    sections,
-    handleItemDragEnd,
-    handleItemDragStart,
-    handleItemDragMove,
-    handleDragStart,
-    handleDragEnd,
-    handleDragMove,
-    addNewSection,
-    exportToCMYKPDF,
-  };
+return {
+  userId,
+  showSetupForm,
+  setShowSetupForm,
+  layoutTitle,
+  setLayoutTitle,
+  columns,
+  setColumns,
+  rows,
+  setRows,
+  gutterWidth,
+  setGutterWidth,
+  stageSize,
+  stageScale,
+  toolMode,
+  setToolMode,
+  selectedId,
+  setSelectedId,
+  availableLayouts,
+  showLayoutList,
+  setShowLayoutList,
+  textValue,
+  setTextValue,
+  textFormatting,
+  setTextFormatting,
+  stageRef,
+  transformerRef,
+  itemSizes,
+  colors,
+  uploadCanvasImage,
+  saveLayout,
+  fetchAvailableLayouts,
+  zoomBy,
+  handleWheel,
+  addBox,
+  addTextBox,
+  addImageItem,
+  handleImageUpload,
+  handleTextChange,
+  toggleFormat,
+  changeFontSize,
+  changeItemColor,
+  deleteSelected,
+  handleTransformEnd,
+  loadLayoutFromSelected,
+  cellWidth,
+  cellHeight,
+  addPredefineditem,
+  addNewSection,
+  addItemToSection,
+  setSectionId,
+  sectionId,
+  sections,
+  handleItemDragEnd,
+  handleItemDragStart,
+  handleItemDragMove,
+  handleDragStart,
+  handleDragEnd,
+  handleDragMove,
+  // addNewSection,
+  exportToCMYKPDF,
+};
 };
 
 export default useWorkbench;
