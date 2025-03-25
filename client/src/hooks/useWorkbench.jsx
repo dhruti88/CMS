@@ -281,6 +281,22 @@ const cellHeight = 50;
     }
   };
 
+  const fetchAvailableSections = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/layouts?userId=${userId}`);
+      if (response.ok) {
+        console.log("Hii2",response);
+        const data = await response.json();
+        setAvailableLayouts(data.layouts);
+        // setShowLayoutList(true);
+      } else {
+        console.log("No layouts found.");
+      }
+    } catch (error) {
+      console.error("Error fetching layouts:", error);
+    }
+  };
+
   const loadLayoutFromSelected = (layout) => {
     if (layout.gridSettings && layout.gridSettings.gutterWidth !== undefined) {
       setColumns(layout.gridSettings.columns);
@@ -1212,6 +1228,7 @@ return {
   showSetupForm,
   setShowSetupForm,
   layoutTitle,
+  setSections,
   setLayoutTitle,
   columns,
   setColumns,
@@ -1269,6 +1286,8 @@ return {
   // addNewSection,
   exportToCMYKPDF,
     fitStageToScreen,
+    fetchAvailableSections,
+  
 };
 };
 

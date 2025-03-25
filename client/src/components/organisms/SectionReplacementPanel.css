@@ -1,0 +1,182 @@
+.replacement-panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.replacement-panel {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 
+                0 10px 20px rgba(0, 0, 0, 0.08);
+    transform: scale(0.9);
+    animation: scaleUp 0.3s ease-out forwards;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.replacement-panel h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-weight: 600;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.section-list {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #c0c0c0 #f0f0f0;
+}
+
+.section-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.section-list::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
+}
+
+.section-list::-webkit-scrollbar-thumb {
+    background-color: #c0c0c0;
+    border-radius: 10px;
+}
+
+.section-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-item:last-child {
+    border-bottom: none;
+}
+
+.section-item:hover {
+    background-color: #f7f9fc;
+    transform: translateX(5px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.section-item.selected {
+    background-color: #e6f2ff;
+    border-left: 4px solid #3b82f6;
+    font-weight: 500;
+    color: #1e40af;
+}
+
+.section-item-details {
+    color: #6b7280;
+    font-size: 0.85em;
+}
+
+.panel-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.panel-actions button {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.panel-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+    .replacement-panel {
+        width: 95%;
+        margin: 0 10px;
+    }
+}
+
+.search-container {
+    margin-bottom: 15px;
+  }
+  
+  .section-search-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  
+  .no-sections {
+    text-align: center;
+    color: #6b7280;
+    padding: 20px;
+  }
+
+  /* Add these to your existing CSS */
+.section-item-main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  
+  .section-item-details {
+    font-size: 0.75em;
+    color: #6b7280;
+    margin-top: 4px;
+  }
+  
+  .section-item-size {
+    color: #6b7280;
+    font-size: 0.8em;
+  }
+  
+  .section-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }

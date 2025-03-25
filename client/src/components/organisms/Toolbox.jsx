@@ -4,6 +4,7 @@ import Button from '../atoms/Button';
 import ColorButton from '../atoms/ColorButton';
 import ToolboxSection from '../molecules/ToolboxSection';
 import TextFormattingTools from '../molecules/TextFormattingTools';
+import SectionReplacementPanel from './SectionReplacementPanel';
 import Input from '../atoms/Input';
 
 const Toolbox = ({
@@ -30,7 +31,8 @@ const Toolbox = ({
   cellWidth,
   cellHeight,
   deleteSelected,
-  changeItemColor
+  changeItemColor,
+  openReplacementPanel
 }) => {
   
   // Find selected section
@@ -186,6 +188,15 @@ const Toolbox = ({
           <li><span className="shortcut-key">Click</span> Select item</li>
         </ul>
       </ToolboxSection>
+      
+<ToolboxSection title="Section Replacement">
+  <div className="replacement-button-container">
+    <Button onClick={openReplacementPanel} className="replacement-button">
+      Replace Section
+    </Button>
+  </div>
+</ToolboxSection>
+
 
       {/* Layout Selection */}
       {showLayoutList && (
