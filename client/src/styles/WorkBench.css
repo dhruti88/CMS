@@ -81,7 +81,7 @@
     flex: 1;
     min-width: 1000px; /* Ensures horizontal scroll when needed */
     min-height: 800px; /* Ensures vertical scroll when needed */
-    overflow: none;
+    overflow: auto;
   }
   
   /* Toolbox Styles */
