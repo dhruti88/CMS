@@ -3,21 +3,16 @@ import { Typography } from "@mui/material";
 import CustomButton from "../atoms/button/CustomButton";
 import colors from "../../theme/colors";
 import "../../styles/LandingPage.css" // Import CSS file
+import Navbar from "../atoms/navbar/NavBar";
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
     <div className="landing-container">
-      <nav className="navbar">
-      <Typography variant="h4" fontWeight="bold" align="left">
-          <span className="text-black">Page</span>
-          <span style={{ color: colors.primary }}>Craft</span>
-        </Typography>
-        <div className="nav-button">
-          <CustomButton onClick={() => navigate("/signin")}>Sign in</CustomButton>
-        </div>
-      </nav>
+       <Navbar>
+        <CustomButton onClick={() => navigate("/signin")}>Sign in</CustomButton>
+      </Navbar>
 
       {/* Main Content */}
       <div className="content-box">
