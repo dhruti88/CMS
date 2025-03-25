@@ -63,3 +63,26 @@
 [2025-03-25T12:05:20.412] [INFO] default - Server running on http://localhost:5000
 [2025-03-25T12:05:21.173] [INFO] default - Connected to Database
 [2025-03-25T12:05:39.674] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-24T11:28:05.869] [INFO] default - Server running on http://localhost:8000
+[2025-03-24T11:28:06.830] [INFO] default - Connected to Database
+[2025-03-24T11:28:26.884] [INFO] default - [POST] /api/users/save
+[2025-03-24T11:28:27.831] [INFO] default - User authenticated: dhruti.bhimani@searce.com
+[2025-03-24T11:28:27.832] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
+[2025-03-24T11:28:27.860] [WARN] default - User already exists: dhruti.bhimani@searce.com
+[2025-03-24T11:31:26.487] [INFO] default - [POST] /api/users/save
+[2025-03-24T11:31:26.507] [INFO] default - User authenticated: dhruti.bhimani@searce.com
+[2025-03-24T11:31:26.507] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
+[2025-03-24T11:31:26.533] [WARN] default - User already exists: dhruti.bhimani@searce.com
+[2025-03-24T12:33:45.529] [INFO] default - [POST] /api/users/save
+[2025-03-24T12:33:45.530] [INFO] default - User authenticated: dhruti.bhimani@searce.com
+[2025-03-24T12:33:45.550] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
+[2025-03-24T12:33:45.858] [WARN] default - User already exists: dhruti.bhimani@searce.com
+[2025-03-24T14:47:43.121] [INFO] default - Server running on http://localhost:5000
+[2025-03-24T14:47:43.953] [INFO] default - Connected to Database
+[2025-03-24T14:56:12.160] [INFO] default - Server running on http://localhost:3000
+[2025-03-24T14:56:12.717] [INFO] default - Connected to Database
+[2025-03-24T15:06:37.804] [INFO] default - Server running on http://localhost:8000
+[2025-03-24T15:06:38.512] [INFO] default - Connected to Database
+[2025-03-25T11:47:43.691] [INFO] default - Server running on http://localhost:8000
+[2025-03-25T11:47:44.808] [INFO] default - Connected to Database
+[2025-03-25T11:50:32.579] [INFO] default - [POST] /api/pdf/convert-cmyk
