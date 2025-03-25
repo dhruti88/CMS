@@ -10,6 +10,7 @@ import WorkBench from './components/pages/WorkBench';
 import ProtectedRoute from './hooks/ProtectedRoute';
 import PublicRoute from './hooks/PublicRoute';
 import { AuthProvider } from './context/AuthContext';
+import MyLayouts from './components/pages/MyLayouts'
 
 function App() {
   return (

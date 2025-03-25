@@ -74,6 +74,14 @@ const WorkbenchTemplate = () => {
     setSections,
     exportToCMYKPDF,
     fitStageToScreen,
+    city,
+    setCity,
+    dueDate,
+    setDueDate,
+    taskStatus,
+    setTaskStatus,
+    layoutType,
+    setLayoutType,
   } = workbenchProps;
 
   return (
@@ -89,6 +97,14 @@ const WorkbenchTemplate = () => {
           gutterWidth={gutterWidth}
           setGutterWidth={setGutterWidth}
           setShowSetupForm={setShowSetupForm}
+          city={city}
+          setCity={setCity}
+          dueDate={dueDate}
+          setDueDate={setDueDate}
+          taskStatus={taskStatus}
+          setTaskStatus={setTaskStatus}
+          layoutType={layoutType}
+          setLayoutType={setLayoutType}
         />
       ) : (
         <>
