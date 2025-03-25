@@ -33,19 +33,19 @@ mongoose
 // Save or update a layout
 app.post('/api/layout', async (req, res) => {
   try {
-    const { userId, title, items, gridSettings } = req.body;
-    console.log('Saving layout with items:', items);
+    const { userId, title,sections, gridSettings } = req.body;
+    console.log('Saving layout with items:', sections);
     // Try to find an existing layout for the user and title
     let layout = await Layout.findOne({ userId, title });
     if (layout) {
       // Update existing layout
-      layout.items = items;
+      layout.sections = sections;
       layout.gridSettings = gridSettings;
       layout.updatedAt = new Date();
       await layout.save();
     } else {
       // Create new layout document
-      layout = new Layout({ userId, title, items, gridSettings });
+      layout = new Layout({ userId, title, sections, gridSettings });
       await layout.save();
     }
     res.json({ success: true, layout });
