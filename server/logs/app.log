@@ -69,3 +69,6 @@
 [2025-03-24T14:56:12.717] [INFO] default - Connected to Database
 [2025-03-24T15:06:37.804] [INFO] default - Server running on http://localhost:8000
 [2025-03-24T15:06:38.512] [INFO] default - Connected to Database
+[2025-03-25T11:47:43.691] [INFO] default - Server running on http://localhost:8000
+[2025-03-25T11:47:44.808] [INFO] default - Connected to Database
+[2025-03-25T11:50:32.579] [INFO] default - [POST] /api/pdf/convert-cmyk

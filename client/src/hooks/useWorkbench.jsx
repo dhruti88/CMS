@@ -474,7 +474,7 @@ const deleteSelected = () => {
     formData.append("image", imageBlob, "konva_image.png");
 
     try {
-      const res = await fetch("http://localhost:5000/api/pdf/convert-cmyk", {
+      const res = await fetch("http://localhost:8000/api/pdf/convert-cmyk", {
         method: "POST",
         body: formData,
       });
