@@ -15,6 +15,7 @@ const WorkbenchActions = ({
   availableLayouts,
   loadLayoutFromSelected, 
   exportToCMYKPDF,
+  fitStageToScreen,
   stageRef, // Add stageRef to props
 }) => {
   return (
@@ -68,6 +69,9 @@ const WorkbenchActions = ({
         </Button>
         <Button onClick={() => exportToCMYKPDF()} className="action-button">
           Download as PDF
+        </Button>
+        <Button onClick={() => fitStageToScreen()} className="action-button">
+          Reset View
         </Button>
       </div>
     </div>

@@ -70,6 +70,7 @@ const WorkbenchTemplate = () => {
     handleItemDragMove,
     setSections,
     exportToCMYKPDF,
+    fitStageToScreen,
   } = workbenchProps;
 
   return (
@@ -103,31 +104,33 @@ const WorkbenchTemplate = () => {
         loadLayoutFromSelected = {loadLayoutFromSelected}
         exportToCMYKPDF = {exportToCMYKPDF}
         stageRef={stageRef}
+        fitStageToScreen = {fitStageToScreen}
       />
-      <WorkbenchCanvas
-        stageSize={stageSize}
-        stageScale={stageScale}
-        toolMode={toolMode}
-        handleWheel={handleWheel}
-        stageRef={stageRef}
-        items={items}
-        selectedId={selectedId}
-        setSelectedId={setSelectedId}
-        handleDragEnd={handleDragEnd}
-        cellWidth={cellWidth}
-        cellHeight={cellHeight}
-        gutterWidth={gutterWidth}
-        transformerRef={transformerRef}
-        setItems={setItems}
-        handleItemDragStart = {handleItemDragStart}
-        handleItemDragMove = {handleItemDragMove}
-        handleItemDragEnd={handleItemDragEnd}
-        handleDragStart = {handleDragStart}
-        handleDragMove = {handleDragMove}
-        setSectionId = {setSectionId}
-        sections = {sections}
-        setSections={setSections}
-      />
+     <WorkbenchCanvas
+  handleTransformEnd={handleTransformEnd}  // ✅ Make sure this is included
+  stageSize={stageSize}
+  stageScale={stageScale}
+  toolMode={toolMode}
+  handleWheel={handleWheel}
+  stageRef={stageRef}
+  items={items}
+  selectedId={selectedId}
+  setSelectedId={setSelectedId}
+  handleItemDragEnd={handleItemDragEnd}
+  cellWidth={cellWidth}
+  cellHeight={cellHeight}
+  gutterWidth={gutterWidth}
+  transformerRef={transformerRef}
+  setItems={setItems}
+  handleItemDragStart={handleItemDragStart}
+  handleItemDragMove={handleItemDragMove}
+  sections={sections}
+  setSectionId={setSectionId}
+  handleDragStart={handleDragStart}
+  handleDragEnd={handleDragEnd}
+  handleDragMove={handleDragMove}
+  sectionId={sectionId}
+/>
     </div>
           <Toolbox
             itemSizes={itemSizes}

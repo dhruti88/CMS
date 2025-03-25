@@ -22,7 +22,7 @@ const useWorkbench = () => {
     const addSection = (size) => 
     {
       return {
-        id: 'box-' + Date.now(),  // Ensuring ID remains a string
+        id: 'section-' + Date.now(),  // Ensuring ID remains a string
         type: 'section',
         x: 0,
         y: 0,
@@ -56,9 +56,52 @@ const useWorkbench = () => {
       gridY: 0
     };
   };
+
+    // Image upload handler
+    const handleImageUpload = (sectionId, e) => {
+      console.log("image : -", e);
+      const file = e.target.files[0];
+    
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64data = reader.result;
+          const defaultSize = { cols: 2, rows: 2, label: '2×2' };
+          const imageItem = addImageItem(defaultSize);
+          imageItem.src = base64data; // Set uploaded image source
+    
+          setSections(prevSections =>
+            prevSections.map(section => {
+              if (section.id !== sectionId) return section; // Skip if not the correct section
+    
+              // Check available space before adding the image
+              const bestPosition = findBestPositionForItem(imageItem, section.items, section.sizeInfo);
+              if (!bestPosition) {
+                alert("No space available in section!");
+                return section;
+              }
+    
+              // Assign correct position before adding the image
+              imageItem.gridX = bestPosition.gridX;
+              imageItem.gridY = bestPosition.gridY;
+              imageItem.x = imageItem.gridX * (cellWidth + gutterWidth);
+              imageItem.y = imageItem.gridY * cellHeight;
+    
+              return { ...section, items: [...section.items, imageItem] };
+            })
+          );
+    
+          setSelectedId(imageItem.id);
+        };
+    
+        reader.readAsDataURL(file);
+      }
+    };
+    
   
   
-  const addItemToSection = (sectionId, size,type) => {
+  const addItemToSection = (sectionId, size,type,e = null) => {
+    
     setSections(prevSections =>
       prevSections.map(section => {
         if (section.id !== sectionId) return section; // Skip if it's not the target section
@@ -68,6 +111,7 @@ const useWorkbench = () => {
         newItem = addTextBox(size);
         else
         newItem = addImageItem(size);
+
 
         const bestPosition = findBestPositionForItem(newItem, section.items, section.sizeInfo);
   
@@ -205,7 +249,7 @@ const cellHeight = 50;
       const response = await fetch('http://localhost:5000/api/layout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, title: layoutTitle, items, gridSettings }),
+        body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings }),
       });
       const data = await response.json();
       console.log('Layout saved successfully', data);
@@ -284,30 +328,7 @@ const cellHeight = 50;
     };
   };
   
-  // Image upload handler
-  const handleImageUpload = (e) => {
-    console.log("image : -",e);
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64data = reader.result;
-        const defaultSize = { cols: 2, rows: 2, label: '2×2' };
-        const imageItem = addImageItem(defaultSize);
-        imageItem.src = base64data; // Set uploaded image source
-        setSections(prevSections =>
-          prevSections.map(section => 
-            section.id === sectionId  // Ensure you're adding image inside the correct section
-              ? { ...section, items: [...section.items, imageItem] }
-              : section
-          )
-        );
-        
-        setSelectedId(imageItem.id);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+
   
 // Helper function to update sections
 const updateSections = (selectedId, sections, updateFn) => {
@@ -519,9 +540,24 @@ const deleteSelected = () => {
     stage.batchDraw();
   };
 
-// Transformer onTransformEnd handler
-  const handleTransformEnd = (e) => {
-    const node = e.target;
+  const fitStageToScreen = () => {
+    if (!stageRef.current) return;
+  
+    const stage = stageRef.current;
+  
+    // Reset scale
+    setStageScale(1);
+    stage.scale({ x: 1, y: 1 });
+  
+    // Reset position
+    stage.position({ x: 0, y: 0 });
+  
+    // Redraw the stage
+    stage.batchDraw();
+  };
+  
+
+  const handleTransformEndHelper = (node, cellWidth, gutterWidth, cellHeight, stageSize) => {
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
     const newWidth = node.width() * scaleX;
@@ -531,20 +567,62 @@ const deleteSelected = () => {
     const snappedWidth = colSpan * cellWidth + (colSpan - 1) * gutterWidth;
     const rowSpan = Math.round(newHeight / cellHeight);
     const snappedHeight = rowSpan * cellHeight;
-    setSections(prev => prev.map(item =>
-      item.id === node.id() ? {
-        ...item,
-        width: snappedWidth,
-        height: snappedHeight,
-        scaleX: 1,
-        scaleY: 1,
-        sizeInfo: { cols: colSpan, rows: rowSpan },
-      } : item
-    ));
-    node.scaleX(1);
-    node.scaleY(1);
+    return { snappedWidth, snappedHeight, colSpan, rowSpan };
   };
 
+
+
+// Transformer onTransformEnd handler
+const handleTransformEnd = (e) => {
+  console.log("end : - ");
+  const node = e.target;
+  if (!selectedId || !sectionId) return;
+
+  const section = sections.find(sec => sec.id === sectionId);
+  if (!section) return;
+
+  const { snappedWidth, snappedHeight, colSpan, rowSpan } = handleTransformEndHelper(
+    node,
+    cellWidth,
+    gutterWidth,
+    cellHeight,
+    stageSize
+  );
+
+  // Compute new gridX, gridY inside section
+  const newGridX = Math.round((node.x() - section.x) / (cellWidth + gutterWidth));
+  const newGridY = Math.round((node.y() - section.y) / cellHeight);
+
+  // Ensure grid position doesn't exceed section boundaries
+  const maxGridX = (section.width - snappedWidth) / (cellWidth + gutterWidth);
+  const maxGridY = (section.height - snappedHeight) / cellHeight;
+
+  setSections(prevSections =>
+    prevSections.map(sec =>
+      sec.id === sectionId
+        ? {
+            ...sec,
+            items: sec.items.map(item =>
+              item.id === selectedId
+                ? {
+                    ...item,
+                    width: snappedWidth,
+                    height: snappedHeight,
+                    gridX: Math.max(0, Math.min(maxGridX, newGridX)),
+                    gridY: Math.max(0, Math.min(maxGridY, newGridY)),
+                    sizeInfo: { cols: colSpan, rows: rowSpan },
+                  }
+                : item
+            ),
+          }
+        : sec
+    )
+  );
+
+  // Reset transformation
+  node.scaleX(1);
+  node.scaleY(1);
+};
 
   // Update transformer when selection changes
  // Update transformer when selection changes
@@ -935,6 +1013,7 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
       const currentBox = sections.find(b => b.id === id);
       if (!currentBox) return;
       setSnapLines(generateSnapLines(currentBox, { gridX: currentBox.gridX, gridY: currentBox.gridY }));
+      //setSelectedId(id);
     };
     
     const handleDragMove = (e, id) => {
@@ -1175,6 +1254,7 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
     handleDragMove,
     addNewSection,
     exportToCMYKPDF,
+    fitStageToScreen,
   };
 };
 

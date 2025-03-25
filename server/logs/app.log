@@ -60,3 +60,6 @@
 [2025-03-24T16:30:48.167] [INFO] default - [POST] /api/pdf/convert-cmyk
 [2025-03-24T16:36:07.276] [INFO] default - [POST] /api/pdf/convert-cmyk
 [2025-03-24T19:37:30.747] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-25T12:05:20.412] [INFO] default - Server running on http://localhost:5000
+[2025-03-25T12:05:21.173] [INFO] default - Connected to Database
+[2025-03-25T12:05:39.674] [INFO] default - [POST] /api/pdf/convert-cmyk
