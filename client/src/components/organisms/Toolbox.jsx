@@ -1,4 +1,3 @@
-// toolbox.jsx:
 import React from 'react';
 import Button from '../atoms/Button';
 import ColorButton from '../atoms/ColorButton';
@@ -13,7 +12,7 @@ const Toolbox = ({
   handleImageUpload,
   selectedId,
   sectionId,
-  sections,
+  sections = [], // default to empty array
   textFormatting,
   toggleFormat,
   changeFontSize,
@@ -23,22 +22,22 @@ const Toolbox = ({
   colors,
   gutterWidth,
   setGutterWidth,
-  availableLayouts,
+  availableLayouts = [], // default to empty array
   loadLayoutFromSelected,
   showLayoutList,
   setShowLayoutList,
   cellWidth,
   cellHeight,
   deleteSelected,
-  changeItemColor
+  changeItemColor,
+  openReplacementPanel,
 }) => {
-  
-  // Find selected section
-  const selectedSection = sections.find(section => section.id === selectedId);
+  // Find selected section safely
+  const selectedSection = (sections || []).find(section => section.id === selectedId);
 
-  // Find selected item inside a section
-  const selectedItem = sections
-    .flatMap(section => section.items)
+  // Find selected item inside a section safely
+  const selectedItem = (sections || [])
+    .flatMap(section => section.items || [])
     .find(item => item.id === selectedId);
 
   return (
@@ -85,7 +84,7 @@ const Toolbox = ({
 
         <div className="size-section">
           <h4>Upload Image</h4>
-          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(sectionId, e)}/>
+          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(sectionId, e)} />
         </div>
       </ToolboxSection>
 
@@ -131,7 +130,7 @@ const Toolbox = ({
               <label>Size:</label>
               <span>
                 {selectedSection
-                  ? `${selectedSection.sizeInfo.cols} × ${selectedSection.sizeInfo.rows}`
+                  ? `${selectedSection.sizeInfo? selectedSection.sizeInfo.cols : 1 } × ${selectedSection.sizeInfo? selectedSection.sizeInfo.rows : 1}`
                   : `${selectedItem?.sizeInfo?.cols || 1} × ${selectedItem?.sizeInfo?.rows || 1}`}
               </span>
             </div>
@@ -187,13 +186,22 @@ const Toolbox = ({
         </ul>
       </ToolboxSection>
 
+      {/* Section Replacement */}
+      <ToolboxSection title="Section Replacement">
+        <div className="replacement-button-container">
+          <Button onClick={openReplacementPanel} className="replacement-button">
+            Replace Section
+          </Button>
+        </div>
+      </ToolboxSection>
+
       {/* Layout Selection */}
       {showLayoutList && (
         <ToolboxSection title="Select Layout to Edit">
           {availableLayouts.length > 0 ? (
             <ul>
               {availableLayouts.map(layout => (
-                <li key={layout._id}>
+                <li key={layout._id || layout.id}>
                   <strong>{layout.title}</strong>
                   <Button onClick={() => loadLayoutFromSelected(layout)}>Edit</Button>
                 </li>

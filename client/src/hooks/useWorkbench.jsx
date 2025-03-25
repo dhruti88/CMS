@@ -281,6 +281,26 @@ const cellHeight = 50;
     }
   };
 
+
+  const fetchAvailablesections = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/layouts?userId=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Fetched Sections:", data.layouts);  
+        setAvailableLayouts(data.layouts);
+        return data.layouts;
+      } else {
+        console.error("No layouts found.");
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching layouts:", error);
+      return [];
+    }
+  };
+  
+
   const loadLayoutFromSelected = (layout) => {
     if (layout.gridSettings && layout.gridSettings.gutterWidth !== undefined) {
       setColumns(layout.gridSettings.columns);
@@ -652,7 +672,7 @@ useEffect(() => {
   let selectedSection = null;
 
   for (const section of sections) {
-    const item = section.items.find(i => i.id === selectedId);
+    const item = (section.items || []).find(i => i.id === selectedId);
     if (item) {
       selectedItem = item;
       selectedSection = section;
@@ -1269,6 +1289,9 @@ return {
   // addNewSection,
   exportToCMYKPDF,
     fitStageToScreen,
+    sections,
+    setSections,
+    fetchAvailablesections,
 };
 };
 
