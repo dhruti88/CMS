@@ -72,3 +72,11 @@
 [2025-03-25T11:47:43.691] [INFO] default - Server running on http://localhost:8000
 [2025-03-25T11:47:44.808] [INFO] default - Connected to Database
 [2025-03-25T11:50:32.579] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-25T12:00:39.779] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-25T12:01:17.277] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-25T12:03:49.858] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-25T12:05:48.434] [INFO] default - [POST] /api/pdf/convert-cmyk
+[2025-03-25T12:35:22.285] [INFO] default - [POST] /api/users/save
+[2025-03-25T12:35:23.323] [INFO] default - User authenticated: dhruti.bhimani@searce.com
+[2025-03-25T12:35:23.324] [INFO] default - POST /save - Request from dhruti.bhimani@searce.com
+[2025-03-25T12:35:23.350] [WARN] default - User already exists: dhruti.bhimani@searce.com
