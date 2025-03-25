@@ -407,7 +407,7 @@ const WorkbenchCanvas = ({
   handleDragStart,
   handleDragEnd,
   handleDragMove,
-  sectionId
+  sectionId,
   columns,
   rows
 }) => {

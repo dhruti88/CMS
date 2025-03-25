@@ -233,17 +233,15 @@ const SectionSchema = new Schema({
 const LayoutSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
   title: { type: String, required: true },
-  items: [SectionSchema],
+  sections: [SectionSchema], // Each layout contains multiple sections
   gridSettings: {
     columns: { type: Number },
     rows: { type: Number },
     gutterWidth: { type: Number },
   },
-  previousLayouts: [EmbeddedLayoutSchema],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
 const Layout = mongoose.model('Layout', LayoutSchema);
 export default Layout;
-
