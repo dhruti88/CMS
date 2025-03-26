@@ -1,12 +1,44 @@
 import { useState, useRef, useEffect } from 'react';
 import { getCellDimensions } from '../utils/gridHelpers';
 import { saveAs } from "file-saver";
+import {SERVER_URL} from '../Urls';
+import axios from "axios";
 
 const useWorkbench = () => {
   // Constants
-  const userId = "60d21b4667d0d8992e610c85"; // example ObjectId
-  const defaultTitle = "default";
+const [userID, setUserID] = useState("60d21b4667d0d8992e610c85");
+const token =localStorage.getItem("token");
 
+// Fetch user info from the backend
+  const fetchUser = async() =>
+  {
+    try {
+      const response = await axios.get(`${SERVER_URL}/api/users/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUserID(response.data.uid); // Set the user data
+      console.log("User UID:", response.data.uid);
+      console.log("User data fetched:", response.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+  
+   useEffect(() => {
+      if (token) {
+        fetchUser();
+      } else {
+        console.error("No token found. Please sign in.");
+      }
+    }, [token]);
+
+  const userId = userID;
+  console.log("userId : -",userId);
+  const defaultTitle = "default";
+  
   // Setup & grid configuration
   const [showSetupForm, setShowSetupForm] = useState(true);
   const [layoutTitle, setLayoutTitle] = useState(defaultTitle);
@@ -253,9 +285,9 @@ const cellHeight = 50;
   const saveLayout = async () => {
     try {
       const gridSettings = { columns, rows, gutterWidth };
-      const response = await fetch('http://localhost:5000/api/layout', {
+      const response = await fetch(`${SERVER_URL}/api/layout`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' , 'Authorization': `Bearer ${token}`},
         body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings }),
       });
       const data = await response.json();
@@ -267,7 +299,9 @@ const cellHeight = 50;
 
   const fetchAvailableLayouts = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/layouts?userId=${userId}`);
+      const response = await fetch(`${SERVER_URL}/api/layouts?userId=${userId}`, 
+       { headers: { 'Authorization': `Bearer ${token}`}},
+      );
       if (response.ok) {
         console.log("Hii",response);
         const data = await response.json();
@@ -283,7 +317,9 @@ const cellHeight = 50;
 
   const fetchAvailableSections = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/layouts?userId=${userId}`);
+      const response = await fetch(`${SERVER_URL}/api/layouts?userId=${userId}`,
+        { headers: { 'Authorization': `Bearer ${token}`}},
+      );
       if (response.ok) {
         console.log("Hii2",response);
         const data = await response.json();
@@ -490,9 +526,10 @@ const deleteSelected = () => {
       const blob = dataURLToBlob(dataURL);
       const formData = new FormData();
       formData.append("image", blob, "canvas-image.png");
-      fetch("http://localhost:5000/upload", {
+      fetch(`${SERVER_URL}/upload`, {
         method: "POST",
         body: formData,
+         headers: { 'Authorization': `Bearer ${token}`},
       })
         .then(response => response.json())
         .then(data => console.log("Upload successful:", data))
@@ -511,9 +548,10 @@ const deleteSelected = () => {
     formData.append("image", imageBlob, "konva_image.png");
 
     try {
-      const res = await fetch("http://localhost:8000/api/pdf/convert-cmyk", {
+      const res = await fetch(`${SERVER_URL}/api/pdf/convert-cmyk`, {
         method: "POST",
         body: formData,
+       headers: { 'Authorization': `Bearer ${token}`},
       });
 
       if (!res.ok) throw new Error("Failed to generate PDF");
