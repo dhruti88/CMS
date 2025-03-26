@@ -27,7 +27,7 @@ function App() {
           <ProtectedRoute><WorkBench/></ProtectedRoute>} />
         <Route path="/home" element={
           <ProtectedRoute><HomePage /></ProtectedRoute>} />
-        <Route path='/mylayout' element={<MyLayout />} /> 
+        <Route path='/mylayout' element={<MyLayouts />} /> 
          {/* <Route path="/grideditor" element={<GridEditor/>} /> */}
        
       </Routes>

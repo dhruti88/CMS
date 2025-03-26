@@ -18,7 +18,22 @@ const WorkbenchActions = ({
   exportToCMYKPDF,
   fitStageToScreen,
   stageRef, // Add stageRef to props
+  setHideGrid,        // New state function to hide grid
+  setHideBackground,  // New state function to hide background
+  setSelectedId
 }) => {
+
+  const handleExport = () => {
+    setHideGrid(true);        // Hide grid before capture
+    setHideBackground(true);  // Hide background before capture
+    setSelectedId(null);      // Remove selection box (transformation)
+    setTimeout(() => {
+      exportToCMYKPDF();       // Capture stage as PDF
+      setHideGrid(false);      // Restore grid after capture
+      setHideBackground(false); // Restore background after capture
+    }, 1000); // Small delay ensures UI updates before capturing
+  };
+
   return (
     <div className="workbench-header">
       <h1>{layoutTitle}</h1>
@@ -68,7 +83,7 @@ const WorkbenchActions = ({
         <Button onClick={() => zoomBy(1 / 1.1)} className="action-button">
           Zoom Out
         </Button>
-        <Button onClick={() => exportToCMYKPDF()} className="action-button">
+        <Button onClick={() => handleExport()} className="action-button">
           Download as PDF
         </Button>
         <Button onClick={() => fitStageToScreen()} className="action-button">
