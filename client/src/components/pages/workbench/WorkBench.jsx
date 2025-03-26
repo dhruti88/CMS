@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Stage, Layer, Rect, Line, Text, Transformer, Image as KonvaImage } from 'react-konva';
 import useImage from 'use-image';
 import './WorkBench.css';
-
+import { SERVER_URL } from '../../../config';
 // Helper component to load and display an image (from URL or base64)
 const URLImage = ({ src, ...props }) => {
   const [image] = useImage(src);

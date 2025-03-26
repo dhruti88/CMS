@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import { logger, errorLogger } from "./utils/logger.js"; 
 import userRoutes from "./routes/userRoutes.js";
 import pdfRoutes from "./controllers/pdfDownload.js";
+import layoutRoutes from "./routes/layoutRoutes.js";  
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ app.use(cors({
   methods: ["*"]
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 
 // Log all incoming API requests
 app.use((req, res, next) => {
@@ -41,5 +42,6 @@ mongoose.connect(MONGO_URL, {
 
 app.use("/api/users", userRoutes);
 app.use("/api/pdf", pdfRoutes);
+app.use("/api", layoutRoutes);
 
 export default app;
