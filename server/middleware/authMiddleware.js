@@ -21,6 +21,7 @@ export const verifyFirebaseToken = async (req, res, next) => {
       logger.warn(`Access denied for user: ${decodedToken.email}`);
       return res.status(403).json({ error: "Access denied: Only searce.com users are allowed" });
     }
+    console.log("decodedToken",decodedToken);
 
     logger.info(`User authenticated: ${decodedToken.email}`);
     req.user = decodedToken; // Attach user data to request

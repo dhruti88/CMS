@@ -91,9 +91,11 @@ export const updateUserProfile = async (req, res) => {
 // Get User Profile
 export const getUserProfile = async (req, res) => {
   try {
+    console.log("uid", req.user);
     const { uid } = req.user; // Firebase UID from the token
 
     const user = await User.findOne({ uid });
+    console.log("user data", user);
 
     if (!user) {
       logger.warn(`User not found: ${uid}`);
