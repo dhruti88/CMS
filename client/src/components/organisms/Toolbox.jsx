@@ -6,6 +6,7 @@ import ToolboxSection from '../molecules/ToolboxSection';
 import TextFormattingTools from '../molecules/TextFormattingTools';
 import SectionReplacementPanel from './SectionReplacementPanel';
 import Input from '../atoms/Input';
+import { TextField, MenuItem, Select, FormControl,Grid, InputLabel } from "@mui/material";
 
 const Toolbox = ({
   itemSizes,
@@ -32,7 +33,10 @@ const Toolbox = ({
   cellHeight,
   deleteSelected,
   changeItemColor,
-  openReplacementPanel
+  openReplacementPanel,
+  taskStatus,
+  setTaskStatus,
+  changeFontFamily
 }) => {
   
   // Find selected section
@@ -46,6 +50,20 @@ const Toolbox = ({
   return (
     <div className="toolbox">
       <h2 className="toolbox-header">Tool Box</h2>
+
+      <ToolboxSection>
+      {/* Task Status & Layout Type */}
+          <Grid item xs={6}>
+            <FormControl fullWidth>
+              <InputLabel sx={{ background: "#f8f9fa", px: 0.5 }} >Task Status</InputLabel>
+              <Select value={taskStatus} onChange={(e) => setTaskStatus(e.target.value)}>
+                <MenuItem value="In Progress">In Progress</MenuItem>
+                <MenuItem value="Pending">Pending</MenuItem>
+                <MenuItem value="Completed">Completed</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          </ToolboxSection>
 
       {/* Add Sections */}
       <ToolboxSection title="Add Sections">
@@ -101,6 +119,7 @@ const Toolbox = ({
             handleTextChange={handleTextChange}
             textValue={textValue}
             setTextFormatting={setTextFormatting}
+            changeFontFamily = {changeFontFamily}
           />
         </ToolboxSection>
       )}

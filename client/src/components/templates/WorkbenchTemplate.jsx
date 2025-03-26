@@ -78,6 +78,19 @@ const WorkbenchTemplate = () => {
     // fetchAvailableLayouts,
     fetchAvailableSections,
     // openReplacementPanel,
+    city,
+    setCity,
+    dueDate,
+    setDueDate,
+    taskStatus,
+    setTaskStatus,
+    layoutType,
+    setLayoutType,
+    setHideGrid,        // New state function to hide grid
+    setHideBackground,  // New state function to hide background
+    hideGrid,       // New prop to control grid visibility
+    hideBackground, // New prop to control background visibility
+    changeFontFamily,
   } = workbenchProps;
 // Inside WorkbenchTemplate component (before the return)
 
@@ -227,6 +240,12 @@ const handleReplaceSection = (selectedSection) => {
           gutterWidth={gutterWidth}
           setGutterWidth={setGutterWidth}
           setShowSetupForm={setShowSetupForm}
+          city={city}
+          setCity={setCity}
+          dueDate={dueDate}
+          setDueDate={setDueDate}
+          layoutType={layoutType}
+          setLayoutType={setLayoutType}
         />
       ) : (
         <>
@@ -246,6 +265,10 @@ const handleReplaceSection = (selectedSection) => {
         exportToCMYKPDF = {exportToCMYKPDF}
         stageRef={stageRef}
         fitStageToScreen = {fitStageToScreen}
+        setHideGrid={setHideGrid}
+        setHideBackground={setHideBackground}
+        transformerRef={transformerRef}
+        setSelectedId = {setSelectedId}
       />
      <WorkbenchCanvas
   handleTransformEnd={handleTransformEnd}  
@@ -273,6 +296,9 @@ const handleReplaceSection = (selectedSection) => {
   sectionId={sectionId}
         columns={columns}
         rows={rows}
+        hideGrid={hideGrid}
+        hideBackground={hideBackground}
+        setSections = {setSections}
 />
     </div>
           <Toolbox
@@ -306,6 +332,9 @@ const handleReplaceSection = (selectedSection) => {
             addItemToSection = {addItemToSection}
             sections = {sections}
             setSections = {setSections}
+          taskStatus={taskStatus}
+          setTaskStatus={setTaskStatus}
+          changeFontFamily = {changeFontFamily}
             openReplacementPanel={openReplacementPanel}
             
           />

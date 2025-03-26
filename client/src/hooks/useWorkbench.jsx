@@ -38,6 +38,19 @@ const token =localStorage.getItem("token");
   const userId = userID;
   console.log("userId : -",userId);
   const defaultTitle = "default";
+
+
+//city,dueDate,Status,layoutType
+const [city, setCity] = useState("Chicago");
+const [dueDate, setDueDate] = useState("");
+const [taskStatus, setTaskStatus] = useState("Pending");
+const [layoutType, setLayoutType] = useState("");
+
+//handle image download and pdf
+const [hideGrid, setHideGrid] = useState(false);          // State to control grid visibility
+const [hideBackground, setHideBackground] = useState(false);  // State to control background visibility
+
+
   
   // Setup & grid configuration
   const [showSetupForm, setShowSetupForm] = useState(true);
@@ -438,7 +451,6 @@ const toggleFormat = (format) => {
     }
     return;
   }
-
   setTextFormatting(prev => {
     const updated = { ...prev, [format]: !prev[format] };
 
@@ -458,6 +470,22 @@ const toggleFormat = (format) => {
     return updated;
   });
 };
+
+  // Change font family handler
+  const changeFontFamily = (newFont) => {
+    setTextFormatting(prev => {
+      const updated = { ...prev, fontFamily: newFont };
+  
+      if (selectedId) {
+        setSections(prevSections => updateSections(selectedId, prevSections, item => ({
+          ...item,
+          fontFamily: newFont
+        })));
+      }
+  
+      return updated;
+    });
+  };
 
 // Change font size handler
 const changeFontSize = (change) => {
@@ -501,6 +529,7 @@ const deleteSelected = () => {
 
   setSelectedId(null);
 };
+
 
 
   // Convert dataURL to Blob
@@ -1326,6 +1355,19 @@ return {
     fitStageToScreen,
     fetchAvailableSections,
   
+    city,
+    setCity,
+    dueDate,
+    setDueDate,
+    taskStatus,
+    setTaskStatus,
+    layoutType,
+    setLayoutType,
+    setHideGrid,        // New state function to hide grid
+    setHideBackground,  // New state function to hide background
+    hideGrid,       // New prop to control grid visibility
+    hideBackground, // New prop to control background visibility
+    changeFontFamily,
 };
 };
 
