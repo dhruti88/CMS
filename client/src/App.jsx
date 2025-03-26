@@ -11,6 +11,7 @@ import ProtectedRoute from './hooks/ProtectedRoute';
 import PublicRoute from './hooks/PublicRoute';
 import { AuthProvider } from './context/AuthContext';
 import MyLayouts from './components/pages/MyLayouts'
+import LayoutHistory from './components/pages/LayoutHistory'
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
           <ProtectedRoute><HomePage /></ProtectedRoute>} />
         <Route path='/mylayout' element={<MyLayouts />} /> 
          {/* <Route path="/grideditor" element={<GridEditor/>} /> */}
+
+         <Route path='/history' element={<LayoutHistory />} /> 
        
       </Routes>
     </Router>
