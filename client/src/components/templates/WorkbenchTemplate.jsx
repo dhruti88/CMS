@@ -82,6 +82,11 @@ const WorkbenchTemplate = () => {
     setTaskStatus,
     layoutType,
     setLayoutType,
+    setHideGrid,        // New state function to hide grid
+    setHideBackground,  // New state function to hide background
+    hideGrid,       // New prop to control grid visibility
+    hideBackground, // New prop to control background visibility
+    changeFontFamily,
   } = workbenchProps;
 
   return (
@@ -101,8 +106,6 @@ const WorkbenchTemplate = () => {
           setCity={setCity}
           dueDate={dueDate}
           setDueDate={setDueDate}
-          taskStatus={taskStatus}
-          setTaskStatus={setTaskStatus}
           layoutType={layoutType}
           setLayoutType={setLayoutType}
         />
@@ -124,9 +127,13 @@ const WorkbenchTemplate = () => {
         exportToCMYKPDF = {exportToCMYKPDF}
         stageRef={stageRef}
         fitStageToScreen = {fitStageToScreen}
+        setHideGrid={setHideGrid}
+        setHideBackground={setHideBackground}
+        transformerRef={transformerRef}
+        setSelectedId = {setSelectedId}
       />
      <WorkbenchCanvas
-  handleTransformEnd={handleTransformEnd}  // ✅ Make sure this is included
+  handleTransformEnd={handleTransformEnd}  
   stageSize={stageSize}
   stageScale={stageScale}
   toolMode={toolMode}
@@ -151,6 +158,9 @@ const WorkbenchTemplate = () => {
   sectionId={sectionId}
         columns={columns}
         rows={rows}
+        hideGrid={hideGrid}
+        hideBackground={hideBackground}
+        setSections = {setSections}
 />
     </div>
           <Toolbox
@@ -184,6 +194,9 @@ const WorkbenchTemplate = () => {
             addItemToSection = {addItemToSection}
             sections = {sections}
             setSections = {setSections}
+          taskStatus={taskStatus}
+          setTaskStatus={setTaskStatus}
+          changeFontFamily = {changeFontFamily}
           />
         </>
       )}

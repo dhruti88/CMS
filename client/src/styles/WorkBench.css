@@ -101,6 +101,7 @@
     background-color: var(--primary-color);
     text-align: center;
     color: white;
+    border-radius: 10px;
   }
   
   .toolbox-section {

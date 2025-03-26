@@ -390,7 +390,6 @@ const WorkbenchCanvas = ({
   toolMode,
   handleWheel,
   stageRef,
-  items,
   selectedId,
   setSelectedId,
   handleItemDragEnd,
@@ -398,7 +397,6 @@ const WorkbenchCanvas = ({
   cellHeight,
   gutterWidth,
   transformerRef,
-  setItems,
   handleTransformEnd,
   handleItemDragStart,
   handleItemDragMove,
@@ -409,7 +407,9 @@ const WorkbenchCanvas = ({
   handleDragMove,
   sectionId,
   columns,
-  rows
+  rows,
+  hideGrid,       // New prop to control grid visibility
+  hideBackground, // New prop to control background visibility
 }) => {
   const [draggingItem, setDraggingItem] = useState(false);
 
@@ -465,11 +465,16 @@ const WorkbenchCanvas = ({
             setSelectedId(null);
           }
         }}
+        
         className="konva-stage"
       >
         <Layer>
-          <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="gray" />
-          {gridLines}
+        {!hideBackground && (
+          <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="gray" 
+          onClick={() => setSelectedId(null)}
+          onTap={() => setSelectedId(null)} />
+        )}
+        {!hideGrid && gridLines}
 
           {sections.map((section) => (
             <Group
@@ -483,9 +488,20 @@ const WorkbenchCanvas = ({
               onClick={() => setSectionId(section.id)}
               onTap={() => setSectionId(section.id)}
             >
+              {!hideBackground && (
                  <Rect width={section.width} height={section.height} fill="" stroke="red" strokeWidth={2} 
-              onTap={() => setSelectedId(section.id)}
-              onClick={() => setSelectedId(section.id)}/>
+                 onTap={(e) => {
+                  transformerRef.current?.nodes([]);
+                  transformerRef.current?.getLayer()?.batchDraw();
+                  setSelectedId(section.id);
+                }}
+                onClick={(e) => {
+                  transformerRef.current?.nodes([]);
+                  transformerRef.current?.getLayer()?.batchDraw();
+                  setSelectedId(section.id);
+                }}
+                />
+            )}
 
               {section.items.map((item) =>
                 item.type === "text" ? (
