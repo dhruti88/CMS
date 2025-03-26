@@ -449,9 +449,25 @@ const WorkbenchCanvas = ({
       transformerRef.current.getLayer().batchDraw();
     }
   }, [selectedId, sections]);
+  
+  const [zoomLevel, setZoomLevel] = useState(1);
+
+  useEffect(() => {
+    const container = document.querySelector('.workbench-container');
+    if (!container || !stageRef.current) return;
+  
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+  
+    // Directly adjust the stage size using the ref
+    stageRef.current.width(Math.max(stageSize.width, containerWidth));
+    stageRef.current.height(Math.max(stageSize.height, containerHeight));
+  }, [zoomLevel, stageSize]);
+  
+
 
   return (
-    <div className="workbench-container" style={{ border: '2px solid black' }}>
+    <div className="workbench-container" style={{border: '2px solid black' }}>
       <Stage
         ref={stageRef}
         width={stageSize.width}
