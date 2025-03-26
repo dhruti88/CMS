@@ -91,6 +91,8 @@ const WorkbenchTemplate = () => {
     hideGrid,       // New prop to control grid visibility
     hideBackground, // New prop to control background visibility
     changeFontFamily,
+    handleDeleteLayout,
+    isDeleting,
   } = workbenchProps;
 // Inside WorkbenchTemplate component (before the return)
 
@@ -269,6 +271,8 @@ const handleReplaceSection = (selectedSection) => {
         setHideBackground={setHideBackground}
         transformerRef={transformerRef}
         setSelectedId = {setSelectedId}
+        handleDeleteLayout = {handleDeleteLayout}
+        isDeleting = {isDeleting}
       />
      <WorkbenchCanvas
   handleTransformEnd={handleTransformEnd}  
