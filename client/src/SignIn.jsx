@@ -20,14 +20,20 @@ const signIn = async (provider, navigate, email, password) => {
         const result = await signInWithPopup(auth, googleProvider);
 
         if (!result.user.email.endsWith("@searce.com")) {
+
+          try{
+          await result.user.delete();
           setTimeout(()=>{
             alert("Only searce.com email addresses are allowed.");
           },1000)
-          await auth.signOut(); // Sign out if domain is not allowed
 
           setTimeout(()=>{
             navigate("/");
           },1000)
+        }catch(error){
+          console.error("Error deleting user:", error);
+          await signOut(auth);
+        }
           
           return;
         }
