@@ -9,6 +9,7 @@ const TextFormattingTools = ({
   handleTextChange,
   textValue,
   setTextFormatting,
+  changeFontFamily
 }) => {
   return (
     <div className="text-formatting-tools">
@@ -59,10 +60,7 @@ const TextFormattingTools = ({
         <Label>Font:</Label>
         <select
           value={textFormatting.fontFamily}
-          onChange={(e) => {
-            const newFont = e.target.value;
-            setTextFormatting(prev => ({ ...prev, fontFamily: newFont }));
-          }}
+          onChange={(e) => changeFontFamily(e.target.value)}
         >
           <option value="Arial">Arial</option>
           <option value="Helvetica">Helvetica</option>

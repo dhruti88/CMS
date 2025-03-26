@@ -152,15 +152,14 @@
 
 
 //layout.js:
-
 // layout.js
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-// Define SectionItem schema (for layout items inside a section)
+// Define SectionItem schema (for items inside a section)
 const SectionItem = new Schema({
   id: { type: String, required: true },
-  type: { type: String, required: true }, // e.g. "text", "image", "section" (if this item holds nested sections)
+  type: { type: String, required: true }, // e.g. "text", "image"
   x: { type: Number, required: true },
   y: { type: Number, required: true },
   width: { type: Number, required: true },
@@ -189,32 +188,12 @@ const SectionItem = new Schema({
   },
   gridX: { type: Number, required: true },
   gridY: { type: Number, required: true },
-  // NEW: Nested sections field (an array of sections)
-  nestedSections: {
-    type: [new Schema({
-      id: { type: String, required: true },
-      sectionType: { type: String, required: true }, // e.g. "section"
-      gridX: { type: Number, required: true },
-      gridY: { type: Number, required: true },
-      width: { type: Number, required: true },
-      height: { type: Number, required: true },
-      draggable: { type: Boolean, default: true },
-      sizeInfo: {
-        cols: { type: Number },
-        rows: { type: Number },
-        label: { type: String },
-      },
-     
-      zIndex: { type: Number, default: 0 },
-    }, { _id: false })],
-    default: []
-  },
 }, { _id: false });
 
-// Define SectionSchema – a section contains multiple items (and these items can include nested sections)
+// Define SectionSchema – a section contains multiple items
 const SectionSchema = new Schema({
   id: { type: String, required: true },
-  sectionType: { type: String }, // For example: "section"
+  sectionType: { type: String, required: true }, // For example: "section"
   gridX: { type: Number, required: true },
   gridY: { type: Number, required: true },
   width: { type: Number, required: true },
@@ -225,7 +204,7 @@ const SectionSchema = new Schema({
     rows: { type: Number },
     label: { type: String },
   },
-  items: [SectionItem], 
+  items: [SectionItem],
   zIndex: { type: Number, default: 0 },
 }, { _id: false });
 
@@ -233,7 +212,24 @@ const SectionSchema = new Schema({
 const LayoutSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
   title: { type: String, required: true },
-  sections: [SectionSchema], // Each layout contains multiple sections
+  city: { type: String, required: false, default: 'Pune' },    
+  name: { type: String, required: false, default: 'Dainik Bhaskar' },
+  state: { type: String, required: false, default: 'Maharastra' },
+  date: { type: Date, required: false, default: Date.now },
+  // day: { type: String, required: false, default: '' },
+  day: { 
+    type: String, 
+    required: false, 
+    default: () => {
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      return days[new Date().getDay()];
+    } 
+  },
+  duedate: { type: Date, required: false, default: null },
+  taskstatus: { type: String, required: false, default: 'pending' },
+  layouttype: { type: String, required: false, default: 'default...' },
+
+  sections: [SectionSchema],
   gridSettings: {
     columns: { type: Number },
     rows: { type: Number },

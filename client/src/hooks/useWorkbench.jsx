@@ -1,12 +1,93 @@
 import { useState, useRef, useEffect } from 'react';
 import { getCellDimensions } from '../utils/gridHelpers';
 import { saveAs } from "file-saver";
+import {SERVER_URL} from '../Urls';
+import axios from "axios";
 
 const useWorkbench = () => {
   // Constants
-  const userId = "60d21b4667d0d8992e610c85"; // example ObjectId
+const [userID, setUserID] = useState("60d21b4667d0d8992e610c85");
+const token =localStorage.getItem("token");
+
+// Fetch user info from the backend
+  const fetchUser = async() =>
+  {
+    try {
+      const response = await axios.get(`${SERVER_URL}/api/users/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUserID(response.data.uid); // Set the user data
+      console.log("User UID:", response.data.uid);
+      localStorage.setItem('userId', response.data.uid);
+      console.log("User data fetched:", response.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  const [isDeleting, setIsDeleting] = useState(null);
+
+  const handleDeleteLayout = async (layout) => {
+      try {
+        setIsDeleting(layout._id);
+        
+        // Assuming you have a way to get the current user's ID
+        const userId = localStorage.getItem('userId'); // Adjust this based on your auth method
+  
+        const response = await fetch(`${SERVER_URL}/api/layout?_id=${encodeURIComponent(layout._id)}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        const result = await response.json();
+  console.log(result);
+        if (result.success) {
+          // Refresh the layouts list
+          fetchAvailableLayouts();
+          // Optionally, you can add a toast or alert here
+          alert(`Layout "${layout.title}" deleted successfully`);
+        } else {
+          alert('Failed to delete layout');
+        }
+      } catch (error) {
+        console.error('Error deleting layout:', error);
+        alert('An error occurred while deleting the layout');
+      } finally {
+        setIsDeleting(null);
+      }
+    };
+  
+   useEffect(() => {
+      if (token) {
+        fetchUser();
+      } else {
+        console.error("No token found. Please sign in.");
+      }
+    }, [token]);
+
+  const userId = userID;
+  console.log("userId : -",userId);
   const defaultTitle = "default";
 
+
+//city,dueDate,Status,layoutType
+const [city, setCity] = useState("Chicago");
+const [dueDate, setDueDate] = useState("");
+const [taskStatus, setTaskStatus] = useState("Pending");
+const [layoutType, setLayoutType] = useState("");
+
+//handle image download and pdf
+const [hideGrid, setHideGrid] = useState(false);          // State to control grid visibility
+const [hideBackground, setHideBackground] = useState(false);  // State to control background visibility
+
+
+  
   // Setup & grid configuration
   const [showSetupForm, setShowSetupForm] = useState(true);
   const [layoutTitle, setLayoutTitle] = useState(defaultTitle);
@@ -253,9 +334,9 @@ const cellHeight = 50;
   const saveLayout = async () => {
     try {
       const gridSettings = { columns, rows, gutterWidth };
-      const response = await fetch('http://localhost:5000/api/layout', {
+      const response = await fetch(`${SERVER_URL}/api/layout`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' , 'Authorization': `Bearer ${token}`},
         body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings }),
       });
       const data = await response.json();
@@ -267,12 +348,32 @@ const cellHeight = 50;
 
   const fetchAvailableLayouts = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/layouts?userId=${userId}`);
+      const response = await fetch(`${SERVER_URL}/api/layouts`, 
+       { headers: { 'Authorization': `Bearer ${token}`}},
+      );
       if (response.ok) {
         console.log("Hii",response);
         const data = await response.json();
         setAvailableLayouts(data.layouts);
         setShowLayoutList(true);
+      } else {
+        console.log("No layouts found.");
+      }
+    } catch (error) {
+      console.error("Error fetching layouts:", error);
+    }
+  };
+
+  const fetchAvailableSections = async () => {
+    try {
+      const response = await fetch(`${SERVER_URL}/api/layouts?userId=${userId}`,
+        { headers: { 'Authorization': `Bearer ${token}`}},
+      );
+      if (response.ok) {
+        console.log("Hii2",response);
+        const data = await response.json();
+        setAvailableLayouts(data.layouts);
+        // setShowLayoutList(true);
       } else {
         console.log("No layouts found.");
       }
@@ -386,7 +487,6 @@ const toggleFormat = (format) => {
     }
     return;
   }
-
   setTextFormatting(prev => {
     const updated = { ...prev, [format]: !prev[format] };
 
@@ -406,6 +506,22 @@ const toggleFormat = (format) => {
     return updated;
   });
 };
+
+  // Change font family handler
+  const changeFontFamily = (newFont) => {
+    setTextFormatting(prev => {
+      const updated = { ...prev, fontFamily: newFont };
+  
+      if (selectedId) {
+        setSections(prevSections => updateSections(selectedId, prevSections, item => ({
+          ...item,
+          fontFamily: newFont
+        })));
+      }
+  
+      return updated;
+    });
+  };
 
 // Change font size handler
 const changeFontSize = (change) => {
@@ -451,6 +567,7 @@ const deleteSelected = () => {
 };
 
 
+
   // Convert dataURL to Blob
   const dataURLToBlob = (dataURL) => {
     const byteString = atob(dataURL.split(',')[1]);
@@ -474,9 +591,10 @@ const deleteSelected = () => {
       const blob = dataURLToBlob(dataURL);
       const formData = new FormData();
       formData.append("image", blob, "canvas-image.png");
-      fetch("http://localhost:5000/upload", {
+      fetch(`${SERVER_URL}/upload`, {
         method: "POST",
         body: formData,
+         headers: { 'Authorization': `Bearer ${token}`},
       })
         .then(response => response.json())
         .then(data => console.log("Upload successful:", data))
@@ -495,9 +613,10 @@ const deleteSelected = () => {
     formData.append("image", imageBlob, "konva_image.png");
 
     try {
-      const res = await fetch("http://localhost:8000/api/pdf/convert-cmyk", {
+      const res = await fetch(`${SERVER_URL}/api/pdf/convert-cmyk`, {
         method: "POST",
         body: formData,
+       headers: { 'Authorization': `Bearer ${token}`},
       });
 
       if (!res.ok) throw new Error("Failed to generate PDF");
@@ -1212,6 +1331,7 @@ return {
   showSetupForm,
   setShowSetupForm,
   layoutTitle,
+  setSections,
   setLayoutTitle,
   columns,
   setColumns,
@@ -1269,6 +1389,23 @@ return {
   // addNewSection,
   exportToCMYKPDF,
     fitStageToScreen,
+    fetchAvailableSections,
+  
+    city,
+    setCity,
+    dueDate,
+    setDueDate,
+    taskStatus,
+    setTaskStatus,
+    layoutType,
+    setLayoutType,
+    setHideGrid,        // New state function to hide grid
+    setHideBackground,  // New state function to hide background
+    hideGrid,       // New prop to control grid visibility
+    hideBackground, // New prop to control background visibility
+    changeFontFamily,
+    handleDeleteLayout,
+    isDeleting,
 };
 };
 

@@ -1,5 +1,7 @@
 import React from 'react';
 
-const Label = ({ children }) => <label>{children}</label>;
+const Label = ({ children,sx = {} }) => <label sx={{
+    ...sx,
+}}>{children}</label>;
 
 export default Label;
