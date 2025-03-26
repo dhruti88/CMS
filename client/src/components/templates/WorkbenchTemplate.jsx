@@ -4,8 +4,9 @@ import WorkbenchActions from '../organisms/WorkbenchActions';
 import WorkbenchCanvas from '../organisms/WorkbenchCanvas';
 import Toolbox from '../organisms/Toolbox';
 import { WorkbenchContext } from '../../context/WorkbenchContext';
-import { useContext } from 'react';
+import { useContext,useState } from 'react';
 import NestedSectionsPanel from '../organisms/NestedSectionsPanel';
+import SectionReplacementPanel from '../organisms/SectionReplacementPanel';
 
 
 
@@ -74,6 +75,9 @@ const WorkbenchTemplate = () => {
     setSections,
     exportToCMYKPDF,
     fitStageToScreen,
+    // fetchAvailableLayouts,
+    fetchAvailableSections,
+    // openReplacementPanel,
     city,
     setCity,
     dueDate,
@@ -88,6 +92,140 @@ const WorkbenchTemplate = () => {
     hideBackground, // New prop to control background visibility
     changeFontFamily,
   } = workbenchProps;
+// Inside WorkbenchTemplate component (before the return)
+
+  const [targetSectionIdForReplacement, setTargetSectionIdForReplacement] = useState(null);
+  const [showReplacementPanel, setShowReplacementPanel] = useState(false);
+
+const openReplacementPanel = async () => {
+  // Check if there are sections and a section is currently selected
+  if (sections && sections.length > 0 && selectedId) {
+    // Save the selected section ID as the target for replacement
+    setTargetSectionIdForReplacement(selectedId);
+    // Optionally, you might trigger a fetch here if you need to update availableLayouts:
+    await fetchAvailableSections();  // Uncomment if needed
+    // Now open the replacement panel
+    setShowReplacementPanel(true);
+  } else {
+    console.warn("No section selected for replacement.");
+  }
+};
+
+// Correctly implement handleReplaceSection
+// const handleReplaceSection = (selectedSection) => {
+//   // Find the target section in the current sections array
+//   const targetSection = sections.find(sec => sec.id === targetSectionIdForReplacement);
+
+//   if (!targetSection || !selectedSection) {
+//     console.warn("Invalid section replacement");
+//     setShowReplacementPanel(false);
+//     return;
+//   }
+
+//   // Create the new section, preserving position and size of the target section
+//   const newSection = {
+//     ...selectedSection,        // Take all data from the selected section
+//     id: targetSection.id,       // Preserve the target section's ID
+//     x: targetSection.x,         // Use the current layout's section position
+//     y: targetSection.y,
+//     width: targetSection.width, // And size
+//     height: targetSection.height,
+//     // Add any additional logic for merging or transforming section data
+//   };
+
+//   // // Update sections using the setSections function
+//   // setSections(prevSections => 
+//   //   prevSections.map(sec => 
+//   //     sec.id === targetSectionIdForReplacement ? newSection : sec
+//   //   )
+//   const ReplaceSection = 
+//     {
+//       ...selectedSection,  
+      
+//     };
+//     ReplaceSection.x= targetSection.x;         // Use the current layout's section position
+//     ReplaceSection.y=  targetSection.y;
+//     ReplaceSection.gridX= targetSection.gridX;         // Use the current layout's section position
+//     ReplaceSection.gridY=  targetSection.gridY;
+//     ReplaceSection.id= targetSection.id
+//     // ReplaceSection.width=  targetSection.width; // And size
+//     // ReplaceSection.height=  targetSection.height;
+//   // );
+//   // const new's=ReplaceSection();
+//   console.log("Selected",selectedSection);
+//   deleteSelected();
+//   // layout.sections.append(ReplaceSection);
+//   // setSections(prev => prev.map(ReplaceSection));
+//   setSections(prevSections => 
+//     prevSections.map(section => 
+//       section.id === targetSection.id ? ReplaceSection : section
+//     )
+//   );
+  
+  
+//   setSelectedId(ReplaceSection.id);
+//   // const ma = addSection();
+// console.log("Replce",ReplaceSection);
+
+
+
+//   // Close the replacement panel
+//   setShowReplacementPanel(false);
+// // onClose();
+//   // Optionally update the selected section
+//   // setSelectedId(newSection.id);
+// };
+const handleReplaceSection = (selectedSection) => {
+  // Debug: Log the function call and inputs
+  console.log('handleReplaceSection called');
+  console.log('selectedSection:', selectedSection);
+  console.log('targetSectionIdForReplacement:', targetSectionIdForReplacement);
+  console.log('Current sections:', sections);
+
+  // Verify setSections function exists
+  if (typeof setSections !== 'function') {
+    console.error('setSections is not a function!');
+    return;
+  }
+
+  // Find the target section in the current sections array
+  const targetSection = sections.find(sec => sec.id === targetSectionIdForReplacement);
+
+  if (!targetSection || !selectedSection) {
+    console.warn("Invalid section replacement");
+    setShowReplacementPanel(false);
+    return;
+  }
+
+  // Create the replacement section
+  const replacementSection = {
+    ...selectedSection,
+    id: targetSection.id,  // Keep original ID
+    x: targetSection.x,
+    y: targetSection.y,
+    gridX: targetSection.gridX,
+    gridY: targetSection.gridY,
+    // Add any other necessary properties
+  };
+
+  // Use functional update to ensure correct state update
+  setSections(prevSections => 
+    prevSections.map(section => 
+      section.id === targetSectionIdForReplacement 
+        ? replacementSection 
+        : section
+    )
+  );
+
+  // Close the replacement panel
+  setShowReplacementPanel(false);
+
+  // Update selected section
+  setSelectedId(replacementSection.id);
+
+  // Debug: Log the result
+  console.log('Replacement completed', replacementSection);
+};
 
   return (
     <div className="cms-container">
@@ -197,7 +335,18 @@ const WorkbenchTemplate = () => {
           taskStatus={taskStatus}
           setTaskStatus={setTaskStatus}
           changeFontFamily = {changeFontFamily}
+            openReplacementPanel={openReplacementPanel}
+            
           />
+            {showReplacementPanel && (
+        <SectionReplacementPanel
+          availableLayouts={availableLayouts} // Ensure this is defined
+          targetSection={sections.find(sec => sec.id === targetSectionIdForReplacement)}
+          onReplaceSection={ handleReplaceSection }
+          onClose={() => setShowReplacementPanel(false)}
+        />
+      )}
+
         </>
       )}
     </div>

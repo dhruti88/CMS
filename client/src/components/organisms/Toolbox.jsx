@@ -4,6 +4,7 @@ import Button from '../atoms/Button';
 import ColorButton from '../atoms/ColorButton';
 import ToolboxSection from '../molecules/ToolboxSection';
 import TextFormattingTools from '../molecules/TextFormattingTools';
+import SectionReplacementPanel from './SectionReplacementPanel';
 import Input from '../atoms/Input';
 import { TextField, MenuItem, Select, FormControl,Grid, InputLabel } from "@mui/material";
 
@@ -32,6 +33,7 @@ const Toolbox = ({
   cellHeight,
   deleteSelected,
   changeItemColor,
+  openReplacementPanel,
   taskStatus,
   setTaskStatus,
   changeFontFamily
@@ -205,6 +207,15 @@ const Toolbox = ({
           <li><span className="shortcut-key">Click</span> Select item</li>
         </ul>
       </ToolboxSection>
+      
+<ToolboxSection title="Section Replacement">
+  <div className="replacement-button-container">
+    <Button onClick={openReplacementPanel} className="replacement-button">
+      Replace Section
+    </Button>
+  </div>
+</ToolboxSection>
+
 
       {/* Layout Selection */}
       {showLayoutList && (

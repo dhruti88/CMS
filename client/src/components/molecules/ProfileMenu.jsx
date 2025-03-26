@@ -4,7 +4,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ProfileIcon from "../atoms/Profile/ProfileIcon";
 import axios from "axios";
 import { getAuth, signOut } from "firebase/auth";
-
+import { SERVER_URL } from "../../Urls";
 const ProfileMenu = ({ user, token }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -18,7 +18,7 @@ const ProfileMenu = ({ user, token }) => {
   // Fetch Profile Image
   const fetchProfileImage = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/users/profile-image/${user.uid}`, {
+      const response = await axios.get(`${SERVER_URL}/api/users/profile-image/${user.uid}`, {
         responseType: 'blob', // Get image as blob
         headers: {
             Authorization: `Bearer ${token}`
@@ -69,7 +69,7 @@ const ProfileMenu = ({ user, token }) => {
     }
 
     try {
-      await axios.put("http://localhost:8000/api/users/update", formData, {
+      await axios.put(`${SERVER_URL}/api/users/update`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
