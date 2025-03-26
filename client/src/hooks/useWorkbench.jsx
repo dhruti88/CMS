@@ -21,11 +21,47 @@ const token =localStorage.getItem("token");
 
       setUserID(response.data.uid); // Set the user data
       console.log("User UID:", response.data.uid);
+      localStorage.setItem('userId', response.data.uid);
       console.log("User data fetched:", response.data);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   };
+
+  const [isDeleting, setIsDeleting] = useState(null);
+
+  const handleDeleteLayout = async (layout) => {
+      try {
+        setIsDeleting(layout._id);
+        
+        // Assuming you have a way to get the current user's ID
+        const userId = localStorage.getItem('userId'); // Adjust this based on your auth method
+  
+        const response = await fetch(`${SERVER_URL}/api/layout?_id=${encodeURIComponent(layout._id)}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        const result = await response.json();
+  console.log(result);
+        if (result.success) {
+          // Refresh the layouts list
+          fetchAvailableLayouts();
+          // Optionally, you can add a toast or alert here
+          alert(`Layout "${layout.title}" deleted successfully`);
+        } else {
+          alert('Failed to delete layout');
+        }
+      } catch (error) {
+        console.error('Error deleting layout:', error);
+        alert('An error occurred while deleting the layout');
+      } finally {
+        setIsDeleting(null);
+      }
+    };
   
    useEffect(() => {
       if (token) {
@@ -312,7 +348,7 @@ const cellHeight = 50;
 
   const fetchAvailableLayouts = async () => {
     try {
-      const response = await fetch(`${SERVER_URL}/api/layouts?userId=${userId}`, 
+      const response = await fetch(`${SERVER_URL}/api/layouts`, 
        { headers: { 'Authorization': `Bearer ${token}`}},
       );
       if (response.ok) {
@@ -1368,6 +1404,8 @@ return {
     hideGrid,       // New prop to control grid visibility
     hideBackground, // New prop to control background visibility
     changeFontFamily,
+    handleDeleteLayout,
+    isDeleting,
 };
 };
 

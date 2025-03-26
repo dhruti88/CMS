@@ -49,7 +49,7 @@ export const getLayout = async (req, res) => {
 export const getAllLayouts = async (req, res) => {
     try {
       const { userId } = req.query;
-      const layouts = await Layout.find({ userId });
+      const layouts = await Layout.find();
       res.json({ layouts });
     } catch (error) {
       console.error('Error fetching layouts:', error);
@@ -57,18 +57,57 @@ export const getAllLayouts = async (req, res) => {
     }
   };
 
+// export const deleteLayout = async (req, res) => {
+//     try {
+//       const { userId, title } = req.query;
+//       const layout = await Layout.findOneAndDelete({title });
+//       console.log('Deleted layout:', layout);
+//       res.json({ success: true, layout });
+//     } catch (error) {
+//       console.error('Error deleting layout:', error);
+//       res.status(500).json({ error: error.message });
+//     }
+//   };
+
 export const deleteLayout = async (req, res) => {
     try {
-      const { userId, title } = req.query;
-      const layout = await Layout.findOneAndDelete({ userId, title });
+      const { _id } = req.query;
+      
+      // Log the incoming request details for debugging
+      console.log('Delete Request Received:', { 
+        method: req.method, 
+        _id, 
+        fullQuery: req.query 
+      });
+      
+      // Validate that title is provided
+      if (!_id) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Layout title is required' 
+        });
+      }
+
+      const layout = await Layout.findOneAndDelete({ _id });
+
+      // Check if a layout was actually deleted
+      if (!layout) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Layout not found' 
+        });
+      }
+
       console.log('Deleted layout:', layout);
-      res.json({ success: true, layout });
+      res.status(200).json({ success: true, layout });
     } catch (error) {
       console.error('Error deleting layout:', error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ 
+        success: false,
+        error: error.message 
+      });
     }
   };
-
 
 
 

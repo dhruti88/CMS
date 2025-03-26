@@ -1,5 +1,4 @@
-// workbenchaction.jsx:
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '../atoms/Button';
 import { downloadStageAsPDF } from '../../utils/pdfUtils';
 
@@ -17,22 +16,27 @@ const WorkbenchActions = ({
   loadLayoutFromSelected, 
   exportToCMYKPDF,
   fitStageToScreen,
-  stageRef, // Add stageRef to props
-  setHideGrid,        // New state function to hide grid
-  setHideBackground,  // New state function to hide background
-  setSelectedId
+  stageRef,
+  setHideGrid,
+  setHideBackground,
+  setSelectedId,
+  handleDeleteLayout,
+  isDeleting,
 }) => {
+  
 
   const handleExport = () => {
-    setHideGrid(true);        // Hide grid before capture
-    setHideBackground(true);  // Hide background before capture
-    setSelectedId(null);      // Remove selection box (transformation)
+    setHideGrid(true);
+    setHideBackground(true);
+    setSelectedId(null);
     setTimeout(() => {
-      exportToCMYKPDF();       // Capture stage as PDF
-      setHideGrid(false);      // Restore grid after capture
-      setHideBackground(false); // Restore background after capture
-    }, 1000); // Small delay ensures UI updates before capturing
+      exportToCMYKPDF();
+      setHideGrid(false);
+      setHideBackground(false);
+    }, 1000);
   };
+
+  
 
   return (
     <div className="workbench-header">
@@ -56,8 +60,18 @@ const WorkbenchActions = ({
                 {availableLayouts.map((layout) => (
                   <li key={layout._id}>
                     <strong>{layout.title}</strong>
-                    <Button onClick={() => loadLayoutFromSelected(layout)} className="small-button">
+                    <Button 
+                      onClick={() => loadLayoutFromSelected(layout)} 
+                      className="small-button"
+                    >
                       Edit
+                    </Button>
+                    <Button 
+                      onClick={() => handleDeleteLayout(layout)} 
+                      className="small-button"
+                      disabled={isDeleting === layout._id}
+                    >
+                      {isDeleting === layout._id ? 'Deleting...' : 'Delete'}
                     </Button>
                   </li>
                 ))}
