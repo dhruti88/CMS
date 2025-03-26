@@ -1,9 +1,10 @@
 // toolbox.jsx:
-import React from 'react';
+import React ,{useState} from 'react';
 import Button from '../atoms/Button';
 import ColorButton from '../atoms/ColorButton';
 import ToolboxSection from '../molecules/ToolboxSection';
 import TextFormattingTools from '../molecules/TextFormattingTools';
+import ManualRowColumn from '../molecules/ManualRowColumn';
 import SectionReplacementPanel from './SectionReplacementPanel';
 import Input from '../atoms/Input';
 import { TextField, MenuItem, Select, FormControl,Grid, InputLabel } from "@mui/material";
@@ -77,6 +78,9 @@ const Toolbox = ({
             ))}
           </div>
         </div>
+
+        <ManualRowColumn title = "Manual Section" buttonText='Add' handleClick={addNewSection}/>
+
       </ToolboxSection>
 
       {/* Add Elements */}
@@ -90,6 +94,7 @@ const Toolbox = ({
               </Button>
             ))}
           </div>
+          <ManualRowColumn title = "Manual Text Box" buttonText='Add' sectionId={sectionId} type='text' handleClick={addItemToSection}/>
         </div>
 
         <div className="size-section">
@@ -101,6 +106,7 @@ const Toolbox = ({
               </Button>
             ))}
           </div>
+          <ManualRowColumn title = "Manual Image" buttonText='Add' sectionId={sectionId} type='dimage' handleClick={addItemToSection}/>
         </div>
 
         <div className="size-section">
