@@ -14,6 +14,7 @@ const CustomButton = ({
             backgroundColor: colors.primary,
             width: "150px",
             fontFamily: "'Poppins', sans-serif",
+            marginRight : "20px",
             ...sx,
         }}>{children}</Button>
 

@@ -1,88 +1,110 @@
 :root {
-    --primary-color: #2563EB;
-    --secondary-color: #f1f3f4;
-    --border-color: #dadce0;
-    --accent-color: #ea4335;
-    --text-color: #202124;
-    --toolbox-bg: #f8f9fa;
-    --toolbar-height: 60px;
-    --hover-color: #e8f0fe;
-  }
-  
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  body {
-    font-family: 'Google Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--text-color);
-    background-color: var(--secondary-color);
-    overflow: hidden;
-  }
-  
-  .cms-container {
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-    gap: 15px; /* Increased gutter for clear visibility */
-    padding: 15px; /* Ensures space around the entire layout */
-    background-color: var(--secondary-color);
-  }
-  /* Workbench Styles */
-  .workbench-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-    overflow: auto; /* Allows both horizontal & vertical scrolling */
-    padding: 10px; /* Adds space inside */
-  }
-  
-  .workbench-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    height: var(--toolbar-height);
-    border-bottom: 1px solid var(--border-color);
-    background-color: white;
-  }
-  
-  .workbench-header h1 {
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--primary-color);
-  }
-  
-  .workbench-actions {
-    display: flex;
-  }
-  
-  .action-button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 8px 16px;
-    margin-right: 5px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .action-button:hover {
-    background-color: #1967d2;
-  }
-  
-  .konva-stage {
-    flex: 1;
-    min-width: 1000px; /* Ensures horizontal scroll when needed */
-    min-height: 800px; /* Ensures vertical scroll when needed */
-    overflow: auto;
-  }
+  --primary-color: #2563EB;
+  --secondary-color: #f1f3f4;
+  --border-color: #dadce0;
+  --accent-color: #ea4335;
+  --text-color: #202124;
+  --toolbox-bg: #f8f9fa;
+  --toolbar-height: 60px;
+  --hover-color: #e8f0fe;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Google Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-color);
+  background-color: var(--secondary-color);
+  overflow: hidden;
+}
+
+.cms-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  gap: 15px;
+  padding: 15px; /* Ensures space around the layout */
+  background-color: var(--secondary-color);
+  padding-top: 100px;
+}
+
+/* Workbench Styles */
+.workbench-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  overflow: auto; /* Allows scrolling */
+  padding: 10px;
+}
+
+.workbench-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  height: var(--toolbar-height);
+  border-bottom: 1px solid var(--border-color);
+  background-color: white;
+}
+
+.workbench-header h1 {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
+.workbench-actions {
+  display: flex;
+  gap: 10px; /* Adds spacing between buttons */
+}
+
+/* Konva Stage */
+.konva-stage {
+  flex: 1;
+  min-width: 1000px;
+  min-height: 800px;
+  overflow: auto;
+}
+
+/* Icon Styling */
+
+.icon-accent {
+  color: var(--accent-color);
+}
+
+.icon-text {
+  color: var(--text-color);
+}
+
+.icon-disabled {
+  color: var(--border-color);
+}
+
+.icon-accent:hover {
+  color: #d32f2f; /* Darker red for hover effect */
+}
+.icon-primary {
+  color: var(--primary-color) !important;
+  transition: transform 0.2s ease-in-out, color 0.2s ease-in-out !important;
+}
+
+.icon-primary:hover {
+  color: #1e40af !important; /* Darker blue */
+  transform: scale(1.2) !important; /* Slightly enlarges the icon */
+}
+
+/* Click effect */
+.icon-primary:active {
+  transform: scale(0.9) !important; /* Shrinks slightly when clicked */
+  transition: transform 0.1s ease-in-out !important;
+}
+
+
   
   /* Toolbox Styles */
   .toolbox {
@@ -369,7 +391,9 @@
   align-items: center;
   background-color: var(--secondary-color);
   min-height: 100vh;
-  overflow-y: auto;
+  padding-top: 80px; /* Ensure no overlap with the navbar */
+  box-sizing: border-box; /* Include padding in the height calculation */
+  overflow-y: auto; /* Enable scroll if content overflows */
 }
 
 .news-header {
