@@ -4,6 +4,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ProfileIcon from "../atoms/Profile/ProfileIcon";
 import axios from "axios";
 import { getAuth, signOut } from "firebase/auth";
+import { logout } from "../../utils/logout";
 import { SERVER_URL } from "../../Urls";
 const ProfileMenu = ({ user, token }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -85,16 +86,13 @@ const ProfileMenu = ({ user, token }) => {
     }
   };
 
-  const auth = getAuth();
+const auth = getAuth();
 
 const handleLogout = async () => {
   try {
-    await signOut(auth); // Firebase sign out
-    localStorage.removeItem("token"); // Remove token from localStorage
+    await logout(); // Firebase sign out
     alert("Successfully logged out!");
-    window.location.href = "/signin"; // Redirect to SignIn page
   } catch (error) {
-    console.error("Logout failed:", error);
     alert("Failed to log out. Please try again.");
   }
 };

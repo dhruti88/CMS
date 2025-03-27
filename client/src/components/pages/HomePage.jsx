@@ -4,6 +4,7 @@ import Navbar from "../../components/atoms/navbar/NavBar";
 import ProfileMenu from "../molecules/ProfileMenu";
 import { useNavigate } from "react-router-dom";
 import { SERVER_URL } from "../../Urls";
+import { logout } from "../../utils/logout";
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
@@ -29,12 +30,12 @@ const HomePage = () => {
       console.log("User data fetched:", response.data);
     } catch (error) {
       console.error("Error fetching user data:", error);
-
-      if (error.response?.status === 403) {
-        console.warn("Token expired or invalid. Logging out...");
-        localStorage.removeItem("token");
-        navigate("/signin"); // Redirect to Sign-In page
-      }
+      await logout(); // Logout on error
+      // if (error.response?.status === 403) {
+      //   console.warn("Token expired or invalid. Logging out...");
+      //   localStorage.removeItem("token");
+      //   navigate("/signin"); // Redirect to Sign-In page
+      // }
     }
   };
 
