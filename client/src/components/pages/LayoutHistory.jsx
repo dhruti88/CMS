@@ -39,6 +39,10 @@ const LayoutHistory = () => {
   const [dateFrom, setDateFrom] = useState(null);
   const [dateTo, setDateTo] = useState(null);
   const [statusFilter, setStatusFilter] = useState('');
+  const [userFilter, setUserFilter] = useState('');
+
+  // State to store unique users
+  const [uniqueUsers, setUniqueUsers] = useState([]);
 
   // Fetch layout history from API based on filter changes
   useEffect(() => {
@@ -56,7 +60,7 @@ const LayoutHistory = () => {
             dateFrom: dateFrom,
             dateTo: dateTo,
             status: statusFilter,
-            // userId: userId,
+            user: userFilter
           })
         });
 
@@ -65,6 +69,11 @@ const LayoutHistory = () => {
         }
         const data = await response.json();
         setHistoryEntries(data);
+        
+        // Extract unique users from the history entries
+        const users = [...new Set(data.map(entry => entry.userName).filter(Boolean))];
+        setUniqueUsers(users);
+        
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -73,7 +82,7 @@ const LayoutHistory = () => {
     };
 
     fetchLayoutHistory();
-  }, [titleFilter, cityFilter, actionTypeFilter, dateFrom, dateTo, statusFilter]);
+  }, [titleFilter, cityFilter, actionTypeFilter, dateFrom, dateTo, statusFilter, userFilter]);
 
   // Create unique list of cities for filtering
   const uniqueCities = useMemo(() => {
@@ -91,6 +100,7 @@ const LayoutHistory = () => {
     setDateFrom(null);
     setDateTo(null);
     setStatusFilter('');
+    setUserFilter('');
   };
 
   if (loading) {
@@ -130,7 +140,7 @@ const LayoutHistory = () => {
         <CardContent>
           {/* Filters Section */}
           <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <TextField
                 fullWidth
                 label="Filter by Title"
@@ -139,7 +149,7 @@ const LayoutHistory = () => {
                 onChange={(e) => setTitleFilter(e.target.value)}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <FormControl fullWidth variant="outlined">
                 <InputLabel id="city-label">City</InputLabel>
                 <Select
@@ -159,7 +169,27 @@ const LayoutHistory = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel id="user-label">User</InputLabel>
+                <Select
+                  labelId="user-label"
+                  label="User"
+                  value={userFilter}
+                  onChange={(e) => setUserFilter(e.target.value)}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {uniqueUsers.map((user) => (
+                    <MenuItem key={user} value={user}>
+                      {user}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={3}>
               <FormControl fullWidth variant="outlined">
                 <InputLabel id="action-type-label">Action Type</InputLabel>
                 <Select
@@ -224,6 +254,7 @@ const LayoutHistory = () => {
                 <TableRow>
                   <TableCell>Date</TableCell>
                   <TableCell>Title</TableCell>
+                  <TableCell>User</TableCell>
                   <TableCell>Action</TableCell>
                   <TableCell>City</TableCell>
                   <TableCell>Status</TableCell>
@@ -235,6 +266,7 @@ const LayoutHistory = () => {
                   <TableRow key={entry._id}>
                     <TableCell>{new Date(entry.timestamp).toLocaleString()}</TableCell>
                     <TableCell>{entry.metadata?.title || 'Untitled'}</TableCell>
+                    <TableCell>{entry.userName || 'N/A'}</TableCell>
                     <TableCell>
                       <Box
                         sx={{

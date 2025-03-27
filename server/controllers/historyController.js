@@ -1,21 +1,28 @@
-
 import LayoutHistory from "../models/layoutHistory.js";
+import User from "../models/user.js"; // Assuming you have a User model
 import { logger, errorLogger } from "../utils/logger.js"
-
 
 // Enhanced layout history logging function
 export const logLayoutAction = async (layout, actionType, userId, previousVersion = null) => {
     try {
+      // Fetch user details to include username
+
+      // const { userId } = req.query;
+      // const user = await User.findById(userId);
+     
+      
       await LayoutHistory.create({
         layoutId: layout._id,
         userId: userId,
+        userName: userId || 'Unknown User', // Add user name
         actionType: actionType,
         metadata: {
           title: layout.title,
           city: layout.city,
           state: layout.state,
           status: layout.taskstatus,
-          layoutType: layout.layouttype
+          layoutType: layout.layouttype,
+          lastEditedTime: new Date() // Add last edited time
         },
         timestamp: new Date(),
         previousVersion: previousVersion
@@ -25,14 +32,10 @@ export const logLayoutAction = async (layout, actionType, userId, previousVersio
     }
   };
 
-
-
 export const histlayout = async (req, res) => {
     try {
-      // Assuming you have user authentication and can get the user ID
-    //   const userId = "123456";
-    const { userId } = req.query;
       // Destructure filter parameters
+      const { userId } = req.query;
       const { 
         title, 
         city, 
@@ -40,11 +43,11 @@ export const histlayout = async (req, res) => {
         dateFrom, 
         dateTo, 
         status,
-        // userId 
+        user 
       } = req.body;
-  console.log("userId",userId);
+  
       // Build query object
-      const query = { userId };
+      const query = {};
   
       // Apply filters
       if (title) {
@@ -53,6 +56,10 @@ export const histlayout = async (req, res) => {
   
       if (city) {
         query['metadata.city'] = city;
+      }
+  
+      if (user) {
+        query.userName = { $regex: user, $options: 'i' };
       }
   
       if (actionType) {
@@ -81,4 +88,3 @@ export const histlayout = async (req, res) => {
       res.status(500).json({ message: 'Error fetching layout history' });
     }
   };
-  

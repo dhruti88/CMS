@@ -13,6 +13,10 @@ const LayoutHistorySchema = new Schema({
     ref: 'User', 
     required: true 
   },
+  userName: {
+    type: String,
+    required: true
+  },
   actionType: { 
     type: String, 
     required: true, 
@@ -23,7 +27,7 @@ const LayoutHistorySchema = new Schema({
     default: Date.now 
   },
   previousVersion: {
-    type: Object,
+    type: mongoose.Schema.Types.Mixed,
     default: null
   },
   changes: {
