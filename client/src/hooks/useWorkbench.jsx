@@ -182,57 +182,65 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
     
   
   
-  const addItemToSection = (sectionId, size,type,e = null) => {
+
+    const addItemToSection = (sectionId, size, type, e = null) => {
+      let newItem;
     
-    setSections(prevSections =>
-      prevSections.map(section => {
-        if (section.id !== sectionId) return section; // Skip if it's not the target section
-  
-        let newItem;
-        if(type == "text")
+      if (type === "text") {
         newItem = addTextBox(size);
-        else
+      } else {
         newItem = addImageItem(size);
-
-
-        const bestPosition = findBestPositionForItem(newItem, section.items, section.sizeInfo);
-  
-        if (!bestPosition) {
-          alert('No space available in section!');
-          return section;
-        }
-  
-        newItem.gridX = bestPosition.gridX;
-        newItem.gridY = bestPosition.gridY;
-        newItem.x = newItem.gridX * cellWidth + newItem.gridX * gutterWidth;
-        newItem.y = newItem.gridY * cellHeight;
-  
-        return { ...section, items: [...section.items, newItem] };
-      })
-    );
-  };
-  
-  const addNewSection = (size) => {
-    // if (!newBoxContent && newBoxType === 'text') {
-    //   alert('Please enter text content for the new box');
-    //   return;
-    // }
-    const newSection = addSection(size)
-  
-    const position = findBestPositionForBox(newSection, sections, columns, rows);
-    if (!position) {
-      alert('No space available for new box');
-      return;
-    }
-    console.log("position: - ",position);
-    newSection.gridX = position.gridX;
-    newSection.gridY = position.gridY;
-    newSection.x = newSection.gridX * cellWidth + (newSection.gridX) * gutterWidth;
-    newSection.y = newSection.gridY * cellHeight;
-    setSections(prev => [...prev, newSection]);
-    setSelectedId(newSection.id);
+      }
     
-  };
+      setSections(prevSections =>
+        prevSections.map(section => {
+          if (section.id !== sectionId) return section; // Skip if not the target section
+    
+          const bestPosition = findBestPositionForItem(newItem, section.items, section.sizeInfo);
+    
+          if (!bestPosition) {
+            alert('No space available in section!');
+            return section;
+          }
+    
+          // Assign position
+          newItem = {
+            ...newItem,
+            gridX: bestPosition.gridX,
+            gridY: bestPosition.gridY,
+            x: bestPosition.gridX * (cellWidth + gutterWidth),
+            y: bestPosition.gridY * cellHeight,
+          };
+    
+          return { ...section, items: [...section.items, newItem] };
+        })
+      );
+    
+      setSelectedId(newItem.id);
+    };
+    
+  
+    const addNewSection = (size) => {
+      // if (!newBoxContent && newBoxType === 'text') {
+      //   alert('Please enter text content for the new box');
+      //   return;
+      // }
+      const newSection = addSection(size)
+    
+      const position = findBestPositionForBox(newSection, sections, columns, rows);
+      if (!position) {
+        alert('No space available for new box');
+        return;
+      }
+      console.log("position: - ",position);
+      newSection.gridX = position.gridX;
+      newSection.gridY = position.gridY;
+      newSection.x = newSection.gridX * cellWidth + (newSection.gridX) * gutterWidth;
+      newSection.y = newSection.gridY * cellHeight;
+      setSections(prev => [...prev, newSection]);
+      setSelectedId(newSection.id);
+      setSectionId(newSection.id);
+    };
   
   
   // Debugging useEffect to log sections when they change
@@ -1006,65 +1014,74 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
     return result;
   };
   
-  // Handle item drag inside a section
-  const handleItemDragEnd = (e, itemId, sectionId) => {
-    setSections(prevSections =>
-      prevSections.map(section => {
-        if (section.id !== sectionId) return section; // Ignore other sections
+
+// Reset item position if movement is invalid
+const resetItemPosition = (e, id, currentItem) => {
+  if (!e || !e.target) {
+    alert("Error: Dragging operation failed."); // Alert if event is missing
+    return;
+  }
+
+  const stageNode = e.target.getStage();
+  const layer = stageNode.findOne('Layer');
+  const group = layer.findOne(`#${id}`);
   
-        const currentItem = section.items.find(item => item.id === itemId);
-        if (!currentItem || !dragPreviewPosition) {
-          resetDragState();
-          return section;
-        }
+  if (group) {
+    group.to({
+      x: currentItem.gridX * (cellWidth + gutterWidth),
+      y: currentItem.gridY * cellHeight,
+      duration: 0.3
+    });
+  }
+};
+
+// Handle item drag inside a section
+const handleItemDragEnd = (e, itemId, sectionId) => {
+  setSections(prevSections =>
+    prevSections.map(section => {
+      if (section.id !== sectionId) return section; // Ignore other sections
+
+      const currentItem = section.items.find(item => item.id === itemId);
+      if (!currentItem || !dragPreviewPosition) {
+        resetDragState();
+        return section;
+      }
+
+      const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
+      if (newGridX === currentItem.gridX && newGridY === currentItem.gridY) {
+        resetDragState();
+        return section;
+      }
+
+      // Reposition items inside the section
+      const repositionResult = repositionItemsInSection(currentItem, { gridX: newGridX, gridY: newGridY }, section);
+      
+      if (repositionResult.success) {
+        return {
+          ...section,
+          items: section.items.map(item =>
+            repositionResult.newPositions[item.id]
+              ? {
+                  ...item,
+                  gridX: repositionResult.newPositions[item.id].gridX,
+                  gridY: repositionResult.newPositions[item.id].gridY,
+                  x: repositionResult.newPositions[item.id].gridX * (cellWidth + gutterWidth),
+                  y: repositionResult.newPositions[item.id].gridY * cellHeight
+                }
+              : item
+          )
+        };
+      } else {
+        alert("Cannot move item: No available space.");
+        resetItemPosition(e, itemId, currentItem); // Pass event here
+        return section;
+      }
+    })
+  );
+
+  resetDragState();
+};
   
-        const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
-        if (newGridX === currentItem.gridX && newGridY === currentItem.gridY) {
-          resetDragState();
-          return section;
-        }
-  
-        // Reposition items inside the section
-        const repositionResult = repositionItemsInSection(currentItem, { gridX: newGridX, gridY: newGridY }, section);
-        
-        if (repositionResult.success) {
-          return {
-            ...section,
-            items: section.items.map(item =>
-              repositionResult.newPositions[item.id]
-                ? {
-                    ...item,
-                    gridX: repositionResult.newPositions[item.id].gridX,
-                    gridY: repositionResult.newPositions[item.id].gridY,
-                    x: repositionResult.newPositions[item.id].gridX * cellWidth + repositionResult.newPositions[item.id].gridX * gutterWidth,
-                    y: repositionResult.newPositions[item.id].gridY * cellHeight
-                  }
-                : item
-            )
-          };
-        } else {
-          resetItemPosition(itemId, currentItem);
-          return section;
-        }
-      })
-    );
-  
-    resetDragState();
-  };
-  
-  // Reset item position if movement is invalid
-  const resetItemPosition = (id, currentItem) => {
-    const stageNode = e.target.getStage();
-    const layer = stageNode.findOne('Layer');
-    const group = layer.findOne(`#${id}`);
-    if (group) {
-      group.to({
-        x: currentItem.gridX * (cellWidth + gutterWidth),
-        y: currentItem.gridY * cellHeight,
-        duration: 0.3
-      });
-    }
-  };
   
   // Handle item dragging
   const handleItemDragMove = (e, itemId, sectionId) => {
@@ -1168,9 +1185,11 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
       setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
     };
     
+    
     const handleDragEnd = (e, id) => {
       setSnapLines([]);
       const currentBox = sections.find(b => b.id === id);
+      
       if (!currentBox || !dragPreviewPosition) {
         resetDragState();
         return;
@@ -1183,34 +1202,51 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
       }
     
       const repositionResult = repositionBoxes(currentBox, { gridX: newGridX, gridY: newGridY }, sections, columns, rows);
+      
       if (repositionResult.success) {
         setSections(prevBoxes =>
-          prevBoxes.map(box => repositionResult.newPositions[box.id] ? {
-            ...box,
-            gridX: repositionResult.newPositions[box.id].gridX,
-            gridY: repositionResult.newPositions[box.id].gridY,
-            x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
-            y: repositionResult.newPositions[box.id].gridY * cellHeight,
-          } : box)
+          prevBoxes.map(box =>
+            repositionResult.newPositions[box.id]
+              ? {
+                  ...box,
+                  gridX: repositionResult.newPositions[box.id].gridX,
+                  gridY: repositionResult.newPositions[box.id].gridY,
+                  x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
+                  y: repositionResult.newPositions[box.id].gridY * cellHeight,
+                }
+              : box
+          )
         );
       } else {
-        resetBoxPosition(id, currentBox);
+        alert("Cannot move item: No available space.");
+        resetBoxPosition(e, id, currentBox); // ✅ Pass event `e`
       }
+    
       resetDragState();
     };
-    const resetBoxPosition = (id, currentBox) => {
-      const stageNode = e.target.getStage();
-      const layer = stageNode.findOne('Layer');
-      const group = layer.findOne(`#${id}`);
-      if (group) {
-        group.to({
-          x: currentBox.gridX * (cellWidth + gutterWidth),
-          y: currentBox.gridY * cellHeight,
-          duration: 0.3
-        });
-      }
-    }; 
 
+// ✅ Fix: Pass `e` as a parameter to prevent ReferenceError
+const resetBoxPosition = (e, id, currentBox) => {
+  if (!e || !e.target) {
+    alert("Error: Dragging operation failed."); // Alert if event is missing
+    return;
+  }
+
+  const stageNode = e.target.getStage();
+  const layer = stageNode.findOne('Layer');
+  const group = layer.findOne(`#${id}`);
+
+  if (group) {
+    group.to({
+      x: currentBox.gridX * (cellWidth + gutterWidth),
+      y: currentBox.gridY * cellHeight,
+      duration: 0.3, // ✅ Smooth animation
+      easing: Konva.Easings.EaseOut
+    });
+  }
+};
+    
+    
   
 // Drag end handler (snapping)
 // const handleDragEnd = (e) => {
