@@ -3,6 +3,7 @@ import { logger, errorLogger } from "../utils/logger.js"
 import fs from "fs"
 import multer from "multer"
 import path from 'path';
+import { logLayoutAction } from "./historyController.js";
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,11 +19,16 @@ export const saveLayout = async (req, res) => {
       layout.sections = sections;
       layout.gridSettings = gridSettings;
       layout.updatedAt = new Date();
+      await logLayoutAction(layout, 'updated', userId);
       await layout.save();
+
     } else {
       // Create new layout document
       layout = new Layout({ userId, title, sections, gridSettings });
+
+      await logLayoutAction(layout, 'created', userId);
       await layout.save();
+
     }
     res.json({ success: true, layout });
   } catch (error) {
@@ -87,6 +93,9 @@ export const deleteLayout = async (req, res) => {
           message: 'Layout title is required' 
         });
       }
+
+    //   const l= await Layout.find({ _id });
+    //   await logLayoutAction(l , 'Deleted');
 
       const layout = await Layout.findOneAndDelete({ _id });
 
