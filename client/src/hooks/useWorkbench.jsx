@@ -1,78 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { getCellDimensions } from '../utils/gridHelpers';
 import { saveAs } from "file-saver";
-import {SERVER_URL} from '../Urls';
-import axios from "axios";
 
 const useWorkbench = () => {
   // Constants
-const [userID, setUserID] = useState("60d21b4667d0d8992e610c85");
-const token =localStorage.getItem("token");
-
-// Fetch user info from the backend
-  const fetchUser = async() =>
-  {
-    try {
-      const response = await axios.get(`${SERVER_URL}/api/users/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setUserID(response.data.uid); // Set the user data
-      console.log("User UID:", response.data.uid);
-      localStorage.setItem('userId', response.data.uid);
-      console.log("User data fetched:", response.data);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
-
-  const [isDeleting, setIsDeleting] = useState(null);
-
-  const handleDeleteLayout = async (layout) => {
-      try {
-        setIsDeleting(layout._id);
-        
-        // Assuming you have a way to get the current user's ID
-        const userId = localStorage.getItem('userId'); // Adjust this based on your auth method
-  
-        const response = await fetch(`${SERVER_URL}/api/layout?_id=${encodeURIComponent(layout._id)}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        const result = await response.json();
-  console.log(result);
-        if (result.success) {
-          // Refresh the layouts list
-          fetchAvailableLayouts();
-          // Optionally, you can add a toast or alert here
-          alert(`Layout "${layout.title}" deleted successfully`);
-        } else {
-          alert('Failed to delete layout');
-        }
-      } catch (error) {
-        console.error('Error deleting layout:', error);
-        alert('An error occurred while deleting the layout');
-      } finally {
-        setIsDeleting(null);
-      }
-    };
-  
-   useEffect(() => {
-      if (token) {
-        fetchUser();
-      } else {
-        console.error("No token found. Please sign in.");
-      }
-    }, [token]);
-
-  const userId = userID;
-  console.log("userId : -",userId);
+  const userId = "60d21b4667d0d8992e610c85"; // example ObjectId
   const defaultTitle = "default";
 
 
@@ -87,7 +19,7 @@ const [hideGrid, setHideGrid] = useState(false);          // State to control gr
 const [hideBackground, setHideBackground] = useState(false);  // State to control background visibility
 
 
-  
+
   // Setup & grid configuration
   const [showSetupForm, setShowSetupForm] = useState(true);
   const [layoutTitle, setLayoutTitle] = useState(defaultTitle);
@@ -181,36 +113,42 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
     };
     
   
-  
-  const addItemToSection = (sectionId, size,type,e = null) => {
+    const addItemToSection = (sectionId, size, type, e = null) => {
+      let newItem;
     
-    setSections(prevSections =>
-      prevSections.map(section => {
-        if (section.id !== sectionId) return section; // Skip if it's not the target section
-  
-        let newItem;
-        if(type == "text")
+      if (type === "text") {
         newItem = addTextBox(size);
-        else
+      } else {
         newItem = addImageItem(size);
-
-
-        const bestPosition = findBestPositionForItem(newItem, section.items, section.sizeInfo);
-  
-        if (!bestPosition) {
-          alert('No space available in section!');
-          return section;
-        }
-  
-        newItem.gridX = bestPosition.gridX;
-        newItem.gridY = bestPosition.gridY;
-        newItem.x = newItem.gridX * cellWidth + newItem.gridX * gutterWidth;
-        newItem.y = newItem.gridY * cellHeight;
-  
-        return { ...section, items: [...section.items, newItem] };
-      })
-    );
-  };
+      }
+    
+      setSections(prevSections =>
+        prevSections.map(section => {
+          if (section.id !== sectionId) return section; // Skip if not the target section
+    
+          const bestPosition = findBestPositionForItem(newItem, section.items, section.sizeInfo);
+    
+          if (!bestPosition) {
+            alert('No space available in section!');
+            return section;
+          }
+    
+          // Assign position
+          newItem = {
+            ...newItem,
+            gridX: bestPosition.gridX,
+            gridY: bestPosition.gridY,
+            x: bestPosition.gridX * (cellWidth + gutterWidth),
+            y: bestPosition.gridY * cellHeight,
+          };
+    
+          return { ...section, items: [...section.items, newItem] };
+        })
+      );
+    
+      setSelectedId(newItem.id);
+    };
+    
   
   const addNewSection = (size) => {
     // if (!newBoxContent && newBoxType === 'text') {
@@ -231,7 +169,7 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
     newSection.y = newSection.gridY * cellHeight;
     setSections(prev => [...prev, newSection]);
     setSelectedId(newSection.id);
-    
+    setSectionId(newSection.id);
   };
   
   
@@ -334,9 +272,9 @@ const cellHeight = 50;
   const saveLayout = async () => {
     try {
       const gridSettings = { columns, rows, gutterWidth };
-      const response = await fetch(`${SERVER_URL}/api/layout`, {
+      const response = await fetch('http://localhost:5000/api/layout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' , 'Authorization': `Bearer ${token}`},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings }),
       });
       const data = await response.json();
@@ -348,32 +286,12 @@ const cellHeight = 50;
 
   const fetchAvailableLayouts = async () => {
     try {
-      const response = await fetch(`${SERVER_URL}/api/layouts`, 
-       { headers: { 'Authorization': `Bearer ${token}`}},
-      );
+      const response = await fetch(`http://localhost:5000/api/layouts?userId=${userId}`);
       if (response.ok) {
         console.log("Hii",response);
         const data = await response.json();
         setAvailableLayouts(data.layouts);
         setShowLayoutList(true);
-      } else {
-        console.log("No layouts found.");
-      }
-    } catch (error) {
-      console.error("Error fetching layouts:", error);
-    }
-  };
-
-  const fetchAvailableSections = async () => {
-    try {
-      const response = await fetch(`${SERVER_URL}/api/layouts?userId=${userId}`,
-        { headers: { 'Authorization': `Bearer ${token}`}},
-      );
-      if (response.ok) {
-        console.log("Hii2",response);
-        const data = await response.json();
-        setAvailableLayouts(data.layouts);
-        // setShowLayoutList(true);
       } else {
         console.log("No layouts found.");
       }
@@ -591,10 +509,9 @@ const deleteSelected = () => {
       const blob = dataURLToBlob(dataURL);
       const formData = new FormData();
       formData.append("image", blob, "canvas-image.png");
-      fetch(`${SERVER_URL}/upload`, {
+      fetch("http://localhost:5000/upload", {
         method: "POST",
         body: formData,
-         headers: { 'Authorization': `Bearer ${token}`},
       })
         .then(response => response.json())
         .then(data => console.log("Upload successful:", data))
@@ -613,10 +530,9 @@ const deleteSelected = () => {
     formData.append("image", imageBlob, "konva_image.png");
 
     try {
-      const res = await fetch(`${SERVER_URL}/api/pdf/convert-cmyk`, {
+      const res = await fetch("http://localhost:8000/api/pdf/convert-cmyk", {
         method: "POST",
         body: formData,
-       headers: { 'Authorization': `Bearer ${token}`},
       });
 
       if (!res.ok) throw new Error("Failed to generate PDF");
@@ -1006,65 +922,72 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
     return result;
   };
   
-  // Handle item drag inside a section
-  const handleItemDragEnd = (e, itemId, sectionId) => {
-    setSections(prevSections =>
-      prevSections.map(section => {
-        if (section.id !== sectionId) return section; // Ignore other sections
+// Reset item position if movement is invalid
+const resetItemPosition = (e, id, currentItem) => {
+  if (!e || !e.target) {
+    alert("Error: Dragging operation failed."); // Alert if event is missing
+    return;
+  }
+
+  const stageNode = e.target.getStage();
+  const layer = stageNode.findOne('Layer');
+  const group = layer.findOne(`#${id}`);
   
-        const currentItem = section.items.find(item => item.id === itemId);
-        if (!currentItem || !dragPreviewPosition) {
-          resetDragState();
-          return section;
-        }
-  
-        const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
-        if (newGridX === currentItem.gridX && newGridY === currentItem.gridY) {
-          resetDragState();
-          return section;
-        }
-  
-        // Reposition items inside the section
-        const repositionResult = repositionItemsInSection(currentItem, { gridX: newGridX, gridY: newGridY }, section);
-        
-        if (repositionResult.success) {
-          return {
-            ...section,
-            items: section.items.map(item =>
-              repositionResult.newPositions[item.id]
-                ? {
-                    ...item,
-                    gridX: repositionResult.newPositions[item.id].gridX,
-                    gridY: repositionResult.newPositions[item.id].gridY,
-                    x: repositionResult.newPositions[item.id].gridX * cellWidth + repositionResult.newPositions[item.id].gridX * gutterWidth,
-                    y: repositionResult.newPositions[item.id].gridY * cellHeight
-                  }
-                : item
-            )
-          };
-        } else {
-          resetItemPosition(itemId, currentItem);
-          return section;
-        }
-      })
-    );
-  
-    resetDragState();
-  };
-  
-  // Reset item position if movement is invalid
-  const resetItemPosition = (id, currentItem) => {
-    const stageNode = e.target.getStage();
-    const layer = stageNode.findOne('Layer');
-    const group = layer.findOne(`#${id}`);
-    if (group) {
-      group.to({
-        x: currentItem.gridX * (cellWidth + gutterWidth),
-        y: currentItem.gridY * cellHeight,
-        duration: 0.3
-      });
-    }
-  };
+  if (group) {
+    group.to({
+      x: currentItem.gridX * (cellWidth + gutterWidth),
+      y: currentItem.gridY * cellHeight,
+      duration: 0.3
+    });
+  }
+};
+
+// Handle item drag inside a section
+const handleItemDragEnd = (e, itemId, sectionId) => {
+  setSections(prevSections =>
+    prevSections.map(section => {
+      if (section.id !== sectionId) return section; // Ignore other sections
+
+      const currentItem = section.items.find(item => item.id === itemId);
+      if (!currentItem || !dragPreviewPosition) {
+        resetDragState();
+        return section;
+      }
+
+      const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
+      if (newGridX === currentItem.gridX && newGridY === currentItem.gridY) {
+        resetDragState();
+        return section;
+      }
+
+      // Reposition items inside the section
+      const repositionResult = repositionItemsInSection(currentItem, { gridX: newGridX, gridY: newGridY }, section);
+      
+      if (repositionResult.success) {
+        return {
+          ...section,
+          items: section.items.map(item =>
+            repositionResult.newPositions[item.id]
+              ? {
+                  ...item,
+                  gridX: repositionResult.newPositions[item.id].gridX,
+                  gridY: repositionResult.newPositions[item.id].gridY,
+                  x: repositionResult.newPositions[item.id].gridX * (cellWidth + gutterWidth),
+                  y: repositionResult.newPositions[item.id].gridY * cellHeight
+                }
+              : item
+          )
+        };
+      } else {
+        alert("Cannot move item: No available space.");
+        resetItemPosition(e, itemId, currentItem); // Pass event here
+        return section;
+      }
+    })
+  );
+
+  resetDragState();
+};
   
   // Handle item dragging
   const handleItemDragMove = (e, itemId, sectionId) => {
@@ -1171,6 +1094,7 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
     const handleDragEnd = (e, id) => {
       setSnapLines([]);
       const currentBox = sections.find(b => b.id === id);
+      
       if (!currentBox || !dragPreviewPosition) {
         resetDragState();
         return;
@@ -1183,34 +1107,51 @@ const repositionBoxes = (movingItem, targetPosition, allItems, columns, rows) =>
       }
     
       const repositionResult = repositionBoxes(currentBox, { gridX: newGridX, gridY: newGridY }, sections, columns, rows);
+      
       if (repositionResult.success) {
         setSections(prevBoxes =>
-          prevBoxes.map(box => repositionResult.newPositions[box.id] ? {
-            ...box,
-            gridX: repositionResult.newPositions[box.id].gridX,
-            gridY: repositionResult.newPositions[box.id].gridY,
-            x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
-            y: repositionResult.newPositions[box.id].gridY * cellHeight,
-          } : box)
+          prevBoxes.map(box =>
+            repositionResult.newPositions[box.id]
+              ? {
+                  ...box,
+                  gridX: repositionResult.newPositions[box.id].gridX,
+                  gridY: repositionResult.newPositions[box.id].gridY,
+                  x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
+                  y: repositionResult.newPositions[box.id].gridY * cellHeight,
+                }
+              : box
+          )
         );
       } else {
-        resetBoxPosition(id, currentBox);
+        alert("Cannot move item: No available space.");
+        resetBoxPosition(e, id, currentBox); // ✅ Pass event `e`
       }
+    
       resetDragState();
     };
-    const resetBoxPosition = (id, currentBox) => {
-      const stageNode = e.target.getStage();
-      const layer = stageNode.findOne('Layer');
-      const group = layer.findOne(`#${id}`);
-      if (group) {
-        group.to({
-          x: currentBox.gridX * (cellWidth + gutterWidth),
-          y: currentBox.gridY * cellHeight,
-          duration: 0.3
-        });
-      }
-    }; 
 
+// ✅ Fix: Pass `e` as a parameter to prevent ReferenceError
+const resetBoxPosition = (e, id, currentBox) => {
+  if (!e || !e.target) {
+    alert("Error: Dragging operation failed."); // Alert if event is missing
+    return;
+  }
+
+  const stageNode = e.target.getStage();
+  const layer = stageNode.findOne('Layer');
+  const group = layer.findOne(`#${id}`);
+
+  if (group) {
+    group.to({
+      x: currentBox.gridX * (cellWidth + gutterWidth),
+      y: currentBox.gridY * cellHeight,
+      duration: 0.3, // ✅ Smooth animation
+      easing: Konva.Easings.EaseOut
+    });
+  }
+};
+    
+    
   
 // Drag end handler (snapping)
 // const handleDragEnd = (e) => {
@@ -1331,7 +1272,6 @@ return {
   showSetupForm,
   setShowSetupForm,
   layoutTitle,
-  setSections,
   setLayoutTitle,
   columns,
   setColumns,
@@ -1389,8 +1329,6 @@ return {
   // addNewSection,
   exportToCMYKPDF,
     fitStageToScreen,
-    fetchAvailableSections,
-  
     city,
     setCity,
     dueDate,
@@ -1404,8 +1342,6 @@ return {
     hideGrid,       // New prop to control grid visibility
     hideBackground, // New prop to control background visibility
     changeFontFamily,
-    handleDeleteLayout,
-    isDeleting,
 };
 };
 
