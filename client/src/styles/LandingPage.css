@@ -9,16 +9,21 @@
     background-color: #ffffff;
   }/* Navigation bar */
   
+/* Navbar */
 .navbar {
-  position: absolute;
+  position: fixed;
   top: 0;
-  left: 0; /* Ensure it starts from the left */
+  left: 0;
   width: 100%;
   display: flex;
-  justify-content: space-between; /* Align items to both ends */
-  align-items: center; /* Vertically center the items */
-  padding: 20px 40px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px 10px 10px;
   background: #f8f9fa;
+  z-index: 1000; /* Ensure it is above other content */
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow:rgba(2, 31, 221, 0.07) 0rem 0.5rem 1rem;
 }
 
   

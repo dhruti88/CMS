@@ -7,10 +7,13 @@ import { WorkbenchContext } from '../../context/WorkbenchContext';
 import { useContext,useState } from 'react';
 import NestedSectionsPanel from '../organisms/NestedSectionsPanel';
 import SectionReplacementPanel from '../organisms/SectionReplacementPanel';
-
+import CustomButton from '../atoms/button/CustomButton';
+import Navbar from '../atoms/navbar/NavBar';
+import { useNavigate } from 'react-router-dom';
 
 
 const WorkbenchTemplate = () => {
+  const navigate = useNavigate(); // Initialize navigate function
   const workbenchProps = useContext(WorkbenchContext);
   const {
     showSetupForm,
@@ -251,6 +254,9 @@ const handleReplaceSection = (selectedSection) => {
         />
       ) : (
         <>
+                <Navbar>
+                  <CustomButton onClick={() => navigate("/signup")}>Sign up</CustomButton>
+                </Navbar>
           <div className="workbench-container">
       <WorkbenchActions
         uploadCanvasImage={uploadCanvasImage}
