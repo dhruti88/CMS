@@ -478,16 +478,18 @@ const WorkbenchCanvas = ({
 
           {sections.map((section) => (
             <Group
-              key={section.id}
-              x={section.x}
-              y={section.y}
-              draggable={!draggingItem}
-              onDragStart={(e) => !draggingItem && handleDragStart(e, section.id)}
-              onDragMove={(e) => !draggingItem && handleDragMove(e, section.id)}
-              onDragEnd={(e) => !draggingItem && handleDragEnd(e, section.id)}
-              onClick={() => setSectionId(section.id)}
-              onTap={() => setSectionId(section.id)}
-            >
+            key={section.id}
+            id={section.id}  // ✅ Make sure this matches 'section-<timestamp>'
+            x={section.x}
+            y={section.y}
+            draggable={!draggingItem}
+            onDragStart={(e) => !draggingItem && handleDragStart(e, section.id)}
+            onDragMove={(e) => !draggingItem && handleDragMove(e, section.id)}
+            onDragEnd={(e) => !draggingItem && handleDragEnd(e, section.id)}
+            onClick={() => setSectionId(section.id)}
+            onTap={() => setSectionId(section.id)}
+          >
+          
               {!hideBackground && (
                  <Rect width={section.width} height={section.height} fill="" stroke="red" strokeWidth={2} 
                  onTap={(e) => {
@@ -567,35 +569,101 @@ const WorkbenchCanvas = ({
 
           <Transformer
             ref={transformerRef}
+            rotateEnabled={false} 
             boundBoxFunc={(oldBox, newBox) => {
               if (!selectedId || !sectionId) return oldBox;
-
+            
               const section = sections.find(sec => sec.id === sectionId);
               if (!section) return oldBox;
-
-              const totalCellWidth = cellWidth + gutterWidth;
-
+            
+              const selectedItem = section.items.find(i => i.id === selectedId);
+              if (!selectedItem) return oldBox;
+            
+              const otherItems = section.items.filter(i => i.id !== selectedId);
+              console.log("section : - ",section,"new box : -",newBox, "old box : -",oldBox);
+            
+              // Section boundaries
               const sectionLeft = section.x;
               const sectionRight = section.x + section.width;
               const sectionTop = section.y;
               const sectionBottom = section.y + section.height;
-
-              const newX = Math.max(sectionLeft, Math.min(newBox.x, sectionRight - newBox.width));
-              const newY = Math.max(sectionTop, Math.min(newBox.y, sectionBottom - newBox.height));
-
+            
+              // Grid calculations
+              const totalCellWidth = cellWidth + gutterWidth;
+              const newGridX = Math.round((newBox.x - section.x) / totalCellWidth);
+              const newGridY = Math.round((newBox.y - section.y) / cellHeight);
               const colSpan = Math.max(1, Math.round((newBox.width + gutterWidth) / totalCellWidth));
-              const snappedWidth = colSpan * cellWidth + (colSpan - 1) * gutterWidth;
               const rowSpan = Math.max(1, Math.round(newBox.height / cellHeight));
+              //console.log("colSpan : -",colSpan,"rowSpan : -",rowSpan);
+              const snappedWidth = colSpan * cellWidth + (colSpan - 1) * gutterWidth;
               const snappedHeight = rowSpan * cellHeight;
-
+            
+              let canExpandLeft = true, canExpandRight = true, canExpandTop = true, canExpandBottom = true;
+            
+              // **Check for collisions**
+              otherItems.forEach(item => {
+                console.log("otheritem : -",item);
+                const itemGridX = Math.round((item.x) / totalCellWidth);
+                const itemGridY = Math.round((item.y) / cellHeight);
+                const itemColSpan = Math.round(item.width / totalCellWidth);
+                const itemRowSpan = Math.round(item.height / cellHeight);
+            
+                const itemRight = itemGridX + itemColSpan;
+                const itemBottom = itemGridY + itemRowSpan;
+                const newRight = newGridX + colSpan;
+                const newBottom = newGridY + rowSpan;
+            
+                // **Stop left expansion if another item is in the way**
+                if (newGridX < selectedItem.gridX && itemRight > newGridX && itemGridY < newBottom && itemBottom > newGridY) {
+                  canExpandLeft = false;
+                }
+            
+                // **Stop right expansion if another item is in the way**
+                if (newRight > selectedItem.gridX + selectedItem.sizeInfo.cols && itemGridX < newRight && itemRight > newGridX && itemGridY < newBottom && itemBottom > newGridY) {
+                  canExpandRight = false;
+                }
+            
+                // **Stop top expansion if another item is in the way**
+                if (newGridY < selectedItem.gridY && itemBottom > newGridY && itemGridX < newRight && itemRight > newGridX) {
+                  canExpandTop = false;
+                }
+            
+                // **Stop bottom expansion if another item is in the way**
+                if (newBottom > selectedItem.gridY + selectedItem.sizeInfo.rows && itemGridY < newBottom && itemBottom > newGridY && itemGridX < newRight && itemRight > newGridX) {
+                  canExpandBottom = false;
+                }
+              });
+            
+              // **Adjust Left Expansion** (Move `x` position left)
+              const adjustedX = canExpandLeft
+                ? Math.max(sectionLeft, section.x + newGridX * totalCellWidth)
+                : section.x + selectedItem.gridX * totalCellWidth;
+            
+              // **Adjust Top Expansion** (Move `y` position up)
+              const adjustedY = canExpandTop
+                ? Math.max(sectionTop, section.y + newGridY * cellHeight)
+                : section.y + selectedItem.gridY * cellHeight;
+            
+              // **Width & Height Adjustments**
+              const adjustedWidth = canExpandRight
+                ? Math.min(snappedWidth, sectionRight - adjustedX)
+                : selectedItem.sizeInfo.cols * totalCellWidth - gutterWidth;
+            
+              const adjustedHeight = canExpandBottom
+                ? Math.min(snappedHeight, sectionBottom - adjustedY)
+                : selectedItem.sizeInfo.rows * cellHeight;
+            
               return {
-                ...newBox,
-                x: newX,
-                y: newY,
-                width: Math.min(snappedWidth, sectionRight - newX),
-                height: Math.min(snappedHeight, sectionBottom - newY),
+                ...oldBox,
+                x: adjustedX,
+                y: adjustedY,
+                width: adjustedWidth,
+                height: adjustedHeight,
               };
             }}
+            
+            
+
             onTransformEnd={(e) => {
               console.log("Transform End Triggered");
               handleTransformEnd(e);
