@@ -1,23 +1,13 @@
 import React from 'react';
-import IconButton  from '@mui/material/IconButton';
+import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import { Typography, Card } from "@mui/material";
-
+import Typography from '@mui/material/Typography';
 import { 
-  Upload, 
-  Save, 
-  Search, 
-  PanTool, 
-  Mouse, 
-  ZoomIn, 
-  ZoomOut, 
-  PictureAsPdf, 
-  Refresh, 
-  Delete, 
-  Edit, 
-  Close 
+  Upload, Save, Search, PanTool, Mouse, ZoomIn, 
+  ZoomOut, PictureAsPdf, Refresh, Delete, Edit, Close 
 } from '@mui/icons-material';
-import '../../styles/WorkBench.css'; // Import your CSS file
+import LoadLayoutAndSection from './LoadLayoutAndSection';
+import '../../styles/WorkBench.css';
 
 const WorkbenchActions = ({
   uploadCanvasImage,
@@ -53,21 +43,21 @@ const WorkbenchActions = ({
 
   return (
     <div className="workbench-header">
-    <Typography
-      variant="h5"
-      sx={{
-        fontWeight: "bold",
-        color: "var(--primary-color)",
-        padding: "10px 0",
-        textAlign: "center",
-      }}
-    >
-      {layoutTitle}
-    </Typography>
-
-
+      {/* Title with better UI */}
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: "bold",
+          color: "var(--primary-color)",
+          padding: "10px 0",
+          textAlign: "center",
+        }}
+      >
+        {layoutTitle}
+      </Typography>
 
       <div className="workbench-actions">
+        {/* Toolbar Buttons */}
         <Tooltip title="Upload Canvas">
           <IconButton onClick={uploadCanvasImage} className="icon-primary">
             <Upload />
@@ -81,46 +71,22 @@ const WorkbenchActions = ({
         </Tooltip>
 
         <Tooltip title="Search Layout">
-          <IconButton onClick={fetchAvailableLayouts} className="icon-primary">
+          <IconButton onClick={() => {setShowLayoutList(true),fetchAvailableLayouts()}} className="icon-primary">
             <Search />
           </IconButton>
         </Tooltip>
 
+        {/* Layout Selection Panel */}
         {showLayoutList && (
-          <div className="layout-list-modal">
-            <h2>Select a Layout to Edit</h2>
-            {availableLayouts.length > 0 ? (
-              <ul>
-                {availableLayouts.map((layout) => (
-                  <li key={layout._id}>
-                    <strong>{layout.title}</strong>
-                    <Tooltip title="Edit Layout">
-                      <IconButton onClick={() => loadLayoutFromSelected(layout)} className="icon-primary">
-                        <Edit />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete Layout">
-                      <IconButton 
-                        onClick={() => handleDeleteLayout(layout)} 
-                        disabled={isDeleting === layout._id}
-                        className={isDeleting === layout._id ? "icon-disabled" : "icon-accent"}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </Tooltip>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No saved layouts found.</p>
-            )}
-            <Tooltip title="Close">
-              <IconButton onClick={() => setShowLayoutList(false)} className="icon-text">
-                <Close />
-              </IconButton>
-            </Tooltip>
-          </div>
-        )}
+  <LoadLayoutAndSection 
+    availableLayouts={availableLayouts}
+    loadLayoutFromSelected={loadLayoutFromSelected}
+    handleDeleteLayout={handleDeleteLayout}
+    setShowLayoutList={setShowLayoutList}
+    isDeleting={isDeleting}
+    mode="layout" // Handles layout selection
+  />
+)}
 
         <Tooltip title={toolMode === 'pointer' ? "Switch to Hand Tool" : "Switch to Pointer Tool"}>
           <IconButton onClick={() => setToolMode(toolMode === 'pointer' ? 'hand' : 'pointer')} className="icon-primary">

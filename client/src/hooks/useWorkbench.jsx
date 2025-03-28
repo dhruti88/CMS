@@ -29,6 +29,7 @@ const token =localStorage.getItem("token");
   };
 
   const [isDeleting, setIsDeleting] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
 
   const handleDeleteLayout = async (layout) => {
       try {
@@ -359,6 +360,7 @@ const cellHeight = 50;
       const response = await fetch(`${SERVER_URL}/api/layouts`, 
        { headers: { 'Authorization': `Bearer ${token}`}},
       );
+      console.log("response : -",response);
       if (response.ok) {
         console.log("Hii",response);
         const data = await response.json();
