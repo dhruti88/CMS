@@ -10,6 +10,8 @@ import SectionReplacementPanel from '../organisms/SectionReplacementPanel';
 import CustomButton from '../atoms/button/CustomButton';
 import Navbar from '../atoms/navbar/NavBar';
 import { useNavigate } from 'react-router-dom';
+import { Modal ,Box } from '@mui/material';
+import LoadLayoutAndSection from '../organisms/LoadLayoutAndSection';
 
 
 const WorkbenchTemplate = () => {
@@ -348,15 +350,15 @@ const handleReplaceSection = (selectedSection) => {
             openReplacementPanel={openReplacementPanel}
             
           />
-            {showReplacementPanel && (
-        <SectionReplacementPanel
-          availableLayouts={availableLayouts} // Ensure this is defined
-          targetSection={sections.find(sec => sec.id === targetSectionIdForReplacement)}
-          onReplaceSection={ handleReplaceSection }
-          onClose={() => setShowReplacementPanel(false)}
-        />
-      )}
-
+{showReplacementPanel && (
+  <LoadLayoutAndSection
+    availableLayouts={availableLayouts}
+    targetSection={sections.find(sec => sec.id === targetSectionIdForReplacement)}
+    onReplaceSection={handleReplaceSection}
+    setShowLayoutList={setShowReplacementPanel} // Used to close panel
+    mode="section" // Handles section replacement
+  />
+)}
         </>
       )}
     </div>
