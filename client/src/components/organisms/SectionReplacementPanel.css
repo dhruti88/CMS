@@ -96,17 +96,18 @@
 }
 
 .section-item:hover {
-    background-color: #f7f9fc;
-    transform: translateX(5px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.section-item.selected {
     background-color: #e6f2ff;
     border-left: 4px solid #3b82f6;
     font-weight: 500;
     color: #1e40af;
 }
+/* 
+.section-item.selected {
+    background-color: #e6f2ff;
+    border-left: 4px solid #3b82f6;
+    font-weight: 500;
+    color: #1e40af;
+} */
 
 .section-item-details {
     color: #6b7280;
@@ -173,6 +174,7 @@
   .section-item-size {
     color: #6b7280;
     font-size: 0.8em;
+    padding-right: 10px;
   }
   
   .section-item {
@@ -180,3 +182,50 @@
     justify-content: space-between;
     align-items: center;
   }
+
+  .panel-title {
+    text-align: center;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+/* Updated Close Button Styling */
+.panel-actions .panel-button {
+    background: var(--primary-color);
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.panel-actions .panel-button:hover {
+    background: #1e40af;
+}
+
+
+  /* Layout Title */
+.layout-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Section Item Actions (for buttons) */
+.section-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Layout Details */
+.section-item-details {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 4px;
+    display: block;
+}

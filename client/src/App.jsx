@@ -11,11 +11,13 @@ import PublicRoute from './hooks/PublicRoute';
 import { AuthProvider } from './context/AuthContext';
 import MyLayouts from './components/pages/MyLayouts'
 import LayoutHistory from './components/pages/LayoutHistory'
+import Navbar from './components/atoms/navbar/NavBar';
 
 function App() {
   return (
     <AuthProvider>
     <Router>
+      <Navbar />
       <Routes>
         <Route path="/" element={
           <PublicRoute><LandingPage/></PublicRoute>}/>
