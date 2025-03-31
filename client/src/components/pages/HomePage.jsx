@@ -5,6 +5,7 @@ import ProfileMenu from "../molecules/ProfileMenu";
 import { useNavigate } from "react-router-dom";
 import { SERVER_URL } from "../../Urls";
 import { logout } from "../../utils/logout";
+import "../../styles/LandingPage.css"
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
@@ -31,16 +32,11 @@ const HomePage = () => {
     } catch (error) {
       console.error("Error fetching user data:", error);
       await logout(); // Logout on error
-      // if (error.response?.status === 403) {
-      //   console.warn("Token expired or invalid. Logging out...");
-      //   localStorage.removeItem("token");
-      //   navigate("/signin"); // Redirect to Sign-In page
-      // }
     }
   };
 
   return (
-    <div>
+    <div style={{ backgroundColor: 'white', width: '100vw', height: '100vh' }}>
       <Navbar>
         {user ? (
           <ProfileMenu user={user} token={token} />
@@ -48,6 +44,7 @@ const HomePage = () => {
           <p>Loading user data...</p>
         )}
       </Navbar>
+
     </div>
   );
 };
