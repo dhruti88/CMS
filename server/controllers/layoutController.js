@@ -167,11 +167,4 @@ export const uploadImage = (req, res) => {
         }
         res.json({ message: 'File uploaded successfully', filePath: `/uploads/${req.file.filename}` });
     });
-};
-
-
-
-
-
-
-    
+};    
