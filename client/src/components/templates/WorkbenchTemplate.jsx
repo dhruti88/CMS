@@ -102,6 +102,7 @@ const WorkbenchTemplate = () => {
     userID,
     userProfilePic,
     activeEditors,
+    positionDisplay,
     // setuserID,
   } = workbenchProps;
 // Inside WorkbenchTemplate component (before the return)
@@ -314,6 +315,7 @@ const handleReplaceSection = (selectedSection) => {
   handleDragEnd={handleDragEnd}
   handleDragMove={handleDragMove}
   sectionId={sectionId}
+  positionDisplay = {positionDisplay}
         columns={columns}
         rows={rows}
         hideGrid={hideGrid}
