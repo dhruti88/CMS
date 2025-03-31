@@ -383,6 +383,7 @@ import React, { useState, useEffect } from 'react';
 import { Stage, Layer, Rect, Text, Transformer, Group } from 'react-konva';
 import URLImage from '../atoms/URLImage';
 import { getGridLines } from '../../utils/gridHelpers';
+import { Line } from "react-konva";
 
 const WorkbenchCanvas = ({
   stageSize,
@@ -408,7 +409,8 @@ const WorkbenchCanvas = ({
   sectionId,
   columns,
   rows,
-  hideGrid,       // New prop to control grid visibility
+  hideGrid, 
+  snapLines,      // New prop to control grid visibility
   hideBackground, // New prop to control background visibility
 }) => {
   const [draggingItem, setDraggingItem] = useState(false);
@@ -684,6 +686,17 @@ const WorkbenchCanvas = ({
               handleTransformEnd(e);
             }}
           />
+
+          {/* Your other Stage content */}
+          {snapLines.map((line, i) => (
+            <Line
+              key={`snapline-${i}`}
+              points={line.points}
+              stroke={line.stroke}
+              strokeWidth={line.strokeWidth}
+              dash={line.dash}
+            />
+          ))}
         </Layer>
       </Stage>
     </div>
