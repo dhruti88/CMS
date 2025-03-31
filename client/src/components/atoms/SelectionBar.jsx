@@ -21,7 +21,7 @@ const SelectionBar = ({ onSearch }) => {
       <FormControl>
         <InputLabel sx={{ background: "#f1f3f4", px: 0.5 }}>City</InputLabel>
         <Select value={city} onChange={(e) => setCity(e.target.value)}>
-          <MenuItem value="New York">New York</MenuItem>
+          <MenuItem value="Pune">Pune</MenuItem>
           <MenuItem value="Los Angeles">Los Angeles</MenuItem>
           <MenuItem value="Chicago">Chicago</MenuItem>
         </Select>
