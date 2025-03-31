@@ -31,6 +31,7 @@ const SignUp = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       const idToken = await user.getIdToken();
+      localStorage.setItem("token", idToken);
 
       // Send user data to backend
       const response = await fetch(`${SERVER_URL}/api/users/save`, {
@@ -57,7 +58,9 @@ const SignUp = () => {
           console.error("Error storing user:", data);
         }
       
-      navigate('/signin');
+        console.log("Bearer Token: ",idToken);
+        navigate('/home'); // Redirect to home page after successful sign-up
+     
     } catch (error) {
       setError(error.message);
     }

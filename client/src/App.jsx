@@ -21,8 +21,10 @@ function App() {
           <PublicRoute><LandingPage/></PublicRoute>}/>
         <Route path="/signin" element={
            <PublicRoute><SignInPage /></PublicRoute>} />
-        <Route path="/signup" element={
-          <PublicRoute><SignUp /></PublicRoute>} />
+        {/* <Route path="/signup" element={
+          <PublicRoute><SignUp /></PublicRoute>} /> */}
+           <Route path="/signup" element={
+          <SignUp />} />
         <Route path="/page" element={
           <ProtectedRoute><WorkBench/></ProtectedRoute>} />
         <Route path="/home" element={
