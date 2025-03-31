@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children }) => {
   if (loading) {
     return <div>Loading...</div>; 
   }
-  // console.log(user);
+  console.log("Calling protected route");
   return user ? children : <Navigate to="/signin" replace />;
 };
 

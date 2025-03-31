@@ -35,7 +35,6 @@ function App() {
           <ProtectedRoute><WorkBench/></ProtectedRoute>} />
         <Route path='/history' element={
           <ProtectedRoute><LayoutHistory /></ProtectedRoute>} /> 
-
          <Route path="/grideditor" element={<GridEditor/>} />
 
        
