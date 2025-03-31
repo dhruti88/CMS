@@ -31,6 +31,7 @@ const SignUp = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       const idToken = await user.getIdToken();
+      localStorage.setItem("token", idToken);
 
       // Send user data to backend
       const response = await fetch(`${SERVER_URL}/api/users/save`, {
@@ -48,6 +49,7 @@ const SignUp = () => {
       });
       
       console.log("Signed up successfully! :", user);
+      console.log('TOKEN after signup: ', localStorage.getItem("token"));
 
       const data = await response.json();
         
@@ -57,7 +59,7 @@ const SignUp = () => {
           console.error("Error storing user:", data);
         }
       
-      navigate('/signin');
+     navigate('/home');
     } catch (error) {
       setError(error.message);
     }

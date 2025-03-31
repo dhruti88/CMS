@@ -25,11 +25,12 @@ const Navbar = () => {
       const response = await axios.get(`${SERVER_URL}/api/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log("res : -",response.data)
       setUser(response.data);
     } catch (error) {
       console.error("Error fetching user data:", error);
       await logout();
-      navigate("/signin"); // Redirect to Sign-In page if token is invalid
+      // navigate("/signin"); // Redirect to Sign-In page if token is invalid
     }
   };
 
