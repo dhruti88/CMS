@@ -98,6 +98,11 @@ const WorkbenchTemplate = () => {
     changeFontFamily,
     handleDeleteLayout,
     isDeleting,
+    snapLines,
+    userID,
+    userProfilePic,
+    activeEditors,
+    // setuserID,
   } = workbenchProps;
 // Inside WorkbenchTemplate component (before the return)
 
@@ -281,6 +286,9 @@ const handleReplaceSection = (selectedSection) => {
         setSelectedId = {setSelectedId}
         handleDeleteLayout = {handleDeleteLayout}
         isDeleting = {isDeleting}
+        userID={userID} 
+        userProfilePic = {userProfilePic}
+        activeEditors = {activeEditors}
       />
      <WorkbenchCanvas
   handleTransformEnd={handleTransformEnd}  
@@ -311,6 +319,7 @@ const handleReplaceSection = (selectedSection) => {
         hideGrid={hideGrid}
         hideBackground={hideBackground}
         setSections = {setSections}
+        snapLines = {snapLines}
 />
     </div>
           <Toolbox

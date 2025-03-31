@@ -40,6 +40,7 @@
     "socket.io-client": "^4.8.1",
     "use-image": "^1.1.1",
     "y-webrtc": "^10.3.0",
+    "y-websocket": "^2.1.0",
     "yjs": "^13.6.24"
   },
   "devDependencies": {
