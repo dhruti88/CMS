@@ -63,6 +63,30 @@ export const getAllLayouts = async (req, res) => {
     }
   };
 
+  export const getMyLayouts = async (req, res) => {
+    try {
+      // Get userId from the verified token (added by middleware)
+      const userId = req.user.uid;
+  
+      if (!userId) {
+        return res.status(400).json({ error: "User ID not provided or invalid" });
+      }
+  
+      // Fetch layouts created by the current authenticated user
+      const layouts = await Layout.find({ userId });
+  
+      if (!layouts || layouts.length === 0) {
+        return res.status(404).json({ error: "No layouts found for this user" });
+      }
+  
+      res.status(200).json({ layouts });
+    } catch (error) {
+      console.error("Error fetching layouts:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+  
+
 // export const deleteLayout = async (req, res) => {
 //     try {
 //       const { userId, title } = req.query;

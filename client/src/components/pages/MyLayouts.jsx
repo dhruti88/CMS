@@ -1,55 +1,75 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import SelectionBar from "../atoms/SelectionBar"
 import NewsList from "../atoms/NewsList";
 import Pagination from "../atoms/Pagination";
-import Header from "../atoms/Header";
 import Footer from "../atoms/Footer";
-import '../../styles/WorkBench.css';
-import SelectionBar from '../atoms/SelectionBar';
-import Navbar from '../atoms/navbar/NavBar';
-import { useNavigate } from 'react-router-dom';
-import CustomButton from '../atoms/button/CustomButton';
-
+import { useAuth } from "../../context/AuthContext"; 
 
 const MyLayouts = () => {
-  const newsItems = Array.from({ length: 100 }, (_, index) => ({
-    id: index + 1,
-    title: `NewsPageName ${index + 1}`,
-    dueDate: '02-18-2025', // Adjusted to YYYY-MM-DD format for date filtering
-    imageUrl: 'https://via.placeholder.com/300',
-    city: ["New York", "Los Angeles", "Chicago"][index % 3],
-    taskStatus: ["In Progress", "Pending", "Completed"][index % 3],
-    layoutType: ["Page", "Section"][index % 2], // Added Layout Type
-    rows: (index % 5) + 1, // Random row value (1 to 5)
-    cols: (index % 4) + 1  // Random column value (1 to 4)
-  }));
-
-  const navigate = useNavigate(); 
-
-  const itemsPerPage = 8;
+  const [newsItems, setNewsItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredItems, setFilteredItems] = useState(newsItems);
+  const itemsPerPage = 8;
+  const navigate = useNavigate();
+  const { user } = useAuth(); 
+
+  // Fetch layouts from backend using token from localStorage
+  useEffect(() => {
+    const fetchLayouts = async () => {
+      const token = localStorage.getItem("token");
+    
+      if (!token) {
+        console.error("No token found. Please log in.");
+        navigate("/signin");
+        return;
+      }
+    
+      try {
+        const response = await axios.get("http://localhost:8000/api/my-layouts", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+    
+        console.log("Fetched layouts:", response.data.layouts);
+        setNewsItems(response.data.layouts);
+        setFilteredItems(response.data.layouts);
+      } catch (error) {
+        console.error("Error fetching layouts:", error.response?.data?.error || error.message);
+      }
+    };
+    
+
+    fetchLayouts();
+  }, [user, navigate]);
+
+  // Filtering Logic
+  const handleSearch = (filters) => {
+    const filtered = newsItems.filter((item) => {
+      const formattedDueDate = item.duedate
+        ? new Date(item.duedate).toISOString().split("T")[0]
+        : "";
+  
+      return (
+        (!filters.city || item.city?.toLowerCase() === filters.city.toLowerCase()) &&
+        (!filters.dueDate || formattedDueDate === filters.dueDate) &&
+        (!filters.taskStatus || item.taskstatus?.toLowerCase() === filters.taskStatus.toLowerCase()) &&
+        (!filters.title || item.title?.toLowerCase().includes(filters.title.toLowerCase())) &&
+        (!filters.layoutType || item.layouttype?.toLowerCase() === filters.layoutType.toLowerCase()) &&
+        (!filters.rows || item.gridSettings?.rows === Number(filters.rows)) &&
+        (!filters.cols || item.gridSettings?.columns === Number(filters.cols))
+      );
+    });
+  
+    setFilteredItems(filtered);
+    setCurrentPage(1);
+  };
+  
+  // Pagination Logic
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-const handleSearch = (filters) => {
-  const filtered = newsItems.filter(item => {
-    const formattedDueDate = item.dueDate.split("-").reverse().join("-"); // Convert "YYYY-MM-DD" → "DD-MM-YYYY"
-
-    return (
-      (!filters.city || item.city === filters.city) &&
-      (!filters.dueDate || formattedDueDate === filters.dueDate) && // Match converted format
-      (!filters.taskStatus || item.taskStatus === filters.taskStatus) &&
-      (!filters.title || item.title.toLowerCase().includes(filters.title.toLowerCase())) &&
-      (!filters.layoutType || item.layoutType === filters.layoutType) &&
-      (!filters.rows || item.rows === Number(filters.rows)) &&
-      (!filters.cols || item.cols === Number(filters.cols))
-    );
-  });
-
-  setFilteredItems(filtered);
-  setCurrentPage(1);
-};
-
 
   return (
     <div className="news-container">
