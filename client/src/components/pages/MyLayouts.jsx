@@ -5,6 +5,10 @@ import Header from "../atoms/Header";
 import Footer from "../atoms/Footer";
 import '../../styles/WorkBench.css';
 import SelectionBar from '../atoms/SelectionBar';
+import Navbar from '../atoms/navbar/NavBar';
+import { useNavigate } from 'react-router-dom';
+import CustomButton from '../atoms/button/CustomButton';
+
 
 const MyLayouts = () => {
   const newsItems = Array.from({ length: 100 }, (_, index) => ({
@@ -18,6 +22,8 @@ const MyLayouts = () => {
     rows: (index % 5) + 1, // Random row value (1 to 5)
     cols: (index % 4) + 1  // Random column value (1 to 4)
   }));
+
+  const navigate = useNavigate(); 
 
   const itemsPerPage = 8;
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,7 +53,6 @@ const handleSearch = (filters) => {
 
   return (
     <div className="news-container">
-      <Header />
       <SelectionBar onSearch={handleSearch} />
       <NewsList newsItems={paginatedItems} />
       <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />

@@ -23,11 +23,6 @@ const SignInPage = () => {
         }}
       >
 
-        <Navbar>
-          <CustomButton onClick={() => navigate("/signup")}>Sign up</CustomButton>
-        </Navbar>
-
-
         <SignIn />
       </Container>
     </div>

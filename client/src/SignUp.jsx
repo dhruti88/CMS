@@ -49,6 +49,7 @@ const SignUp = () => {
       });
       
       console.log("Signed up successfully! :", user);
+      console.log('TOKEN after signup: ', localStorage.getItem("token"));
 
       const data = await response.json();
         
@@ -58,9 +59,7 @@ const SignUp = () => {
           console.error("Error storing user:", data);
         }
       
-        console.log("Bearer Token: ",idToken);
-        navigate('/home'); // Redirect to home page after successful sign-up
-     
+     navigate('/home');
     } catch (error) {
       setError(error.message);
     }

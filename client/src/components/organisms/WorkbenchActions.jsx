@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
-import Button from '../atoms/Button';
-import { downloadStageAsPDF } from '../../utils/pdfUtils';
+import React from 'react';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import { 
+  Upload, Save, Search, PanTool, Mouse, ZoomIn, 
+  ZoomOut, PictureAsPdf, Refresh, Delete, Edit, Close 
+} from '@mui/icons-material';
+import LoadLayoutAndSection from './LoadLayoutAndSection';
+import '../../styles/WorkBench.css';
 
 const WorkbenchActions = ({
   uploadCanvasImage,
@@ -16,14 +23,12 @@ const WorkbenchActions = ({
   loadLayoutFromSelected, 
   exportToCMYKPDF,
   fitStageToScreen,
-  stageRef,
   setHideGrid,
   setHideBackground,
   setSelectedId,
   handleDeleteLayout,
   isDeleting,
 }) => {
-  
 
   const handleExport = () => {
     setHideGrid(true);
@@ -36,73 +41,82 @@ const WorkbenchActions = ({
     }, 1000);
   };
 
-  
-
   return (
     <div className="workbench-header">
-      <h1>{layoutTitle}</h1>
+      {/* Title with better UI */}
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: "bold",
+          color: "var(--primary-color)",
+          padding: "10px 0",
+          textAlign: "center",
+        }}
+      >
+        {layoutTitle}
+      </Typography>
+
       <div className="workbench-actions">
-        <Button onClick={uploadCanvasImage} className="action-button">
-          Upload Canvas
-        </Button>
-        <Button onClick={saveLayout} className="action-button">
-          Save Layout
-        </Button>
-        <Button onClick={fetchAvailableLayouts} className="action-button">
-          Search Layout
-        </Button>
+        {/* Toolbar Buttons */}
+        <Tooltip title="Upload Canvas">
+          <IconButton onClick={uploadCanvasImage} className="icon-primary">
+            <Upload />
+          </IconButton>
+        </Tooltip>
 
+        <Tooltip title="Save Layout">
+          <IconButton onClick={saveLayout} className="icon-primary">
+            <Save />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Search Layout">
+          <IconButton onClick={() => {setShowLayoutList(true),fetchAvailableLayouts()}} className="icon-primary">
+            <Search />
+          </IconButton>
+        </Tooltip>
+
+        {/* Layout Selection Panel */}
         {showLayoutList && (
-          <div className="layout-list-modal">
-            <h2>Select a Layout to Edit</h2>
-            {availableLayouts.length > 0 ? (
-              <ul>
-                {availableLayouts.map((layout) => (
-                  <li key={layout._id}>
-                    <strong>{layout.title}</strong>
-                    <Button 
-                      onClick={() => loadLayoutFromSelected(layout)} 
-                      className="small-button"
-                    >
-                      Edit
-                    </Button>
-                    <Button 
-                      onClick={() => handleDeleteLayout(layout)} 
-                      className="small-button"
-                      disabled={isDeleting === layout._id}
-                    >
-                      {isDeleting === layout._id ? 'Deleting...' : 'Delete'}
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No saved layouts found.</p>
-            )}
-            <Button onClick={() => setShowLayoutList(false)} className="small-button">
-              Close
-            </Button>
-          </div>
-        )}
+  <LoadLayoutAndSection 
+    availableLayouts={availableLayouts}
+    loadLayoutFromSelected={loadLayoutFromSelected}
+    handleDeleteLayout={handleDeleteLayout}
+    setShowLayoutList={setShowLayoutList}
+    isDeleting={isDeleting}
+    mode="layout" // Handles layout selection
+  />
+)}
 
-        <Button
-          onClick={() => setToolMode(toolMode === 'pointer' ? 'hand' : 'pointer')}
-          className="action-button"
-        >
-          {toolMode === 'pointer' ? 'Switch to Hand Tool' : 'Switch to Pointer Tool'}
-        </Button>
-        <Button onClick={() => zoomBy(1.1)} className="action-button">
-          Zoom In
-        </Button>
-        <Button onClick={() => zoomBy(1 / 1.1)} className="action-button">
-          Zoom Out
-        </Button>
-        <Button onClick={() => handleExport()} className="action-button">
-          Download as PDF
-        </Button>
-        <Button onClick={() => fitStageToScreen()} className="action-button">
-          Reset View
-        </Button>
+        <Tooltip title={toolMode === 'pointer' ? "Switch to Hand Tool" : "Switch to Pointer Tool"}>
+          <IconButton onClick={() => setToolMode(toolMode === 'pointer' ? 'hand' : 'pointer')} className="icon-primary">
+            {toolMode === 'pointer' ? <PanTool /> : <Mouse />}
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Zoom In">
+          <IconButton onClick={() => zoomBy(1.1)} className="icon-primary">
+            <ZoomIn />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Zoom Out">
+          <IconButton onClick={() => zoomBy(1 / 1.1)} className="icon-primary">
+            <ZoomOut />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Download as PDF">
+          <IconButton onClick={handleExport} className="icon-primary">
+            <PictureAsPdf />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Reset View">
+          <IconButton onClick={fitStageToScreen} className="icon-primary">
+            <Refresh />
+          </IconButton>
+        </Tooltip>
       </div>
     </div>
   );

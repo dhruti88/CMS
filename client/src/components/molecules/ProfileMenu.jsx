@@ -7,14 +7,25 @@ import { getAuth, signOut } from "firebase/auth";
 import { logout } from "../../utils/logout";
 import { SERVER_URL } from "../../Urls";
 const ProfileMenu = ({ user, token }) => {
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [profileData, setProfileData] = useState({
-    username: user?.name || "Username",
-    email: user?.email || "user@example.com",
+    username: "Username",
+    email: "user@example.com",
     photoURL: "",
   });
   const [selectedFile, setSelectedFile] = useState(null);
+
+  //useEffect to set username and useremail
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        username: user.name || "Username",
+        email: user.email || "user@example.com",
+      });
+    }
+  }, [user]);
 
   // Fetch Profile Image
   const fetchProfileImage = async () => {
