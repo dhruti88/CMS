@@ -111,7 +111,7 @@ const token =localStorage.getItem("token");
 const [city, setCity] = useState("Chicago");
 const [dueDate, setDueDate] = useState("");
 const [taskStatus, setTaskStatus] = useState("Pending");
-const [layoutType, setLayoutType] = useState("");
+const [layoutType, setLayoutType] = useState("Page");
 
 //handle image download and pdf
 const [hideGrid, setHideGrid] = useState(false);          // State to control grid visibility
@@ -323,7 +323,9 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
   // Update all functions that modify sections to use syncToYjs
   const updateSectionsAndSync = useCallback((newSections) => {
     setSections(newSections);
+    
     syncToYjs(newSections);
+  
   }, [syncToYjs]);
 
 
@@ -1362,8 +1364,10 @@ const handleTransformEnd = (e) => {
   );
 
   // Update sections and sync with Yjs in one go
-  updateSectionsAndSync(updatedSections);
-
+  // updateSectionsAndSync(updatedSections);
+  setTimeout(() => {
+    updateSectionsAndSync(updatedSections);
+}, 0);
   // Reset transformation
   node.scaleX(1);
   node.scaleY(1);
@@ -1418,13 +1422,20 @@ useEffect(() => {
   // Global keydown handler for Delete key
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId && document.activeElement === document.body) {
+      if (
+        (e.key === 'Delete' || e.key === 'Backspace') && 
+        selectedId && 
+        (layoutType === "Page" || selectedId !== sectionId) && 
+        document.activeElement === document.body
+      ) {
         deleteSelected();
       }
     };
+  
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedId]);
+  }, [selectedId, layoutType, sectionId]);
+  
   
     useEffect(() => {
       console.log("s-",stageRef);
@@ -2420,6 +2431,8 @@ return {
     userProfilePic,
     activeEditors,
     positionDisplay,
+    layoutType,
+    setLayoutType,
 };
 };
 

@@ -359,7 +359,9 @@ const handleReplaceSection = (selectedSection) => {
           setTaskStatus={setTaskStatus}
           changeFontFamily = {changeFontFamily}
             openReplacementPanel={openReplacementPanel}
-            
+            layoutType = {layoutType}
+            rows = {rows}
+            columns = {columns}            
           />
 {showReplacementPanel && (
   <LoadLayoutAndSection
