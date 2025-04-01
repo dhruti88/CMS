@@ -20,12 +20,23 @@ const Navbar = () => {
     }
   }, [token]);
 
+  const handleWorkbenchClick = () => {
+    if (location.pathname === "/page") {
+      const confirmReload = window.confirm("Are you sure you want to reload the page?");
+      if (confirmReload) {
+        window.location.reload();
+      }
+    } else {
+      navigate("/page");
+    }
+  };
+
   const fetchUserData = async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/api/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("res : -",response.data)
+      console.log("res : -", response.data);
       setUser(response.data);
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -51,7 +62,8 @@ const Navbar = () => {
         ) : (
           <>
             <CustomButton onClick={() => navigate("/mylayout")}>My Layouts</CustomButton>
-            <CustomButton onClick={() => navigate("/page")}>Workbench</CustomButton>
+            {/* Only call handleWorkbenchClick here */}
+            <CustomButton onClick={handleWorkbenchClick}>Workbench</CustomButton>
             <CustomButton onClick={() => navigate("/history")}>History</CustomButton>
             <ProfileMenu user={user} token={token} /> {/* Pass user and token to ProfileMenu */}
           </>
