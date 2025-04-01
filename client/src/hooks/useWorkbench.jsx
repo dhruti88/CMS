@@ -459,7 +459,15 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
     };
     
   
-  
+  // Add to state declarations in useWorkbench
+const [positionDisplay, setPositionDisplay] = useState({
+  show: false,
+  x: 0,
+  y: 0,
+  gridX: 0,
+  gridY: 0,
+  isSection: false
+});
 
     // const addItemToSection = (sectionId, size, type, e = null) => {
     //   let newItem;
@@ -1818,7 +1826,15 @@ const handleItemDragMove = (e, itemId, sectionId) => {
     section.sizeInfo.cols - item.sizeInfo.cols);
   const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), 
     section.sizeInfo.rows - item.sizeInfo.rows);
-
+// Update position display
+setPositionDisplay({
+  show: true,
+  x: shape.x() + section.x,
+  y: shape.y() + section.y,
+  gridX: clampedGridX,
+  gridY: clampedGridY,
+  isSection: false
+});
   // Generate snap lines relative to section
   setSnapLines(generateSnapLines(item, { 
     gridX: clampedGridX, 
@@ -1861,91 +1877,92 @@ const handleItemDragMove = (e, itemId, sectionId) => {
   //   return lines;
   // };
 
-  const generateSnapLines = (item, gridPos, section) => {
-    if (!item || !gridPos || !section) return [];
+  const generateSnapLines = (item, gridPos, container) => {
+    if (!item || !gridPos || !container) return [];
   
-    // Calculate positions relative to section
-    const leftX = section.x + (gridPos.gridX * (cellWidth + gutterWidth));
+    // Calculate positions
+    const leftX = container.x + (gridPos.gridX * (cellWidth + gutterWidth));
     const rightX = leftX + item.width;
-    const topY = section.y + (gridPos.gridY * cellHeight);
+    const topY = container.y + (gridPos.gridY * cellHeight);
     const bottomY = topY + item.height;
   
-    // Add center lines relative to section
+    // Add center lines
     const centerX = leftX + (item.width / 2);
     const centerY = topY + (item.height / 2);
   
-    // Section boundaries for snap lines
-    const sectionLeft = section.x;
-    const sectionRight = section.x + section.width;
-    const sectionTop = section.y;
-    const sectionBottom = section.y + section.height;
+    // Container boundaries
+    const containerLeft = container.x;
+    const containerRight = container.x + container.width;
+    const containerTop = container.y;
+    const containerBottom = container.y + container.height;
+  
+    // Create snap lines with different colors for sections vs items
+    const isSection = item.type === 'section';
+    const primaryColor = isSection ? '#ff6b6b' : '#00ff00';
+    const secondaryColor = isSection ? '#ff8787' : '#ff0000';
   
     const lines = [
-      // Vertical lines
+      // Edges
       {
-        points: [leftX, sectionTop, leftX, sectionBottom],
-        stroke: '#00ff00', // Bright green
-        strokeWidth: 2,
-        dash: [6, 6],
+        points: [leftX, containerTop, leftX, containerBottom],
+        stroke: primaryColor,
+        strokeWidth: isSection ? 3 : 2,
+        dash: [8, 6],
         opacity: 0.8
       },
       {
-        points: [rightX, sectionTop, rightX, sectionBottom],
-        stroke: '#00ff00',
-        strokeWidth: 2,
-        dash: [6, 6],
+        points: [rightX, containerTop, rightX, containerBottom],
+        stroke: primaryColor,
+        strokeWidth: isSection ? 3 : 2,
+        dash: [8, 6],
         opacity: 0.8
       },
       {
-        points: [centerX, sectionTop, centerX, sectionBottom],
-        stroke: '#ff0000', // Red for center lines
-        strokeWidth: 2,
-        dash: [6, 6],
-        opacity: 0.8
-      },
-      // Horizontal lines
-      {
-        points: [sectionLeft, topY, sectionRight, topY],
-        stroke: '#00ff00',
-        strokeWidth: 2,
-        dash: [6, 6],
+        points: [containerLeft, topY, containerRight, topY],
+        stroke: primaryColor,
+        strokeWidth: isSection ? 3 : 2,
+        dash: [8, 6],
         opacity: 0.8
       },
       {
-        points: [sectionLeft, bottomY, sectionRight, bottomY],
-        stroke: '#00ff00',
-        strokeWidth: 2,
-        dash: [6, 6],
+        points: [containerLeft, bottomY, containerRight, bottomY],
+        stroke: primaryColor,
+        strokeWidth: isSection ? 3 : 2,
+        dash: [8, 6],
         opacity: 0.8
       },
+      // Center lines
       {
-        points: [sectionLeft, centerY, sectionRight, centerY],
-        stroke: '#ff0000',
-        strokeWidth: 2,
+        points: [centerX, containerTop, centerX, containerBottom],
+        stroke: secondaryColor,
+        strokeWidth: isSection ? 2.5 : 2,
         dash: [6, 6],
-        opacity: 0.8
+        opacity: 0.7
+      },
+      {
+        points: [containerLeft, centerY, containerRight, centerY],
+        stroke: secondaryColor,
+        strokeWidth: isSection ? 2.5 : 2,
+        dash: [6, 6],
+        opacity: 0.7
       }
     ];
   
-    // Add diagonal guidelines
-    const diagonalLines = [
-      {
-        points: [leftX, topY, rightX, bottomY],
-        stroke: '#0000ff', // Blue for diagonals
-        strokeWidth: 1.5,
-        dash: [4, 4],
-        opacity: 0.6
-      },
-      {
-        points: [leftX, bottomY, rightX, topY],
-        stroke: '#0000ff',
-        strokeWidth: 1.5,
-        dash: [4, 4],
-        opacity: 0.6
-      }
-    ];
+    // Add grid snap indicators
+    const gridLines = Array.from({ length: columns + 1 }, (_, i) => ({
+      points: [
+        i * (cellWidth + gutterWidth),
+        containerTop,
+        i * (cellWidth + gutterWidth),
+        containerBottom
+      ],
+      stroke: '#4299e1',
+      strokeWidth: 1,
+      dash: [4, 4],
+      opacity: 0.3
+    }));
   
-    return [...lines, ...diagonalLines];
+    return [...lines, ...gridLines];
   };
   
   // Reset drag state
@@ -1953,6 +1970,7 @@ const handleItemDragMove = (e, itemId, sectionId) => {
     setDraggingBox(null);
     setDragPreviewPosition(null);
     setDragStatus(null);
+    setPositionDisplay({ show: false, x: 0, y: 0, gridX: 0, gridY: 0, isSection: false });
   };
   const handleItemDragStart = (e, itemId, sectionId) => {
     setDraggingBox(itemId);
@@ -1969,14 +1987,25 @@ const handleItemDragMove = (e, itemId, sectionId) => {
     setSnapLines(generateSnapLines(currentItem, { gridX: currentItem.gridX, gridY: currentItem.gridY }));
   };
     
-    const handleDragStart = (e, id) => {
-      setDraggingBox(id);
-      setDragStatus(null);
-      const currentBox = sections.find(b => b.id === id);
-      if (!currentBox) return;
-      setSnapLines(generateSnapLines(currentBox, { gridX: currentBox.gridX, gridY: currentBox.gridY }));
-      //setSelectedId(id);
+  const handleDragStart = (e, id) => {
+    setDraggingBox(id);
+    setDragStatus(null);
+    
+    const currentSection = sections.find(b => b.id === id);
+    if (!currentSection) return;
+  
+    const canvasSection = {
+      x: 0,
+      y: 0,
+      width: stageSize.width,
+      height: stageSize.height
     };
+  
+    setSnapLines(generateSnapLines(currentSection, { 
+      gridX: currentSection.gridX, 
+      gridY: currentSection.gridY 
+    }, canvasSection));
+  };
     
     // const handleDragMove = (e, id) => {
     //   if (!draggingBox) return;
@@ -2041,26 +2070,76 @@ const handleItemDragMove = (e, itemId, sectionId) => {
 
 // ✅ Fix: Pass `e` as a parameter to prevent ReferenceError
 
+// const handleDragMove = (e, id) => {
+//   if (!draggingBox) return;
+  
+//   const shape = e.target;
+//   const pixelPosition = { x: shape.x(), y: shape.y() };
+//   const gridPosition = snapToGrid(pixelPosition);
+//   const currentBox = sections.find(b => b.id === id);
+  
+//   if (!currentBox) return;
+
+//   const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), columns - currentBox.sizeInfo.cols);
+//   const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), rows - currentBox.sizeInfo.rows);
+
+//   // Clear existing snap lines and generate new ones
+//   setSnapLines(generateSnapLines(currentBox, { 
+//     gridX: clampedGridX, 
+//     gridY: clampedGridY 
+//   }));
+
+//   // Update position
+//   shape.position({
+//     x: clampedGridX * (cellWidth + gutterWidth),
+//     y: clampedGridY * cellHeight
+//   });
+  
+//   setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
+// };
+
+// In handleDragMove, update it to pass section context correctly
 const handleDragMove = (e, id) => {
   if (!draggingBox) return;
   
   const shape = e.target;
+  const currentSection = sections.find(b => b.id === id);
+  
+  if (!currentSection) return;
+
   const pixelPosition = { x: shape.x(), y: shape.y() };
   const gridPosition = snapToGrid(pixelPosition);
-  const currentBox = sections.find(b => b.id === id);
+
+  const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), 
+    columns - currentSection.sizeInfo.cols);
+  const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), 
+    rows - currentSection.sizeInfo.rows);
+
+    // Update position display
+  setPositionDisplay({
+    show: true,
+    x: shape.x(),
+    y: shape.y(),
+    gridX: clampedGridX,
+    gridY: clampedGridY,
+    isSection: true
+  });
+
   
-  if (!currentBox) return;
+  // Create a parent section context for the whole canvas
+  const canvasSection = {
+    x: 0,
+    y: 0,
+    width: stageSize.width,
+    height: stageSize.height
+  };
 
-  const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), columns - currentBox.sizeInfo.cols);
-  const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), rows - currentBox.sizeInfo.rows);
-
-  // Clear existing snap lines and generate new ones
-  setSnapLines(generateSnapLines(currentBox, { 
+  // Generate snap lines with canvas as parent section
+  setSnapLines(generateSnapLines(currentSection, { 
     gridX: clampedGridX, 
     gridY: clampedGridY 
-  }));
+  }, canvasSection));
 
-  // Update position
   shape.position({
     x: clampedGridX * (cellWidth + gutterWidth),
     y: clampedGridY * cellHeight
@@ -2340,6 +2419,7 @@ return {
     setUserID,
     userProfilePic,
     activeEditors,
+    positionDisplay,
 };
 };
 

@@ -411,7 +411,9 @@ const WorkbenchCanvas = ({
   rows,
   hideGrid, 
   snapLines,      // New prop to control grid visibility
-  hideBackground, // New prop to control background visibility
+  hideBackground, 
+  // New prop to control background visibility
+  positionDisplay,
 }) => {
   const [draggingItem, setDraggingItem] = useState(false);
 
@@ -422,6 +424,38 @@ const WorkbenchCanvas = ({
     gutterWidth,
     { grays: ['#202124', '#3c4043', '#5f6368', '#dadce0', '#f1f3f4'] }
   );
+
+  const PositionDisplay = ({ position }) => {
+    if (!position.show) return null;
+  
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: '20px',
+          left: '20px',
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          color: 'white',
+          padding: '8px 12px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          fontFamily: 'monospace',
+          zIndex: 1000,
+          pointerEvents: 'none',
+        }}
+      >
+        <div>
+          {position.isSection ? 'Section' : 'Item'} Position:
+        </div>
+        <div>
+          Pixels: ({Math.round(position.x)}, {Math.round(position.y)})
+        </div>
+        <div>
+          Grid: ({position.gridX}, {position.gridY})
+        </div>
+      </div>
+    );
+  };
 
   useEffect(() => {
     if (!selectedId || !transformerRef.current) {
@@ -470,6 +504,7 @@ const WorkbenchCanvas = ({
 
   return (
     <div className="workbench-container" style={{border: '2px solid black' }}>
+      <PositionDisplay position={positionDisplay} />
       <Stage
         ref={stageRef}
         width={stageSize.width}
