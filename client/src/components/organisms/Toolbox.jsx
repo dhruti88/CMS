@@ -1,5 +1,5 @@
 // toolbox.jsx:
-import React ,{useState} from 'react';
+import React ,{useState, useEffect} from 'react';
 import Button from '../atoms/Button';
 import ColorButton from '../atoms/ColorButton';
 import ToolboxSection from '../molecules/ToolboxSection';
@@ -37,11 +37,23 @@ const Toolbox = ({
   openReplacementPanel,
   taskStatus,
   setTaskStatus,
-  changeFontFamily
+  changeFontFamily,
+  layoutType,
+  rows,
+  columns,
 }) => {
   
   // Find selected section
   const selectedSection = sections.find(section => section.id === selectedId);
+  useEffect(() => {
+    if (layoutType !== "Page") {
+      addNewSection({ 
+        cols: columns, 
+        rows: rows, 
+        label: `${columns}×${rows}`
+      });
+    }
+  }, [layoutType]);
 
   // Find selected item inside a section
   const selectedItem = sections
@@ -67,21 +79,32 @@ const Toolbox = ({
           </ToolboxSection>
 
       {/* Add Sections */}
+      {layoutType === "Page" && (
       <ToolboxSection title="Add Sections">
         <div className="size-section">
           <h4>Sections</h4>
           <div className="size-grid">
-            {itemSizes.map(size => (
-              <Button key={`box-${size.label}`} onClick={() => addNewSection(size)} className="size-button">
+            {itemSizes.map((size) => (
+              <Button
+                key={`box-${size.label}`}
+                onClick={() => addNewSection(size)}
+                className="size-button"
+              >
                 {size.label}
               </Button>
             ))}
           </div>
         </div>
 
-        <ManualRowColumn title = "Manual Section" buttonText='Add' handleClick={addNewSection}/>
-
+        <ManualRowColumn
+          title="Manual Section"
+          buttonText="Add"
+          handleClick={addNewSection}
+        />
       </ToolboxSection>
+    )}
+
+
 
       {/* Add Elements */}
       <ToolboxSection title="Add Elements">
@@ -196,9 +219,12 @@ const Toolbox = ({
               </div>
             )}
 
-            <Button className="delete-button" onClick={deleteSelected} title="Delete selected item">
-              Delete Item
-            </Button>
+{(layoutType === "Page" || selectedId !== sectionId )&& (
+  <Button className="delete-button" onClick={deleteSelected} title="Delete selected item">
+    Delete Item
+  </Button>
+)}
+
           </>
         ) : (
           <p className="no-selection">No item selected. Click on an item to view its properties.</p>
