@@ -57,7 +57,7 @@ const SectionSchema = new Schema({
 // Define the Layout schema
 const LayoutSchema = new Schema({
 //   userId: { type: Schema.Types.ObjectId, ref: 'User' },
-userId: { type: String, ref: 'User' , required: true },
+  userId: { type: String, ref: 'User' , required: true },
   title: { type: String, required: true },
   city: { type: String, required: false, default: 'Pune' },    
   name: { type: String, required: false, default: 'Dainik Bhaskar' },

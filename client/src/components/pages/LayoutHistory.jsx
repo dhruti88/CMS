@@ -50,6 +50,8 @@ const LayoutHistory = () => {
       try {
         setLoading(true);
         const userId = localStorage.getItem('userId');
+        // console.log("userId - ", userId);userid of loggedin user
+        
         const response = await fetch(`${SERVER_URL}/api/layout-history?userId=${userId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -68,10 +70,13 @@ const LayoutHistory = () => {
           throw new Error('Failed to fetch layout history');
         }
         const data = await response.json();
+        console.log("data - ", data);
         setHistoryEntries(data);
-        
+
         // Extract unique users from the history entries
         const users = [...new Set(data.map(entry => entry.userName).filter(Boolean))];
+       
+        
         setUniqueUsers(users);
         
         setLoading(false);
@@ -89,8 +94,8 @@ const LayoutHistory = () => {
     return [...new Set(historyEntries.map(entry => entry.metadata?.city).filter(Boolean))];
   }, [historyEntries]);
 
-  const actionTypes = ['created', 'updated', 'deleted', 'viewed'];
-  const layoutStatuses = ['pending', 'in-progress', 'completed', 'archived'];
+  const actionTypes = ['created', 'updated', 'deleted'];
+  const layoutStatuses = ['pending', 'in-progress', 'completed'];
 
   // Reset filters
   const resetFilters = () => {
@@ -258,7 +263,6 @@ const LayoutHistory = () => {
                   <TableCell>Action</TableCell>
                   <TableCell>City</TableCell>
                   <TableCell>Status</TableCell>
-                  <TableCell>Last Edited</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -327,11 +331,6 @@ const LayoutHistory = () => {
                       >
                         {entry.metadata?.status || 'N/A'}
                       </Box>
-                    </TableCell>
-                    <TableCell>
-                      {entry.metadata?.lastEditedTime
-                        ? new Date(entry.metadata.lastEditedTime).toLocaleString()
-                        : 'Never'}
                     </TableCell>
                   </TableRow>
                 ))}
