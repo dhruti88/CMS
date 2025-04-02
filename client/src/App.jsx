@@ -12,36 +12,116 @@ import { AuthProvider } from './context/AuthContext';
 import MyLayouts from './components/pages/MyLayouts'
 import LayoutHistory from './components/pages/LayoutHistory'
 import Navbar from './components/atoms/navbar/NavBar';
+import ErrorBoundary from './components/pages/ErrorBoundry';
+
+// function App() {
+//   return (
+//     <ErrorBoundary>
+//     <AuthProvider>
+//     <Router>
+//       <Navbar />
+//       <Routes>
+//         <Route path="/" element={
+//           <PublicRoute><LandingPage/></PublicRoute>}/>
+//         <Route path="/signin" element={
+//            <PublicRoute><SignInPage /></PublicRoute>} />
+//         <Route path="/signup" element={
+//           <SignUp />} />
+//         <Route path="/page" element={
+//           <ProtectedRoute><WorkBench/></ProtectedRoute>} />
+//         <Route path="/home" element={
+//           <ProtectedRoute><HomePage /></ProtectedRoute>} />
+//         <Route path='/mylayout' element={
+//           <ProtectedRoute><MyLayouts /></ProtectedRoute>} /> 
+//         <Route path='/section' element= {
+//           <ProtectedRoute><WorkBench/></ProtectedRoute>} />
+//         <Route path='/history' element={
+//           <ProtectedRoute><LayoutHistory /></ProtectedRoute>} /> 
+//          <Route path="/grideditor" element={<GridEditor/>} />
+
+       
+//       </Routes>
+//     </Router>
+//     </AuthProvider>
+//     </ErrorBoundary>
+//   );
+// }
+
+// export default App;
+
 
 function App() {
   return (
-    <AuthProvider>
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={
-          <PublicRoute><LandingPage/></PublicRoute>}/>
-        <Route path="/signin" element={
-           <PublicRoute><SignInPage /></PublicRoute>} />
-        <Route path="/signup" element={
-          <SignUp />} />
-        <Route path="/page" element={
-          <ProtectedRoute><WorkBench/></ProtectedRoute>} />
-        <Route path="/home" element={
-          <ProtectedRoute><HomePage /></ProtectedRoute>} />
-        <Route path='/mylayout' element={
-          <ProtectedRoute><MyLayouts /></ProtectedRoute>} /> 
-        <Route path='/section' element= {
-          <ProtectedRoute><WorkBench/></ProtectedRoute>} />
-        <Route path='/history' element={
-          <ProtectedRoute><LayoutHistory /></ProtectedRoute>} /> 
-         <Route path="/grideditor" element={<GridEditor/>} />
+    <ErrorBoundary>
+      <AuthProvider>
+        <Router>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={
+              <PublicRoute>
+                <ErrorBoundary>
+                  <LandingPage/>
+                </ErrorBoundary>
+              </PublicRoute>
+            }/>
+            <Route path="/signin" element={
+              <PublicRoute>
+                <ErrorBoundary>
+                  <SignInPage />
+                </ErrorBoundary>
+              </PublicRoute>
+            }/>
+            <Route path="/signup" element={
+              <ErrorBoundary>
+                <SignUp />
+              </ErrorBoundary>
+            }/>
+            <Route path="/page" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <WorkBench/>
+                </ErrorBoundary>
+              </ProtectedRoute>
+               }/>
+               <Route path="/home" element={
+                 <ProtectedRoute>
+                   <ErrorBoundary>
+                     <HomePage />
+                   </ErrorBoundary>
+                 </ProtectedRoute>
+               }/>
+               <Route path='/mylayout' element={
+                 <ProtectedRoute>
+                   <ErrorBoundary>
+                     <MyLayouts />
+                   </ErrorBoundary>
+                 </ProtectedRoute>
+               }/> 
+               <Route path='/section' element={
+                 <ProtectedRoute>
+                   <ErrorBoundary>
+                     <WorkBench/>
+                   </ErrorBoundary>
+                 </ProtectedRoute>
+               }/>
+               <Route path='/history' element={
+                 <ProtectedRoute>
+                   <ErrorBoundary>
+                     <LayoutHistory />
+                   </ErrorBoundary>
+                 </ProtectedRoute>
+               }/> 
+               <Route path="/grideditor" element={
+                 <ErrorBoundary>
+                   <GridEditor/>
+                 </ErrorBoundary>
+               }/>
+             </Routes>
+           </Router>
+         </AuthProvider>
+       </ErrorBoundary>
+     );
 
-       
-      </Routes>
-    </Router>
-    </AuthProvider>
-  );
-}
+    }
 
-export default App;
+    export default App;

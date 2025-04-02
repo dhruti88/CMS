@@ -7,10 +7,13 @@ import { logLayoutAction } from "./historyController.js";
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+import { invalidateCache } from '../redis.js';
+
+
 
 export const saveLayout = async (req, res) => {
   try {
-    const { userId, title,sections, gridSettings } = req.body;
+    const { userId, title,sections, gridSettings, layouttype, city, duedate, status } = req.body;
     console.log('Saving layout with items:', sections);
     // Try to find an existing layout for the user and title
     let layout = await Layout.findOne({ userId, title });
@@ -24,12 +27,18 @@ export const saveLayout = async (req, res) => {
 
     } else {
       // Create new layout document
-      layout = new Layout({ userId, title, sections, gridSettings });
+      layout = new Layout({ userId, title, sections, gridSettings,layouttype, city, publishingdate: duedate, taskstatus: status });
 
       await logLayoutAction(layout, 'created', userId);
       await layout.save();
 
     }
+
+        // // Invalidate related caches
+        await invalidateCache('layouts:*');
+        await invalidateCache(`my-layouts:${userId}:*`);
+        await invalidateCache(`single-layout:${userId}:*`);
+
     res.json({ success: true, layout });
   } catch (error) {
     console.error('Error saving layout:', error);
@@ -127,6 +136,12 @@ export const deleteLayout = async (req, res) => {
           message: 'Layout not found' 
         });
       }
+
+
+    //    // Invalidate related caches
+    await invalidateCache('layouts:*');
+    await invalidateCache(`my-layouts:${req.user.uid}:*`);
+    await invalidateCache(`single-layout:${req.user.uid}:*`);
 
       console.log('Deleted layout:', layout);
       res.status(200).json({ success: true, layout });

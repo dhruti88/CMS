@@ -72,6 +72,7 @@ const LayoutSchema = new Schema({
       return days[new Date().getDay()];
     } 
   },
+  publishingdate: { type: Date, required: false, default: null },
   duedate: { type: Date, required: false, default: null },
   taskstatus: { type: String, required: false, default: 'pending' },
   layouttype: { type: String, required: false, default: 'Page' },

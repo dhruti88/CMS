@@ -165,6 +165,8 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
   
   const [activeEditors, setActiveEditors] = useState([]);
   // Get the shared map from Yjs
+  // Add active users count state
+const [activeUsersCount, setActiveUsersCount] = useState(0);
   const ySectionsMap = useMemo(() => ydoc.getMap('sections'), []);
 
   // Initialize WebSocket provider with proper error handling
@@ -211,14 +213,14 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
 
    // Sync function to update Yjs when local changes occur
    const syncToYjs = useCallback((updatedSections) => {
-    console.log("ms:",updatedSections);
+    // console.log("ms:",updatedSections);
     
     // if (!isInitialized) {
     // handleSync(true);
     // console.log("ms0:",updatedSections);
     // }
 
-    console.log("ms1:",updatedSections);
+    console.log("m1:",updatedSections);
     try {
       setIsLocalUpdate(true);
       ydoc.transact(() => {
@@ -700,12 +702,13 @@ const [positionDisplay, setPositionDisplay] = useState({
 
   // Layout endpoints
   const saveLayout = async () => {
+    console.log(taskStatus);
     try {
       const gridSettings = { columns, rows, gutterWidth };
       const response = await fetch(`${SERVER_URL}/api/layout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' , 'Authorization': `Bearer ${token}`},
-        body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings}),
+        body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings, layouttype: layoutType, city : city, duedate : dueDate, status : taskStatus }),
       });
       const data = await response.json();
       console.log('Layout saved successfully', data);
@@ -2432,6 +2435,7 @@ return {
     userProfilePic,
     activeEditors,
     positionDisplay,
+    activeUsersCount,
     layoutType,
     setLayoutType,
 };
