@@ -1022,7 +1022,7 @@ const handleTextChange = (e) => {
 // Toggle format with proper sync
 const toggleFormat = (format) => {
   if (format === 'align') {
-    const alignments = ['left', 'center', 'right'];
+    const alignments = ['left', 'center', 'right', 'justify'];
     const currentIndex = alignments.indexOf(textFormatting.align);
     const nextIndex = (currentIndex + 1) % alignments.length;
 
