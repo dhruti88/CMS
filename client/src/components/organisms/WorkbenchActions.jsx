@@ -83,6 +83,7 @@ const WorkbenchActions = ({
   userID,
   userProfilePic,
   activeEditors,
+  layoutType,
 }) => {
 
   const handleExport = () => {
@@ -218,6 +219,7 @@ const WorkbenchActions = ({
     setShowLayoutList={setShowLayoutList}
     isDeleting={isDeleting}
     mode="layout" // Handles layout selection
+    layoutType = {layoutType}
   />
 )}
 

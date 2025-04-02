@@ -290,6 +290,7 @@ const handleReplaceSection = (selectedSection) => {
         userID={userID} 
         userProfilePic = {userProfilePic}
         activeEditors = {activeEditors}
+        layoutType = {layoutType}
       />
      <WorkbenchCanvas
   handleTransformEnd={handleTransformEnd}  
@@ -372,6 +373,7 @@ const handleReplaceSection = (selectedSection) => {
     mode="section" // Handles section replacement
     selectedId = {selectedId}
     sectionId = {sectionId}
+    layoutType = {layoutType}
   />
 )}
         </>
