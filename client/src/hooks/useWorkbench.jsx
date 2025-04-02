@@ -989,6 +989,7 @@ const loadLayoutFromSelected = (layout) => {
     setColumns(layout.gridSettings.columns);
     setRows(layout.gridSettings.rows);
     setGutterWidth(layout.gridSettings.gutterWidth);
+    setLayoutType("Page");
   }
 
   const recalculatedSections = layout.sections.map(section => ({
