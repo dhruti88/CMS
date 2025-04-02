@@ -74,7 +74,7 @@ const LayoutSchema = new Schema({
   },
   duedate: { type: Date, required: false, default: null },
   taskstatus: { type: String, required: false, default: 'pending' },
-  layouttype: { type: String, required: false, default: 'default...' },
+  layouttype: { type: String, required: false, default: 'Page' },
 
   sections: [SectionSchema],
   gridSettings: {
