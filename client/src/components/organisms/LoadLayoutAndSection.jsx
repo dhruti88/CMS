@@ -44,7 +44,6 @@ const LoadLayoutAndSection = ({
             .includes(searchTerm.toLowerCase())
         );
       });
-
       setFilteredItems(filtered);
     } else {
       // Filter layouts based only on search term
