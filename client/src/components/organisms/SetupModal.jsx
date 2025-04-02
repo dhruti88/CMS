@@ -80,15 +80,15 @@ const SetupModal = ({
             <FormControl fullWidth>
               <InputLabel sx={{ background: "#ffffff", px: 0.5 }} >City</InputLabel>
               <Select value={city} onChange={(e) => setCity(e.target.value)}>
-                <MenuItem value="New York">New York</MenuItem>
-                <MenuItem value="Los Angeles">Los Angeles</MenuItem>
-                <MenuItem value="Chicago">Chicago</MenuItem>
+                <MenuItem value="Pune">Pune</MenuItem>
+                <MenuItem value="Ahmedabad">Ahmedabad</MenuItem>
+                <MenuItem value="Mumbai">Mumbai</MenuItem>
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={6}>
             <TextField 
-              label="Due Date" 
+              label="Publishing Date" 
               type="date" 
               fullWidth 
               InputLabelProps={{ shrink: true }} 
