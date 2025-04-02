@@ -705,7 +705,7 @@ const [positionDisplay, setPositionDisplay] = useState({
       const response = await fetch(`${SERVER_URL}/api/layout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' , 'Authorization': `Bearer ${token}`},
-        body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings }),
+        body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings}),
       });
       const data = await response.json();
       console.log('Layout saved successfully', data);
@@ -1023,7 +1023,7 @@ const handleTextChange = (e) => {
 // Toggle format with proper sync
 const toggleFormat = (format) => {
   if (format === 'align') {
-    const alignments = ['left', 'center', 'right'];
+    const alignments = ['left', 'center', 'right', 'justify'];
     const currentIndex = alignments.indexOf(textFormatting.align);
     const nextIndex = (currentIndex + 1) % alignments.length;
 
