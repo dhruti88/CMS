@@ -24,7 +24,7 @@ export const saveLayout = async (req, res) => {
 
     } else {
       // Create new layout document
-      layout = new Layout({ userId, title, sections, gridSettings, city, taskStatus, layoutType  });
+      layout = new Layout({ userId, title, sections, gridSettings });
 
       await logLayoutAction(layout, 'created', userId);
       await layout.save();
