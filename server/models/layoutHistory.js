@@ -38,7 +38,8 @@ const LayoutHistorySchema = new Schema({
     title: { type: String },
     city: { type: String },
     state: { type: String },
-    layoutType: { type: String }
+    layoutType: { type: String },
+    status: { type: String }
   }
 }, { 
   timestamps: true 
