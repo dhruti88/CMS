@@ -36,16 +36,19 @@ const TextFormattingTools = ({
           U
         </Button>
         <Button
-          onClick={() => toggleFormat('align')}
-          className="format-button align-button"
-          title={`Align: ${textFormatting.align}`}
-        >
-          {textFormatting.align === 'left'
-            ? '⫷'
-            : textFormatting.align === 'center'
-            ? '⫶'
-            : '⫸'}
-        </Button>
+  onClick={() => toggleFormat('align')}
+  className="format-button align-button"
+  title={`Align: ${textFormatting.align}`}
+>
+  {textFormatting.align === 'left'
+    ? '⫷'
+    : textFormatting.align === 'center'
+    ? '⫶'
+    : textFormatting.align === 'right'
+    ? '⫸'
+    : '☰'} 
+</Button>
+
       </div>
       <div className="font-size-control">
         <Button onClick={() => changeFontSize(-2)} className="format-button" title="Decrease font size">
