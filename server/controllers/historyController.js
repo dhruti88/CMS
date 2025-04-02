@@ -5,16 +5,13 @@ import { logger, errorLogger } from "../utils/logger.js"
 // Enhanced layout history logging function
 export const logLayoutAction = async (layout, actionType, userId, previousVersion = null) => {
     try {
-      // Fetch user details to include username
+      // Fetch user details to include username  
+      const user = await User.findOne({ uid: userId });
 
-      // const { userId } = req.query;
-      // const user = await User.findById(userId);
-     
-      
       await LayoutHistory.create({
         layoutId: layout._id,
         userId: userId,
-        userName: userId || 'Unknown User', // Add user name
+        userName: user.email || 'No email User', // Add user name
         actionType: actionType,
         metadata: {
           title: layout.title,
@@ -36,6 +33,7 @@ export const histlayout = async (req, res) => {
     try {
       // Destructure filter parameters
       const { userId } = req.query;
+      console.log("userId", userId);
       const { 
         title, 
         city, 

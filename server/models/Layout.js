@@ -57,7 +57,7 @@ const SectionSchema = new Schema({
 // Define the Layout schema
 const LayoutSchema = new Schema({
 //   userId: { type: Schema.Types.ObjectId, ref: 'User' },
-userId: { type: String, ref: 'User' , required: true },
+  userId: { type: String, ref: 'User' , required: true },
   title: { type: String, required: true },
   city: { type: String, required: false, default: 'Pune' },    
   name: { type: String, required: false, default: 'Dainik Bhaskar' },
@@ -75,7 +75,7 @@ userId: { type: String, ref: 'User' , required: true },
   publishingdate: { type: Date, required: false, default: null },
   duedate: { type: Date, required: false, default: null },
   taskstatus: { type: String, required: false, default: 'pending' },
-  layouttype: { type: String, required: false, default: 'default...' },
+  layouttype: { type: String, required: false, default: 'Page' },
 
   sections: [SectionSchema],
   gridSettings: {

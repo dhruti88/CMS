@@ -126,12 +126,9 @@ export const deleteLayout = async (req, res) => {
           message: 'Layout title is required' 
         });
       }
-
-    //   const l= await Layout.find({ _id });
-    //   await logLayoutAction(l , 'Deleted');
     
       const layout = await Layout.findOneAndDelete({ _id });
-      await logLayoutAction(layout, 'deleted');
+      await logLayoutAction(layout, 'deleted', req.user.uid);
       // Check if a layout was actually deleted
       if (!layout) {
         return res.status(404).json({ 

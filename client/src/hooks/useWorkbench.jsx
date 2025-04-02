@@ -165,6 +165,8 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
   
   const [activeEditors, setActiveEditors] = useState([]);
   // Get the shared map from Yjs
+  // Add active users count state
+const [activeUsersCount, setActiveUsersCount] = useState(0);
   const ySectionsMap = useMemo(() => ydoc.getMap('sections'), []);
 
   // Initialize WebSocket provider with proper error handling
@@ -211,14 +213,14 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
 
    // Sync function to update Yjs when local changes occur
    const syncToYjs = useCallback((updatedSections) => {
-    console.log("ms:",updatedSections);
+    // console.log("ms:",updatedSections);
     
     // if (!isInitialized) {
     // handleSync(true);
     // console.log("ms0:",updatedSections);
     // }
 
-    console.log("ms1:",updatedSections);
+    console.log("m1:",updatedSections);
     try {
       setIsLocalUpdate(true);
       ydoc.transact(() => {
@@ -323,7 +325,9 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
   // Update all functions that modify sections to use syncToYjs
   const updateSectionsAndSync = useCallback((newSections) => {
     setSections(newSections);
+    
     syncToYjs(newSections);
+  
   }, [syncToYjs]);
 
 
@@ -988,6 +992,7 @@ const loadLayoutFromSelected = (layout) => {
     setColumns(layout.gridSettings.columns);
     setRows(layout.gridSettings.rows);
     setGutterWidth(layout.gridSettings.gutterWidth);
+    setLayoutType("Page");
   }
 
   const recalculatedSections = layout.sections.map(section => ({
@@ -1021,7 +1026,7 @@ const handleTextChange = (e) => {
 // Toggle format with proper sync
 const toggleFormat = (format) => {
   if (format === 'align') {
-    const alignments = ['left', 'center', 'right'];
+    const alignments = ['left', 'center', 'right', 'justify'];
     const currentIndex = alignments.indexOf(textFormatting.align);
     const nextIndex = (currentIndex + 1) % alignments.length;
 
@@ -1363,8 +1368,10 @@ const handleTransformEnd = (e) => {
   );
 
   // Update sections and sync with Yjs in one go
-  updateSectionsAndSync(updatedSections);
-
+  // updateSectionsAndSync(updatedSections);
+  setTimeout(() => {
+    updateSectionsAndSync(updatedSections);
+}, 0);
   // Reset transformation
   node.scaleX(1);
   node.scaleY(1);
@@ -1419,13 +1426,20 @@ useEffect(() => {
   // Global keydown handler for Delete key
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId && document.activeElement === document.body) {
+      if (
+        (e.key === 'Delete' || e.key === 'Backspace') && 
+        selectedId && 
+        (layoutType === "Page" || selectedId !== sectionId) && 
+        document.activeElement === document.body
+      ) {
         deleteSelected();
       }
     };
+  
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedId]);
+  }, [selectedId, layoutType, sectionId]);
+  
   
     useEffect(() => {
       console.log("s-",stageRef);
@@ -2421,6 +2435,9 @@ return {
     userProfilePic,
     activeEditors,
     positionDisplay,
+    activeUsersCount,
+    layoutType,
+    setLayoutType,
 };
 };
 

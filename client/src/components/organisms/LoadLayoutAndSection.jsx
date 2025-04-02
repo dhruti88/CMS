@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Tooltip, IconButton, TextField } from "@mui/material";
-import { Edit, Delete, Close } from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 import "./SectionReplacementPanel.css"; // Keep consistent styling
 
 const LoadLayoutAndSection = ({ 
@@ -21,6 +21,9 @@ const LoadLayoutAndSection = ({
     if (!availableLayouts) return;
 
     if (mode === "section") {
+      // Extract selected section's size
+      const { rows: selectedRows, cols: selectedCols } = targetSection?.sizeInfo || {};
+
       // Flatten sections from layouts
       const allSections = availableLayouts.flatMap(layout =>
         (layout.sections || []).map(section => ({
@@ -29,24 +32,27 @@ const LoadLayoutAndSection = ({
         }))
       );
 
-      // Filter based on search term
-      const filtered = allSections.filter(sec =>
-        ((sec.title || sec.name || sec.id) + " " + sec.layoutName)
-          .toString()
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-      );
-
+      // Filter sections based on search term and matching size
+      const filtered = allSections.filter(sec => {
+        const { rows, cols } = sec.sizeInfo || {};
+        const matchesSize = selectedRows && selectedCols ? rows === selectedRows && cols === selectedCols : true;
+        return (
+          matchesSize &&
+          ((sec.title || sec.name || sec.id) + " " + sec.layoutName)
+            .toString()
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+        );
+      });
       setFilteredItems(filtered);
     } else {
-      // Filter layouts based on search term
+      // Filter layouts based only on search term
       const filtered = availableLayouts.filter(layout => 
         layout.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
-
       setFilteredItems(filtered);
     }
-  }, [availableLayouts, searchTerm, mode]);
+  }, [availableLayouts, searchTerm, mode, targetSection]);
 
   // Close modal when clicking outside
   const handleOverlayClick = (e) => {
@@ -65,14 +71,10 @@ const LoadLayoutAndSection = ({
   return (
     <div className="replacement-panel-overlay" onClick={handleOverlayClick}>
       <div className="replacement-panel">
-        {/* Header */}
         <div className="panel-header">
-          <h3 className="panel-title">
-            {mode === "section" ? "Search Sections" : "Search Layouts"}
-          </h3>
+          <h3 className="panel-title">{mode === "section" ? "Search Sections" : "Search Layouts"}</h3>
         </div>
 
-        {/* Search Input */}
         <div className="search-container">
           <TextField
             label={mode === "section" ? "Search Sections..." : "Search Layouts..."}
@@ -85,7 +87,6 @@ const LoadLayoutAndSection = ({
           />
         </div>
 
-        {/* List */}
         <div className="section-list">
           {filteredItems.length > 0 ? (
             filteredItems.map(item => (
@@ -97,7 +98,6 @@ const LoadLayoutAndSection = ({
                 role="button"
                 tabIndex={0}
               >
-                {/* Item Main Details */}
                 <div className="section-item-main">
                   <span className="section-title">
                     {mode === "section" ? item.title || item.name || item.id : item.title || "Untitled Layout"}
@@ -107,7 +107,6 @@ const LoadLayoutAndSection = ({
                   </span>
                 </div>
 
-                {/* Size Info */}
                 {item.gridSettings?.columns || item.sizeInfo?.cols ? (
                   <span className="section-item-size">
                     {mode === "section"
@@ -116,7 +115,6 @@ const LoadLayoutAndSection = ({
                   </span>
                 ) : null}
 
-                {/* Action Buttons */}
                 {mode === "layout" && (
                   <div className="section-item-actions">
                     <Tooltip title="Delete Layout">
@@ -130,21 +128,6 @@ const LoadLayoutAndSection = ({
                     </Tooltip>
                   </div>
                 )}
-
-                {/* Action Buttons */}
-                {mode === "section" && (
-                <div className="section-item-actions">
-                  <Tooltip title="Delete Section">
-                    <IconButton 
-                      onClick={() => console.log("Delete section:", item.id)} 
-                      className="icon-accent"
-                    >
-                      <Delete />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-                )}
-
               </div>
             ))
           ) : (
@@ -153,7 +136,6 @@ const LoadLayoutAndSection = ({
             </p>
           )}
         </div>
-
       </div>
     </div>
   );

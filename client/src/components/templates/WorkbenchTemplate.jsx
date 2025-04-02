@@ -112,7 +112,7 @@ const WorkbenchTemplate = () => {
 
 const openReplacementPanel = async () => {
   // Check if there are sections and a section is currently selected
-  if (sections && sections.length > 0 && selectedId) {
+  if (sections && sections.length > 0 && selectedId == sectionId) {
     // Save the selected section ID as the target for replacement
     setTargetSectionIdForReplacement(selectedId);
     // Optionally, you might trigger a fetch here if you need to update availableLayouts:
@@ -359,7 +359,9 @@ const handleReplaceSection = (selectedSection) => {
           setTaskStatus={setTaskStatus}
           changeFontFamily = {changeFontFamily}
             openReplacementPanel={openReplacementPanel}
-            
+            layoutType = {layoutType}
+            rows = {rows}
+            columns = {columns}            
           />
 {showReplacementPanel && (
   <LoadLayoutAndSection
@@ -368,6 +370,8 @@ const handleReplaceSection = (selectedSection) => {
     onReplaceSection={handleReplaceSection}
     setShowLayoutList={setShowReplacementPanel} // Used to close panel
     mode="section" // Handles section replacement
+    selectedId = {selectedId}
+    sectionId = {sectionId}
   />
 )}
         </>
