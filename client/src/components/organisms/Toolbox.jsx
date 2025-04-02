@@ -240,6 +240,8 @@ const Toolbox = ({
         </ul>
       </ToolboxSection>
       
+
+      {layoutType === "Page" && (
 <ToolboxSection title="Section Replacement">
   <div className="replacement-button-container">
     <Button onClick={openReplacementPanel} className="replacement-button">
@@ -247,6 +249,7 @@ const Toolbox = ({
     </Button>
   </div>
 </ToolboxSection>
+    )}
 
 
       {/* Layout Selection */}
