@@ -111,7 +111,7 @@ const token =localStorage.getItem("token");
 const [city, setCity] = useState("Chicago");
 const [dueDate, setDueDate] = useState("");
 const [taskStatus, setTaskStatus] = useState("Pending");
-const [layoutType, setLayoutType] = useState("");
+const [layoutType, setLayoutType] = useState("Page");
 
 //handle image download and pdf
 const [hideGrid, setHideGrid] = useState(false);          // State to control grid visibility
@@ -698,12 +698,13 @@ const [positionDisplay, setPositionDisplay] = useState({
 
   // Layout endpoints
   const saveLayout = async () => {
+    console.log(taskStatus);
     try {
       const gridSettings = { columns, rows, gutterWidth };
       const response = await fetch(`${SERVER_URL}/api/layout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' , 'Authorization': `Bearer ${token}`},
-        body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings }),
+        body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings, layouttype: layoutType, city : city, duedate : dueDate, status : taskStatus }),
       });
       const data = await response.json();
       console.log('Layout saved successfully', data);

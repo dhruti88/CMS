@@ -8,7 +8,12 @@ import ManualRowColumn from '../molecules/ManualRowColumn';
 import SectionReplacementPanel from './SectionReplacementPanel';
 import Input from '../atoms/Input';
 import { TextField, MenuItem, Select, FormControl,Grid, InputLabel } from "@mui/material";
+import { 
+  CircularProgress, 
+  Box,
 
+} from '@mui/material';
+import { CheckCircle, PauseCircle } from '@mui/icons-material'; 
 const Toolbox = ({
   itemSizes,
   addNewSection,
@@ -58,9 +63,24 @@ const Toolbox = ({
             <FormControl fullWidth>
               <InputLabel sx={{ background: "#f8f9fa", px: 0.5 }} >Task Status</InputLabel>
               <Select value={taskStatus} onChange={(e) => setTaskStatus(e.target.value)}>
-                <MenuItem value="In Progress">In Progress</MenuItem>
-                <MenuItem value="Pending">Pending</MenuItem>
-                <MenuItem value="Completed">Completed</MenuItem>
+              <MenuItem value="In Progress">
+          <Box display="flex" alignItems="center" gap={1}>
+            <CircularProgress size={16} color="primary" />
+            In Progress
+          </Box>
+        </MenuItem>
+        <MenuItem value="Pending">
+          <Box display="flex" alignItems="center" gap={1}>
+            <PauseCircle color="warning" />
+            Pending
+          </Box>
+        </MenuItem>
+        <MenuItem value="Completed">
+          <Box display="flex" alignItems="center" gap={1}>
+            <CheckCircle color="success" />
+            Completed
+          </Box>
+        </MenuItem>
               </Select>
             </FormControl>
           </Grid>
