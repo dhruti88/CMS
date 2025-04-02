@@ -108,8 +108,12 @@ const token =localStorage.getItem("token");
 
 
 //city,dueDate,Status,layoutType
-const [city, setCity] = useState("Chicago");
-const [dueDate, setDueDate] = useState("");
+const [city, setCity] = useState("Pune");
+const [dueDate, setDueDate] = useState(() => {
+  const today = new Date().toISOString().split("T")[0]; 
+  return today;
+});
+
 const [taskStatus, setTaskStatus] = useState("Pending");
 const [layoutType, setLayoutType] = useState("Page");
 
@@ -726,6 +730,7 @@ const [positionDisplay, setPositionDisplay] = useState({
       if (response.ok) {
         console.log("Hii",response);
         const data = await response.json();
+       // console.log("data : - ",data.layouts, "city : - ",city);
         setAvailableLayouts(data.layouts);
         setShowLayoutList(true);
       } else {
@@ -985,29 +990,34 @@ const updateSections = (selectedId, sections, updateFn) => {
     )
   }));
 };
-
-// Load layout function with proper sync
 const loadLayoutFromSelected = (layout) => {
   if (layout.gridSettings && layout.gridSettings.gutterWidth !== undefined) {
     setColumns(layout.gridSettings.columns);
     setRows(layout.gridSettings.rows);
     setGutterWidth(layout.gridSettings.gutterWidth);
-    setLayoutType("Page");
   }
 
-  const recalculatedSections = layout.sections.map(section => ({
+  const recalculatedSections = layout.sections.map((section) => ({
     ...section,
-    x: section.gridX * cellWidth + (section.gridX * gutterWidth),
-    y: section.gridY * cellHeight 
+    x: section.gridX * cellWidth + section.gridX * layout.gridSettings.gutterWidth, 
+    y: section.gridY * cellHeight
   }));
 
   // Update sections and sync with Yjs in one go
   updateSectionsAndSync(recalculatedSections);
+
   setLayoutTitle(layout.title);
   setShowLayoutList(false);
   setShowSetupForm(false);
+
+  // Using functional updates to ensure correct state update
+  setCity(() => layout.city);
+  setDueDate(() => layout.publishingdate);
+  setLayoutType(() => layout.layouttype);
+
   console.log("Loaded layout:", layout);
 };
+
 
 // Text change handler with proper sync
 const handleTextChange = (e) => {
