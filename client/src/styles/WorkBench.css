@@ -19,7 +19,7 @@ body {
   font-family: 'Google Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-color);
   background-color: var(--secondary-color);
-  overflow: hidden;
+  overflow: auto;
 }
 
 .cms-container {
