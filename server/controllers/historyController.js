@@ -7,7 +7,7 @@ export const logLayoutAction = async (layout, actionType, userId, previousVersio
     try {
       // Fetch user details to include username  
       const user = await User.findOne({ uid: userId });
-
+console.log ("ts",layout.taskstatus);
       await LayoutHistory.create({
         layoutId: layout._id,
         userId: userId,

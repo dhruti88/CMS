@@ -71,6 +71,7 @@ const LayoutHistory = () => {
         }
         const data = await response.json();
         console.log("data - ", data);
+        console.log(data.map(entry => entry.metadata?.status));
         setHistoryEntries(data);
 
         // Extract unique users from the history entries
@@ -95,7 +96,7 @@ const LayoutHistory = () => {
   }, [historyEntries]);
 
   const actionTypes = ['created', 'updated', 'deleted'];
-  const layoutStatuses = ['pending', 'in-progress', 'completed'];
+  const layoutStatuses = ['Pending', 'In Progress', 'Completed'];
 
   // Reset filters
   const resetFilters = () => {
@@ -309,19 +310,19 @@ const LayoutHistory = () => {
                           py: 0.5,
                           borderRadius: '12px',
                           backgroundColor:
-                            entry.metadata?.status === 'completed'
+                            entry.metadata?.status === 'Completed'
                               ? 'success.light'
-                              : entry.metadata?.status === 'in-progress'
+                              : entry.metadata?.status === 'In Progress'
                               ? 'warning.light'
-                              : entry.metadata?.status === 'pending'
+                              : entry.metadata?.status === 'Pending'
                               ? 'info.light'
                               : 'grey.300',
                           color:
-                            entry.metadata?.status === 'completed'
+                            entry.metadata?.status === 'Completed'
                               ? 'success.dark'
-                              : entry.metadata?.status === 'in-progress'
+                              : entry.metadata?.status === 'In Progress'
                               ? 'warning.dark'
-                              : entry.metadata?.status === 'pending'
+                              : entry.metadata?.status === 'Pending'
                               ? 'info.dark'
                               : 'grey.800',
                           fontWeight: 'bold',
