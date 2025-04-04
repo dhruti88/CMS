@@ -291,6 +291,7 @@ const handleReplaceSection = (selectedSection) => {
         userProfilePic = {userProfilePic}
         activeEditors = {activeEditors}
         layoutType = {layoutType}
+        setLayoutTitle = {setLayoutTitle}
       />
      <WorkbenchCanvas
   handleTransformEnd={handleTransformEnd}  
