@@ -10,41 +10,82 @@ const __dirname = path.dirname(__filename);
 import { invalidateCache } from '../redis.js';
 
 
+function base64ToBuffer(dataURL) {
+  const matches = dataURL.match(/^data:(.+);base64,(.+)$/);
+  if (!matches || matches.length !== 3) {
+    throw new Error('Invalid base64 image data');
+  }
+  const contentType = matches[1];
+  const buffer = Buffer.from(matches[2], 'base64');
+  return { buffer, contentType };
+}
+
 
 export const saveLayout = async (req, res) => {
   try {
-    const { userId, title,sections, gridSettings, layouttype, city, duedate, status } = req.body;
-    console.log('Saving layout with items:', sections);
-    // Try to find an existing layout for the user and title
+    const {
+      userId,
+      title,
+      sections,
+      gridSettings,
+      layouttype,
+      city,
+      duedate,
+      status,
+      stageImage, // base64 image from client
+    } = req.body;
+
+    const imageData = stageImage ? base64ToBuffer(stageImage) : null;
+
     let layout = await Layout.findOne({ userId, title });
+
     if (layout) {
-      // Update existing layout
       layout.sections = sections;
       layout.gridSettings = gridSettings;
       layout.updatedAt = new Date();
+
+      if (imageData) {
+        layout.stageImage = {
+          data: imageData.buffer,
+          contentType: imageData.contentType,
+        };
+      }
+
       await logLayoutAction(layout, 'updated', userId);
       await layout.save();
-
     } else {
-      // Create new layout document
-      layout = new Layout({ userId, title, sections, gridSettings,layouttype, city, publishingdate: duedate, taskstatus: status });
+      layout = new Layout({
+        userId,
+        title,
+        sections,
+        gridSettings,
+        layouttype,
+        city,
+        publishingdate: duedate,
+        taskstatus: status,
+        stageImage: imageData
+          ? {
+              data: imageData.buffer,
+              contentType: imageData.contentType,
+            }
+          : undefined,
+      });
 
       await logLayoutAction(layout, 'created', userId);
       await layout.save();
-
     }
 
-        // // Invalidate related caches
-        await invalidateCache('layouts:*');
-        await invalidateCache(`my-layouts:${userId}:*`);
-        await invalidateCache(`single-layout:${userId}:*`);
+    await invalidateCache('layouts:*');
+    await invalidateCache(`my-layouts:${userId}:*`);
+    await invalidateCache(`single-layout:${userId}:*`);
 
     res.json({ success: true, layout });
   } catch (error) {
-    console.error('Error saving layout:', error);
+    console.error('Error saving layout with image:', error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 export const getLayout = async (req, res) => {
     try {

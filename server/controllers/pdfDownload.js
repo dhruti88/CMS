@@ -24,28 +24,7 @@ router.post("/convert-cmyk", upload.single("image"), async (req, res) => {
         doc.image(inputFilePath, 100,100, { width: 800 },{ align: 'center',valign: 'center'});
 
         doc.end();
-
-        // writeStream.on("finish", () => {
-        //     const ghostscriptCommand = `
-        //         gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=pdfwrite \
-        //         -sColorConversionStrategy=CMYK -dProcessColorModel=/DeviceCMYK \
-        //         -sOutputFile=${finalCmykPdfPath} ${tempPdfPath}
-        //     `;
-
-        //     exec(ghostscriptCommand, (error, stdout, stderr) => {
-        //         if (error) {
-        //             console.error("Ghostscript error:", stderr);
-        //             return res.status(500).send("CMYK conversion failed.");
-        //         }
-
-        //         res.download(finalCmykPdfPath, "CMYK_Newspaper_Export.pdf", () => {
-        //             fs.unlinkSync(inputFilePath);
-        //             fs.unlinkSync(tempPdfPath);
-        //             fs.unlinkSync(finalCmykPdfPath);
-        //         });
-        //     });
-        // });
-
+        
     } catch (error) {
         console.error("Error generating PDF:", error);
         res.status(500).send("Failed to generate PDF.");

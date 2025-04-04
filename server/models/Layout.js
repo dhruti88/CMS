@@ -91,6 +91,10 @@ const LayoutSchema = new Schema({
     rows: { type: Number },
     gutterWidth: { type: Number },
   },
+  stageImage: {
+    data: Buffer,
+    contentType: String,
+  },  
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
