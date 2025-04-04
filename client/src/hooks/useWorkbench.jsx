@@ -63,6 +63,9 @@ const token =localStorage.getItem("token");
   const [openModal, setOpenModal] = useState(false);
 
   const handleDeleteLayout = async (layout) => {
+    const confirmReload = window.confirm("Are you sure you want to delete the layout?");
+    if (!confirmReload) return; // Exit if the user cancels
+
       try {
         setIsDeleting(layout._id);
         
