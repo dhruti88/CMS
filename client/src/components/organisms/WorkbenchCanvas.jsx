@@ -610,7 +610,7 @@ const WorkbenchCanvas = ({
                     fontFamily={item.fontFamily}
                     fill={item.fill}
                     align={item.align}
-                    padding={item.padding}
+                    // padding={item.padding}
                     textDecoration={item.textDecoration}
                     draggable
                     onClick={() => {
