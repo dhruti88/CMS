@@ -2370,7 +2370,6 @@ const resetBoxPosition = (e, id, currentBox) => {
 // };
 
 
-
 return {
   userId,
   showSetupForm,
