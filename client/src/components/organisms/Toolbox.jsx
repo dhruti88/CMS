@@ -46,6 +46,7 @@ const Toolbox = ({
   layoutType,
   rows,
   columns,
+  setSections
 }) => {
   
   // Find selected section
@@ -64,6 +65,47 @@ const Toolbox = ({
   const selectedItem = sections
     .flatMap(section => section.items)
     .find(item => item.id === selectedId);
+
+    const toggleBorder = (border) => {
+      setSections((prevSections) =>
+        prevSections.map((section) =>
+          section.id === selectedId
+            ? {
+                ...section,
+                borderStyle: {
+                  left: section.borderStyle?.left || false,
+                  right: section.borderStyle?.right || false,
+                  top: section.borderStyle?.top || false,
+                  bottom: section.borderStyle?.bottom || false,
+                  [border]: !section.borderStyle?.[border], // Toggle specific border
+                },
+              }
+            : section
+        )
+      );
+    };
+    
+    const changeBorderColor = (color) => {
+      setSections((prevSections) =>
+        prevSections.map((section) =>
+          section.id === selectedId
+            ? { ...section, borderColor: color }
+            : section
+        )
+      );
+    };
+
+    const changeBorderWidth = (newWidth) => {
+      setSections((prev) =>
+        prev.map((section) =>
+          section.id === selectedId
+            ? { ...section, borderWidth: newWidth }
+            : section
+        )
+      );
+    };
+    
+    
 
   return (
     <div className="toolbox">
@@ -250,6 +292,69 @@ const Toolbox = ({
           <p className="no-selection">No item selected. Click on an item to view its properties.</p>
         )}
       </ToolboxSection>
+
+{selectedId === sectionId && selectedSection && (
+  <ToolboxSection title="Add Border">
+    <div className="size-section">
+      <h4>Border</h4>
+      <div className="size-grid">
+        {["left", "right", "top", "bottom"].map((border) => (
+          <Button
+            key={`line-${border}`}
+            onClick={() => toggleBorder(border)}
+            className={`size-button ${selectedSection.borderStyle?.[border] ? 'active' : ''}`}
+          >
+            {border}
+          </Button>
+        ))}
+      </div>
+      <TextField
+        label="Border Width"
+        type="number"
+        variant="outlined"
+        size="small"
+        InputProps={{ inputProps: { min: 1, max: 10 } }}
+        value={selectedSection.borderWidth || 2}
+        onChange={(e) => changeBorderWidth(Number(e.target.value))}
+        sx={{ marginTop: 2, width : "100px"}}
+      />
+    </div>
+  </ToolboxSection>
+)}
+
+{selectedId === sectionId && selectedSection && (
+  <ToolboxSection title="Border Color">
+    <div className="color-palette">
+      <h4>Border Color</h4>
+      <div className="color-buttons">
+        {colors.primary.map((color, index) => (
+          <ColorButton
+            key={`border-primary-${index}`}
+            color={color}
+            onClick={() => changeBorderColor(color)}
+            title={`Primary ${index + 1}`}
+          />
+        ))}
+        {colors.accent.map((color, index) => (
+          <ColorButton
+            key={`border-accent-${index}`}
+            color={color}
+            onClick={() => changeBorderColor(color)}
+            title={`Accent ${index + 1}`}
+          />
+        ))}
+        {colors.grays.map((color, index) => (
+          <ColorButton
+            key={`border-gray-${index}`}
+            color={color}
+            onClick={() => changeBorderColor(color)}
+            title={`Gray ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  </ToolboxSection>
+)}
 
       {/* Keyboard Shortcuts */}
       <ToolboxSection title="Keyboard Shortcuts">
