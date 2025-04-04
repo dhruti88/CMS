@@ -720,19 +720,40 @@ const [positionDisplay, setPositionDisplay] = useState({
   // Layout endpoints
   const saveLayout = async () => {
     console.log(taskStatus);
+  
     try {
-      const gridSettings = { columns, rows, gutterWidth };
+      // 1. Convert canvas to Base64
+      const stage = stageRef.current;
+      const dataURL = stage.toDataURL({ pixelRatio: 2 }); // data:image/png;base64,...
+  
+      const layoutData = {
+        userId,
+        title: layoutTitle,
+        sections,
+        gridSettings: { columns, rows, gutterWidth },
+        layouttype: layoutType,
+        city,
+        duedate: dueDate,
+        status: taskStatus,
+        stageImage: dataURL, // base64 image
+      };
+  
       const response = await fetch(`${SERVER_URL}/api/layout`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' , 'Authorization': `Bearer ${token}`},
-        body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings, layouttype: layoutType, city : city, duedate : dueDate, status : taskStatus }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(layoutData),
       });
+  
       const data = await response.json();
       console.log('Layout saved successfully', data);
     } catch (error) {
       console.error('Error saving layout:', error);
     }
   };
+  
 
   const fetchAvailableLayouts = async () => {
     try {
@@ -2368,6 +2389,41 @@ const resetBoxPosition = (e, id, currentBox) => {
 //   setBoxes([...boxes, newBox]);
 //   setNewBoxContent('');
 // };
+
+const saveLayoutWithImage = async () => {
+  const stage = stageRef.current;
+  const dataURL = stage.toDataURL({ pixelRatio: 2 }); // or 3 for high-res
+  const response = await fetch(dataURL);
+  const imageBlob = await response.blob();
+
+  const formData = new FormData();
+  formData.append('image', imageBlob, 'stage.png');
+
+  formData.append(
+    'layoutData',
+    JSON.stringify({
+      userId,
+      title,
+      sections,
+      gridSettings,
+      layouttype,
+      city,
+      duedate,
+      status,
+    })
+  );
+
+  const res = await fetch(`${SERVER_URL}/api/layout/save`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+  console.log(data);
+};
 
 
 

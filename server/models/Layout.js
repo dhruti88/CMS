@@ -52,6 +52,14 @@ const SectionSchema = new Schema({
   },
   items: [SectionItem],
   zIndex: { type: Number, default: 0 },
+  borderStyle: {
+    left: { type: Boolean, default: false },
+    right: { type: Boolean, default: false },
+    top: { type: Boolean, default: false },
+    bottom: { type: Boolean, default: false },
+  },
+  borderColor: { type: String, default: '#d3d3d3' }, // colors.grays[2] equivalent (e.g., light gray)
+  borderWidth: { type: Number, default: 2 },
 }, { _id: false });
 
 // Define the Layout schema
@@ -83,6 +91,10 @@ const LayoutSchema = new Schema({
     rows: { type: Number },
     gutterWidth: { type: Number },
   },
+  stageImage: {
+    data: Buffer,
+    contentType: String,
+  },  
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
