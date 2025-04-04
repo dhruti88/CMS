@@ -37,6 +37,7 @@ const token =localStorage.getItem("token");
   const cellHeight = 50;
 
   const [userProfilePic, setUserProfilePic] = useState("");
+  const [CurrentLayout,setCurrentLayout] = useState("");
 // Fetch user info from the backend
   const fetchUser = async() =>
   {
@@ -340,9 +341,9 @@ const [activeUsersCount, setActiveUsersCount] = useState(0);
     const addSection = (size) => 
     {
       return {
-        id: 'section-' + Date.now(),  // Ensuring ID remains a string
-        type: 'section',
-        sectionType: 'section',
+        id: "section-" + Date.now(),
+        type: "section",
+        sectionType: "section",
         x: 0,
         y: 0,
         width: size.cols * cellWidth + (size.cols - 1) * gutterWidth,
@@ -355,7 +356,15 @@ const [activeUsersCount, setActiveUsersCount] = useState(0);
         gridX: 0,
         gridY: 0,
         items: [],
-      };
+        borderStyle: {
+          left: false,
+          right: false,
+          top: false,
+          bottom: false,
+        },
+        borderColor: colors.grays[2],      // default border color
+        borderWidth: 2,                    // default border width
+      }      
     };
   // Item addition function
   const addBox = (size) => {
@@ -1349,8 +1358,8 @@ const handleTransformEnd = (e) => {
   );
 
   // Compute new gridX, gridY inside section
-  const newGridX = Math.round((node.x() - section.x) / (cellWidth + gutterWidth));
-  const newGridY = Math.round((node.y() - section.y) / cellHeight);
+  const newGridX = Math.round((node.x()) / (cellWidth + gutterWidth));
+  const newGridY = Math.round((node.y()) / cellHeight);
 
   // Ensure grid position doesn't exceed section boundaries
   const maxGridX = (section.width - snappedWidth) / (cellWidth + gutterWidth);
@@ -2447,6 +2456,8 @@ return {
     activeUsersCount,
     layoutType,
     setLayoutType,
+    CurrentLayout,
+    setCurrentLayout,
 };
 };
 

@@ -19,7 +19,6 @@ body {
   font-family: 'Google Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-color);
   background-color: var(--secondary-color);
-  overflow: auto;
 }
 
 .cms-container {
@@ -215,6 +214,11 @@ body {
     border-color: var(--primary-color);
   }
   
+  .size-button.active{
+    background-color: var(--primary-color);
+    color: white;
+  }
+
   /* Text formatting */
   .formatting-buttons {
     display: flex;

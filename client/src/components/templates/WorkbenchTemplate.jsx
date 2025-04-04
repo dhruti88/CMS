@@ -362,7 +362,7 @@ const handleReplaceSection = (selectedSection) => {
             openReplacementPanel={openReplacementPanel}
             layoutType = {layoutType}
             rows = {rows}
-            columns = {columns}            
+            columns = {columns}
           />
 {showReplacementPanel && (
   <LoadLayoutAndSection
