@@ -30,7 +30,7 @@ const wsProvider = new WebsocketProvider('ws://localhost:1234', 'workbench-room'
 
 const useWorkbench = () => {
   // Constants
-const [userID, setUserID] = useState("60d21b4667d0d8992e610c85");
+const [userID, setUserID] = useState("");
 const token =localStorage.getItem("token");
   // Stage dimensions (minus toolbox width)
   const cellWidth = 100;
@@ -105,7 +105,6 @@ const token =localStorage.getItem("token");
   const userId = userID;
   console.log("userId : -",userId);
   const defaultTitle = "default";
-
 
 //city,dueDate,Status,layoutType
 const [city, setCity] = useState("Pune");
@@ -377,6 +376,8 @@ const [activeUsersCount, setActiveUsersCount] = useState(0);
     };
   };
 
+  //add horizontal/vertical black lines:
+  
     // // Image upload handler
     // const handleImageUpload = (sectionId, e) => {
     //   console.log("image : -", e);
@@ -789,7 +790,7 @@ const [positionDisplay, setPositionDisplay] = useState({
       id: 'text-' + Date.now(),
       type: 'text',
       x: 0,
-      y: 0,
+      y: 0-10,
       width: size.cols * cellWidth + (size.cols - 1) * gutterWidth,
       height: size.rows * cellHeight,
       text: 'Add your text here',
@@ -799,7 +800,6 @@ const [positionDisplay, setPositionDisplay] = useState({
       textDecoration: '',
       fill: colors.grays[0],
       align: 'left',
-      padding: 10,
       backgroundFill: 'white',
       draggable: true,
       sizeInfo: size,
@@ -2423,7 +2423,6 @@ return {
   exportToCMYKPDF,
     fitStageToScreen,
     fetchAvailableSections,
-  
     city,
     setCity,
     dueDate,
