@@ -11,6 +11,7 @@ const SetupModal = ({
   setRows,
   gutterWidth,
   setGutterWidth,
+  showSetupForm,
   setShowSetupForm,
   city,
   setCity,
@@ -20,10 +21,13 @@ const SetupModal = ({
   setTaskStatus,
   layoutType,
   setLayoutType,
+  saveLayout,
 }) => {
+  console.log("sf",rows);
   const handleSubmit = (e) => {
     e.preventDefault();
     setShowSetupForm(false);
+    saveLayout({e:0});
   };
 
 

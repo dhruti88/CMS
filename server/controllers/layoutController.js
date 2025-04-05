@@ -180,3 +180,17 @@ export const uploadImage = (req, res) => {
         res.json({ message: 'File uploaded successfully', filePath: `/uploads/${req.file.filename}` });
     });
 };    
+
+
+export const getLayoutById = async (req, res) => {
+  try {
+    const layout = await Layout.findById(req.params.layoutId);
+    if (!layout) {
+      return res.status(404).json({ message: 'Layout not found' });
+    }
+    res.json(layout);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching layout', error: error.message });
+  }
+};
+

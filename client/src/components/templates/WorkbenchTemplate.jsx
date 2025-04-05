@@ -1,4 +1,5 @@
-import React from 'react';
+import React,{ useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import SetupModal from '../organisms/SetupModal';
 import WorkbenchActions from '../organisms/WorkbenchActions';
 import WorkbenchCanvas from '../organisms/WorkbenchCanvas';
@@ -9,9 +10,55 @@ import NestedSectionsPanel from '../organisms/NestedSectionsPanel';
 import SectionReplacementPanel from '../organisms/SectionReplacementPanel';
 import CustomButton from '../atoms/button/CustomButton';
 import Navbar from '../atoms/navbar/NavBar';
-import { useNavigate } from 'react-router-dom';
 import { Modal ,Box } from '@mui/material';
 import LoadLayoutAndSection from '../organisms/LoadLayoutAndSection';
+
+// import { useEffect } from 'react';
+// Add these imports at the top of your file
+import { CircularProgress, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+
+
+
+
+// Add styled component for the container
+const LoadingContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '100vh',
+  background: theme.palette.background.default,
+}));
+const LoadingBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 3,
+  padding: 4,
+  borderRadius: 2,
+  backgroundColor: 'background.paper',
+  boxShadow: theme.shadows[3]
+}));
+
+
+// Loading component
+const LoadingState2 = () => (
+  // console.log("LoadingState2",showSetupForm),
+  <LoadingContainer>
+    <LoadingBox>
+      <CircularProgress size={60} thickness={4} />
+      <Typography variant="h5" sx={{ fontWeight: 500 }}>
+        Loading layout...
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        Please wait while we prepare your workspace
+      </Typography>
+    </LoadingBox>
+  </LoadingContainer>
+);
+
 
 
 const WorkbenchTemplate = () => {
@@ -103,26 +150,41 @@ const WorkbenchTemplate = () => {
     userProfilePic,
     activeEditors,
     positionDisplay,
+    LoadingState,
+    // showSetupForm
     // setuserID,
   } = workbenchProps;
 // Inside WorkbenchTemplate component (before the return)
 
-  const [targetSectionIdForReplacement, setTargetSectionIdForReplacement] = useState(null);
-  const [showReplacementPanel, setShowReplacementPanel] = useState(false);
 
-const openReplacementPanel = async () => {
-  // Check if there are sections and a section is currently selected
-  if (sections && sections.length > 0 && selectedId == sectionId) {
-    // Save the selected section ID as the target for replacement
-    setTargetSectionIdForReplacement(selectedId);
-    // Optionally, you might trigger a fetch here if you need to update availableLayouts:
-    await fetchAvailableSections();  // Uncomment if needed
-    // Now open the replacement panel
-    setShowReplacementPanel(true);
-  } else {
-    console.warn("No section selected for replacement.");
+useEffect(() => {
+  if(!showSetupForm && localStorage.getItem('layoutid')){ {
+    // Fetch available layouts when the setup form is shown
+    // fetchAvailableLayouts();
+    console.log("sf",showSetupForm);
+    const layoutid =  localStorage.getItem('layoutid');
+  
+    setTimeout(()=> navigate(`/page/${layoutid}`),1000);
+
   }
-};
+}});
+// useEffect(() => {
+//   let timeoutId;
+  
+//   if (!showSetupForm) {
+//     const layoutId = localStorage.getItem('layoutid');
+//     if (layoutId) {
+//       timeoutId = setTimeout(() => navigate(`/page/${layoutId}`), 1000);
+//     }
+//   }
+
+//   return () => {
+//     if (timeoutId) {
+//       clearTimeout(timeoutId);
+//     }
+//   };
+// }, [showSetupForm, navigate]);
+
 
 // Correctly implement handleReplaceSection
 // const handleReplaceSection = (selectedSection) => {
@@ -188,58 +250,9 @@ const openReplacementPanel = async () => {
 //   // Optionally update the selected section
 //   // setSelectedId(newSection.id);
 // };
-const handleReplaceSection = (selectedSection) => {
-  // Debug: Log the function call and inputs
-  console.log('handleReplaceSection called');
-  console.log('selectedSection:', selectedSection);
-  console.log('targetSectionIdForReplacement:', targetSectionIdForReplacement);
-  console.log('Current sections:', sections);
 
-  // Verify setSections function exists
-  if (typeof setSections !== 'function') {
-    console.error('setSections is not a function!');
-    return;
-  }
 
-  // Find the target section in the current sections array
-  const targetSection = sections.find(sec => sec.id === targetSectionIdForReplacement);
-
-  if (!targetSection || !selectedSection) {
-    console.warn("Invalid section replacement");
-    setShowReplacementPanel(false);
-    return;
-  }
-
-  // Create the replacement section
-  const replacementSection = {
-    ...selectedSection,
-    id: targetSection.id,  // Keep original ID
-    x: targetSection.x,
-    y: targetSection.y,
-    gridX: targetSection.gridX,
-    gridY: targetSection.gridY,
-    // Add any other necessary properties
-  };
-
-  // Use functional update to ensure correct state update
-  setSections(prevSections => 
-    prevSections.map(section => 
-      section.id === targetSectionIdForReplacement 
-        ? replacementSection 
-        : section
-    )
-  );
-
-  // Close the replacement panel
-  setShowReplacementPanel(false);
-
-  // Update selected section
-  setSelectedId(replacementSection.id);
-
-  // Debug: Log the result
-  console.log('Replacement completed', replacementSection);
-};
-
+// const navigate= useNavigate();
   return (
     <div className="cms-container">
       {showSetupForm ? (
@@ -252,6 +265,7 @@ const handleReplaceSection = (selectedSection) => {
           setRows={setRows}
           gutterWidth={gutterWidth}
           setGutterWidth={setGutterWidth}
+          showSetupForm={showSetupForm}
           setShowSetupForm={setShowSetupForm}
           city={city}
           setCity={setCity}
@@ -259,122 +273,12 @@ const handleReplaceSection = (selectedSection) => {
           setDueDate={setDueDate}
           layoutType={layoutType}
           setLayoutType={setLayoutType}
+          saveLayout={saveLayout}
         />
       ) : (
-        <>
-                <Navbar>
-                  <CustomButton onClick={() => navigate("/signup")}>Sign up</CustomButton>
-                </Navbar>
-          <div className="workbench-container">
-      <WorkbenchActions
-        uploadCanvasImage={uploadCanvasImage}
-        saveLayout={saveLayout}
-        fetchAvailableLayouts={fetchAvailableLayouts}
-        toolMode={toolMode}
-        setToolMode={setToolMode}
-        zoomBy={zoomBy}
-        layoutTitle = {layoutTitle}
-        showLayoutList = {showLayoutList}
-        setShowLayoutList = {setShowLayoutList}
-        availableLayouts = {availableLayouts}
-        loadLayoutFromSelected = {loadLayoutFromSelected}
-        exportToCMYKPDF = {exportToCMYKPDF}
-        stageRef={stageRef}
-        fitStageToScreen = {fitStageToScreen}
-        setHideGrid={setHideGrid}
-        setHideBackground={setHideBackground}
-        transformerRef={transformerRef}
-        setSelectedId = {setSelectedId}
-        handleDeleteLayout = {handleDeleteLayout}
-        isDeleting = {isDeleting}
-        userID={userID} 
-        userProfilePic = {userProfilePic}
-        activeEditors = {activeEditors}
-      />
-     <WorkbenchCanvas
-  handleTransformEnd={handleTransformEnd}  
-  stageSize={stageSize}
-  stageScale={stageScale}
-  toolMode={toolMode}
-  handleWheel={handleWheel}
-  stageRef={stageRef}
-  items={items}
-  selectedId={selectedId}
-  setSelectedId={setSelectedId}
-  handleItemDragEnd={handleItemDragEnd}
-  cellWidth={cellWidth}
-  cellHeight={cellHeight}
-  gutterWidth={gutterWidth}
-  transformerRef={transformerRef}
-  setItems={setItems}
-  handleItemDragStart={handleItemDragStart}
-  handleItemDragMove={handleItemDragMove}
-  sections={sections}
-  setSectionId={setSectionId}
-  handleDragStart={handleDragStart}
-  handleDragEnd={handleDragEnd}
-  handleDragMove={handleDragMove}
-  sectionId={sectionId}
-  positionDisplay = {positionDisplay}
-        columns={columns}
-        rows={rows}
-        hideGrid={hideGrid}
-        hideBackground={hideBackground}
-        setSections = {setSections}
-        snapLines = {snapLines}
-/>
-    </div>
-          <Toolbox
-            itemSizes={itemSizes}
-            addBox={addBox}
-            addTextBox={addTextBox}
-            addImageItem={addImageItem}
-            handleImageUpload={handleImageUpload}
-            selectedId={selectedId}
-            items={items}
-            changeItemColor={changeItemColor}
-            deleteSelected={deleteSelected}
-            textFormatting={textFormatting}
-            toggleFormat={toggleFormat}
-            changeFontSize={changeFontSize}
-            handleTextChange={handleTextChange}
-            textValue={textValue}
-            setTextFormatting={setTextFormatting}
-            colors={colors}
-            gutterWidth={gutterWidth}
-            setGutterWidth={setGutterWidth}
-            availableLayouts={availableLayouts}
-            loadLayoutFromSelected={loadLayoutFromSelected}
-            showLayoutList={showLayoutList}
-            setShowLayoutList={setShowLayoutList}
-            cellWidth = {cellWidth}
-            cellHeight = {cellHeight}
-            addPredefineditem = {addPredefineditem}
-            addNewSection = {addNewSection}
-            sectionId = {sectionId}
-            addItemToSection = {addItemToSection}
-            sections = {sections}
-            setSections = {setSections}
-          taskStatus={taskStatus}
-          setTaskStatus={setTaskStatus}
-          changeFontFamily = {changeFontFamily}
-            openReplacementPanel={openReplacementPanel}
-            layoutType = {layoutType}
-            rows = {rows}
-            columns = {columns}            
-          />
-{showReplacementPanel && (
-  <LoadLayoutAndSection
-    availableLayouts={availableLayouts}
-    targetSection={sections.find(sec => sec.id === targetSectionIdForReplacement)}
-    onReplaceSection={handleReplaceSection}
-    setShowLayoutList={setShowReplacementPanel} // Used to close panel
-    mode="section" // Handles section replacement
-    selectedId = {selectedId}
-    sectionId = {sectionId}
-  />
-)}
-        </>
+        <div>
+          {LoadingState2()}
+        </div>
       )}
     </div>
   );
