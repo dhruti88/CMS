@@ -72,8 +72,10 @@ const Navbar = () => {
           ) : null
         ) : (
           <>
+          <CustomButton onClick={() => navigate("/home")}>Home</CustomButton>
             <CustomButton onClick={() => navigate("/mylayout")}>My Layouts</CustomButton>
             {/* Only call handleWorkbenchClick here */}
+            
             <CustomButton onClick={handleWorkbenchClick}>Workbench</CustomButton>
             <CustomButton onClick={() => navigate("/history")}>History</CustomButton>
             <ProfileMenu user={user} token={token} /> {/* Pass user and token to ProfileMenu */}

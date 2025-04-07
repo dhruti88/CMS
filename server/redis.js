@@ -97,3 +97,4 @@ export const testConnection = async () => {
 };
 
 export default redis;
+// export default redis;
