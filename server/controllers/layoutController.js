@@ -11,6 +11,7 @@ import { invalidateCache } from '../redis.js';
 
 
 function base64ToBuffer(dataURL) {
+  console.log("url : -",dataURL);
   const matches = dataURL.match(/^data:(.+);base64,(.+)$/);
   if (!matches || matches.length !== 3) {
     throw new Error('Invalid base64 image data');
@@ -33,16 +34,69 @@ export const saveLayout = async (req, res) => {
       duedate,
       status,
       stageImage, // base64 image from client
+      layoutID,
     } = req.body;
 
-    const imageData = stageImage ? base64ToBuffer(stageImage) : null;
+    // const imageData = stageImage ? base64ToBuffer(stageImage) : null;
 
-    let layout = await Layout.findOne({ userId, title });
+    // let layout = await Layout.findOne({ userId, title });
+    const imageData = stageImage ? base64ToBuffer(stageImage) : null;
+    let layout;
+    const layoutId = layoutID;// Use layoutID from body or query
+    console.log("layoutid  ------",layoutId);
+    if (layoutId) {
+      layout = await Layout.findById(layoutId);
+    }
+
+    // if (layout) {
+    //   layout.sections = sections;
+    //   layout.gridSettings = gridSettings;
+    //   layout.updatedAt = new Date();
+
+    //   if (imageData) {
+    //     layout.stageImage = {
+    //       data: imageData.buffer,
+    //       contentType: imageData.contentType,
+    //     };
+    //   }
+
+    //   await logLayoutAction(layout, 'updated', userId);
+    //   await layout.save();
+    // } else {
+    //   layout = new Layout({
+    //     userId,
+    //     title,
+    //     sections,
+    //     gridSettings,
+    //     layouttype,
+    //     city,
+    //     publishingdate: duedate,
+    //     taskstatus: status,
+    //     stageImage: imageData
+    //       ? {
+    //           data: imageData.buffer,
+    //           contentType: imageData.contentType,
+    //         }
+    //       : undefined,
+    //   });
+
+    //   await logLayoutAction(layout, 'created', userId);
+    //   await layout.save();
+    // }
 
     if (layout) {
+      // Update existing layout
       layout.sections = sections;
       layout.gridSettings = gridSettings;
       layout.updatedAt = new Date();
+      layout.title = title; // Update title in case it changed
+      layout.userId = userId; // This allows "transferring" the layout to another user
+
+      // Optionally update other fields if they're provided
+      if (layouttype) layout.layouttype = layouttype;
+      if (city) layout.city = city;
+      if (duedate) layout.publishingdate = duedate;
+      if (status) layout.taskstatus = status;
 
       if (imageData) {
         layout.stageImage = {
@@ -53,7 +107,10 @@ export const saveLayout = async (req, res) => {
 
       await logLayoutAction(layout, 'updated', userId);
       await layout.save();
-    } else {
+    } 
+    else 
+    {
+      // Create new layout
       layout = new Layout({
         userId,
         title,
@@ -221,3 +278,17 @@ export const uploadImage = (req, res) => {
         res.json({ message: 'File uploaded successfully', filePath: `/uploads/${req.file.filename}` });
     });
 };    
+
+
+export const getLayoutById = async (req, res) => {
+  try {
+    const layout = await Layout.findById(req.params.layoutId);
+    if (!layout) {
+      return res.status(404).json({ message: 'Layout not found' });
+    }
+    res.json(layout);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching layout', error: error.message });
+  }
+};
+

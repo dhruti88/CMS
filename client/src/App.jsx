@@ -6,6 +6,7 @@ import HomePage from "./components/pages/HomePage"; // Create this for the main 
 import LandingPage from './components/pages/LandingPage';
 import GridEditor from './components/pages/GridEditor';
 import WorkBench from './components/pages/WorkBench';
+import WorkPage from './components/pages/WorkPage';
 import ProtectedRoute from './hooks/ProtectedRoute';
 import PublicRoute from './hooks/PublicRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -13,7 +14,7 @@ import MyLayouts from './components/pages/MyLayouts'
 import LayoutHistory from './components/pages/LayoutHistory'
 import Navbar from './components/atoms/navbar/NavBar';
 import ErrorBoundary from './components/pages/ErrorBoundry';
-
+import { WorkbenchContext, WorkbenchProvider } from './context/WorkbenchContext';
 // function App() {
 //   return (
 //     <ErrorBoundary>
@@ -54,6 +55,7 @@ function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
+      <WorkbenchProvider>
         <Router>
           <Navbar />
           <Routes>
@@ -80,6 +82,15 @@ function App() {
               <ProtectedRoute>
                 <ErrorBoundary>
                   <WorkBench/>
+                </ErrorBoundary>
+              </ProtectedRoute>
+               }/>
+               <Route path="/page/:layoutid" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                 
+                  <WorkPage/>
+                
                 </ErrorBoundary>
               </ProtectedRoute>
                }/>
@@ -118,6 +129,7 @@ function App() {
                }/>
              </Routes>
            </Router>
+           </WorkbenchProvider>
          </AuthProvider>
        </ErrorBoundary>
      );

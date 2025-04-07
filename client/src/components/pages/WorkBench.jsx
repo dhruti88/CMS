@@ -6,9 +6,9 @@ import ErrorBoundary from './ErrorBoundry.jsx';
 const WorkBench = () => {
   return (
     // <ErrorBoundary>
-    <WorkbenchProvider>
+    // <WorkbenchProvider>
       <WorkbenchTemplate/>
-    </WorkbenchProvider>
+    // </WorkbenchProvider>
     // </ErrorBoundary>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Tooltip, IconButton, TextField } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import "./SectionReplacementPanel.css"; // Keep consistent styling
-
+import { useNavigate } from "react-router-dom";
 const LoadLayoutAndSection = ({ 
   availableLayouts, 
   targetSection, 
@@ -17,8 +17,9 @@ const LoadLayoutAndSection = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
-
+  const navigate = useNavigate(); 
   useEffect(() => {
+    
     if (!availableLayouts) return;
   
     if (mode === "section") {
@@ -73,6 +74,14 @@ const LoadLayoutAndSection = ({
     setShowLayoutList(false);
   };
 
+  const loadLayout=(item)=>
+  {
+   
+    
+    setTimeout(()=> navigate(`/page/${item._id}`),10);
+    loadLayoutFromSelected(item);
+  };
+
   return (
     <div className="replacement-panel-overlay" onClick={handleOverlayClick}>
       <div className="replacement-panel">
@@ -99,7 +108,7 @@ const LoadLayoutAndSection = ({
                 key={item._id || item.id}
                 className={`section-item ${selectedItem === item ? "selected" : ""}`}
                 onClick={() => setSelectedItem(item)}
-                onDoubleClick={() => (mode === "section" ? onReplaceSection(item) : loadLayoutFromSelected(item))}
+                onDoubleClick={() => (mode === "section" ? onReplaceSection(item) : loadLayout(item))}
                 role="button"
                 tabIndex={0}
               >
