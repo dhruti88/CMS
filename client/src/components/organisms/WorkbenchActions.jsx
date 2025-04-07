@@ -87,7 +87,6 @@ const WorkbenchActions = ({
   layoutType,
   setLayoutTitle,
 }) => {
-
   const handleExport = () => {
     setHideGrid(true);
     setHideBackground(true);
