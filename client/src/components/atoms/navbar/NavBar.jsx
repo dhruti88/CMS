@@ -47,10 +47,21 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <Typography variant="h4" fontWeight="bold" align="left">
-        <span className="text-black">Page</span>
-        <span style={{ color: colors.primary }}>Craft</span>
-      </Typography>
+  <Typography
+    variant="h4"
+    fontWeight="bold"
+    align="left"
+    onClick={() => navigate("/")}
+    sx={{
+      cursor: "pointer",
+      userSelect: "none",
+      display: "inline-block",
+    }}
+  >
+    <span style={{ color: "var(--text-color)" }}>Page</span>
+    <span style={{ color: colors.primary }}>Craft</span>
+  </Typography>
+
 
       <div className="nav-buttons">
         {!token ? (
@@ -61,6 +72,7 @@ const Navbar = () => {
           ) : null
         ) : (
           <>
+          <CustomButton onClick={() => navigate("/home")}>Home</CustomButton>
             <CustomButton onClick={() => navigate("/mylayout")}>My Layouts</CustomButton>
             {/* Only call handleWorkbenchClick here */}
             <CustomButton onClick={handleWorkbenchClick}>Workbench</CustomButton>

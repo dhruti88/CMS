@@ -19,9 +19,6 @@ import { CircularProgress, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 
-
-
-
 // Add styled component for the container
 const LoadingContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
