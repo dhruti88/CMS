@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import { useNavigate } from "react-router-dom";
 
 // const ydoc = new Y.Doc();
 // const provider = new WebsocketProvider('ws://localhost:1234', 'workbench-room', ydoc);
@@ -115,6 +116,9 @@ const layoutDocsManager = (() => {
 //---------------------------------------------------
 
 const useWorkbench = () => {
+
+
+  
   // Constants
   const defaultTitle = "default";
   const [showSetupForm, setShowSetupForm] = useState(true);
@@ -129,6 +133,7 @@ const useWorkbench = () => {
   const cellHeight = 50;
 
   const [userProfilePic, setUserProfilePic] = useState("");
+  const [CurrentLayout,setCurrentLayout] = useState("");
 // Fetch user info from the backend
   const fetchUser = async() =>
   {
@@ -154,6 +159,9 @@ const useWorkbench = () => {
   const [openModal, setOpenModal] = useState(false);
 
   const handleDeleteLayout = async (layout) => {
+    const confirmReload = window.confirm("Are you sure you want to delete the layout?");
+    if (!confirmReload) return; // Exit if the user cancels
+
       try {
         setIsDeleting(layout._id);
         
@@ -198,12 +206,15 @@ const useWorkbench = () => {
 
   const userId = userID;
   console.log("userId : -",userId);
-  
-
+  // const defaultTitle = "default";
 
 //city,dueDate,Status,layoutType
-const [city, setCity] = useState("Chicago");
-const [dueDate, setDueDate] = useState("");
+const [city, setCity] = useState("Pune");
+const [dueDate, setDueDate] = useState(() => {
+  const today = new Date().toISOString().split("T")[0]; 
+  return today;
+});
+
 const [taskStatus, setTaskStatus] = useState("Pending");
 const [layoutType, setLayoutType] = useState("Page");
 
@@ -815,9 +826,9 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
     const addSection = (size) => 
     {
       return {
-        id: 'section-' + Date.now(),  // Ensuring ID remains a string
-        type: 'section',
-        sectionType: 'section',
+        id: "section-" + Date.now(),
+        type: "section",
+        sectionType: "section",
         x: 0,
         y: 0,
         width: size.cols * cellWidth + (size.cols - 1) * gutterWidth,
@@ -830,7 +841,15 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
         gridX: 0,
         gridY: 0,
         items: [],
-      };
+        borderStyle: {
+          left: false,
+          right: false,
+          top: false,
+          bottom: false,
+        },
+        borderColor: colors.grays[2],      // default border color
+        borderWidth: 2,                    // default border width
+      }      
     };
   // Item addition function
   const addBox = (size) => {
@@ -851,6 +870,8 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
     };
   };
 
+  //add horizontal/vertical black lines:
+  
     // // Image upload handler
     // const handleImageUpload = (sectionId, e) => {
     //   console.log("image : -", e);
@@ -1181,13 +1202,55 @@ const [positionDisplay, setPositionDisplay] = useState({
   // Layout endpoints
   const saveLayout = async ({e=1}) => {
     console.log(taskStatus);
+  
     try {
-      const gridSettings = { columns, rows, gutterWidth };
+      // 1. Convert canvas to Base64
+      const stage = stageRef.current;
+      console.log("stage ",stage);
+   
+      // Initialize as let instead of const so we can reassign it
+    let dataURL = null;
+    
+    if(stage) {
+      try {
+        // Try to get dataURL with proper CORS settings
+        dataURL = stage.toDataURL({ 
+          pixelRatio: 2,
+          // Add these options to help with CORS issues
+          mimeType: 'image/png',
+          quality: 0.8
+        });
+      } catch (canvasError) {
+        console.warn("Failed to export canvas: ", canvasError);
+        // Continue without the image data if we can't get it
+        dataURL = null;
+      }
+    }
+     
+      const layoutID =localStorage.getItem('layoutid');
+      console.log("layoutID ms: - ",layoutID);
+      const layoutData = {
+        userId,
+        title: layoutTitle,
+        sections,
+        gridSettings: { columns, rows, gutterWidth },
+        layouttype: layoutType,
+        city,
+        duedate: dueDate,
+        status: taskStatus,
+        stageImage: dataURL, // base64 image
+        layoutID  ,
+      };
+  
       const response = await fetch(`${SERVER_URL}/api/layout`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' , 'Authorization': `Bearer ${token}`},
-        body: JSON.stringify({ userId, title: layoutTitle, sections, gridSettings, layouttype: layoutType, city : city, duedate : dueDate, status : taskStatus }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(layoutData),
       });
+  
       const data = await response.json();
       console.log('Layout saved successfully', data);
       if (!e) {
@@ -1199,7 +1262,7 @@ const [positionDisplay, setPositionDisplay] = useState({
           if (localStorage.getItem('layoutid') === data.layout._id) {
         console.log("LocalStorage set successfully");
           } else {
-        setTimeout(checkLocalStorage, 100); // Retry after 100ms
+        setTimeout(checkLocalStorage, 10); // Retry after 100ms
           }
         };
 
@@ -1209,6 +1272,7 @@ const [positionDisplay, setPositionDisplay] = useState({
       console.error('Error saving layout:', error);
     }
   };
+  
 
   const fetchAvailableLayouts = async () => {
     try {
@@ -1219,6 +1283,7 @@ const [positionDisplay, setPositionDisplay] = useState({
       if (response.ok) {
         console.log("Hii",response);
         const data = await response.json();
+       // console.log("data : - ",data.layouts, "city : - ",city);
         setAvailableLayouts(data.layouts);
         setShowLayoutList(true);
       } else {
@@ -1277,7 +1342,7 @@ const [positionDisplay, setPositionDisplay] = useState({
       id: 'text-' + Date.now(),
       type: 'text',
       x: 0,
-      y: 0,
+      y: 0-10,
       width: size.cols * cellWidth + (size.cols - 1) * gutterWidth,
       height: size.rows * cellHeight,
       text: 'Add your text here',
@@ -1287,7 +1352,6 @@ const [positionDisplay, setPositionDisplay] = useState({
       textDecoration: '',
       fill: colors.grays[0],
       align: 'left',
-      padding: 10,
       backgroundFill: 'white',
       draggable: true,
       sizeInfo: size,
@@ -1479,28 +1543,38 @@ const updateSections = (selectedId, sections, updateFn) => {
   }));
 };
 
-// Load layout function with proper sync
+
 const loadLayoutFromSelected = (layout) => {
+  
   if (layout.gridSettings && layout.gridSettings.gutterWidth !== undefined) {
     setColumns(layout.gridSettings.columns);
     setRows(layout.gridSettings.rows);
     setGutterWidth(layout.gridSettings.gutterWidth);
-    setLayoutType("Page");
   }
 
-  const recalculatedSections = layout.sections.map(section => ({
+  const recalculatedSections = layout.sections.map((section) => ({
     ...section,
-    x: section.gridX * cellWidth + (section.gridX * gutterWidth),
-    y: section.gridY * cellHeight 
+    x: section.gridX * cellWidth + section.gridX * layout.gridSettings.gutterWidth, 
+    y: section.gridY * cellHeight
   }));
 
   // Update sections and sync with Yjs in one go
   updateSectionsAndSync(recalculatedSections);
+  localStorage.setItem('layoutid', layout._id);
   setLayoutTitle(layout.title);
   setShowLayoutList(false);
   setShowSetupForm(false);
+
+  // Using functional updates to ensure correct state update
+  setCity(() => layout.city);
+  setDueDate(() => layout.publishingdate);
+  setLayoutType(() => layout.layouttype);
+
   console.log("Loaded layout:", layout);
+  
+
 };
+
 
 // Text change handler with proper sync
 const handleTextChange = (e) => {
@@ -1982,8 +2056,8 @@ const handleTransformEnd = (e) => {
   );
 
   // Compute new gridX, gridY inside section
-  const newGridX = Math.round((node.x() - section.x) / (cellWidth + gutterWidth));
-  const newGridY = Math.round((node.y() - section.y) / cellHeight);
+  const newGridX = Math.round((node.x()) / (cellWidth + gutterWidth));
+  const newGridY = Math.round((node.y()) / cellHeight);
 
   // Ensure grid position doesn't exceed section boundaries
   const maxGridX = (section.width - snappedWidth) / (cellWidth + gutterWidth);
@@ -2989,6 +3063,41 @@ const resetBoxPosition = (e, id, currentBox) => {
 //   setBoxes([...boxes, newBox]);
 //   setNewBoxContent('');
 // };
+
+const saveLayoutWithImage = async () => {
+  const stage = stageRef.current;
+  const dataURL = stage.toDataURL({ pixelRatio: 2 }); // or 3 for high-res
+  const response = await fetch(dataURL);
+  const imageBlob = await response.blob();
+
+  const formData = new FormData();
+  formData.append('image', imageBlob, 'stage.png');
+
+  formData.append(
+    'layoutData',
+    JSON.stringify({
+      userId,
+      title,
+      sections,
+      gridSettings,
+      layouttype,
+      city,
+      duedate,
+      status,
+    })
+  );
+
+  const res = await fetch(`${SERVER_URL}/api/layout/save`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+  console.log(data);
+};
 //=================================
 
 const [isLoading, setIsLoading] = useState(true);
@@ -3158,7 +3267,6 @@ return {
   exportToCMYKPDF,
     fitStageToScreen,
     fetchAvailableSections,
-  
     city,
     setCity,
     dueDate,
@@ -3185,6 +3293,8 @@ return {
     // setLayoutType,
     fetchLayoutById,
     LoadingState,
+    CurrentLayout,
+    setCurrentLayout,
 };
 
 

@@ -156,18 +156,22 @@ const WorkbenchTemplate = () => {
   } = workbenchProps;
 // Inside WorkbenchTemplate component (before the return)
 
+// useEffect
+// const layoutID =localStorage.getItem('layoutid');
 
 useEffect(() => {
-  if(!showSetupForm && localStorage.getItem('layoutid')){ {
+  if(!showSetupForm && localStorage.getItem('layoutid') ){ 
     // Fetch available layouts when the setup form is shown
     // fetchAvailableLayouts();
     console.log("sf",showSetupForm);
     const layoutid =  localStorage.getItem('layoutid');
-  
-    setTimeout(()=> navigate(`/page/${layoutid}`),1000);
 
-  }
-}});
+
+  
+    setTimeout(()=> navigate(`/page/${layoutid}`),100);
+
+  
+}} ,[showSetupForm, navigate, localStorage.getItem('layoutid')]);
 // useEffect(() => {
 //   let timeoutId;
   

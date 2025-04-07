@@ -425,6 +425,7 @@ const WorkbenchCanvas = ({
     { grays: ['#202124', '#3c4043', '#5f6368', '#dadce0', '#f1f3f4'] }
   );
 
+  const offset = (gutterWidth / 2);
   const PositionDisplay = ({ position }) => {
     if (!position.show) return null;
   
@@ -557,6 +558,43 @@ const WorkbenchCanvas = ({
                 />
             )}
 
+{/* Left Border (-5px) */}
+{section.borderStyle.left && (
+  <Line
+    points={[-offset, 0, -offset, section.height]}
+    stroke={section.borderColor || "black"}
+    strokeWidth={section.borderWidth || 2}
+  />
+)}
+
+{/* Right Border (+offsetpx) */}
+{section.borderStyle.right && (
+  <Line
+    points={[section.width + offset, 0, section.width + offset, section.height]}
+    stroke={section.borderColor || "black"}
+    strokeWidth={section.borderWidth || 2}
+  />
+)}
+
+{/* Top Border (Normal) */}
+{section.borderStyle.top && (
+  <Line
+    points={[0, 0, section.width, 0]}
+    stroke={section.borderColor || "black"}
+    strokeWidth={section.borderWidth || 2}
+  />
+)}
+
+{/* Bottom Border (Normal) */}
+{section.borderStyle.bottom && (
+  <Line
+    points={[0, section.height, section.width, section.height]}
+    stroke={section.borderColor || "black"}
+    strokeWidth={section.borderWidth || 2}
+  />
+)}
+
+
               {section.items.map((item) =>
                 item.type === "text" ? (
                   <Text
@@ -572,7 +610,7 @@ const WorkbenchCanvas = ({
                     fontFamily={item.fontFamily}
                     fill={item.fill}
                     align={item.align}
-                    padding={item.padding}
+                    // padding={item.padding}
                     textDecoration={item.textDecoration}
                     draggable
                     onClick={() => {

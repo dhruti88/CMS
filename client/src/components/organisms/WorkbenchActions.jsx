@@ -14,6 +14,7 @@ import '../../styles/WorkBench.css';
 import { bufferToBase64 } from '../molecules/imageUtils.jsx';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Badge from '@mui/material/Badge';
+import EditableTitle from '../molecules/EditableTitle.jsx';
 
 
 // Update the StyledAvatar component
@@ -83,6 +84,8 @@ const WorkbenchActions = ({
   userID,
   userProfilePic,
   activeEditors,
+  layoutType,
+  setLayoutTitle,
 }) => {
 
   const handleExport = () => {
@@ -95,8 +98,8 @@ const WorkbenchActions = ({
       setHideBackground(false);
     }, 1000);
   };
-  // Helper function to extract initials from a user ID string.
-  
+
+
   const formatUserDisplay = (userID) => {
     // First try to extract initials if there are spaces
     const initials = userID
@@ -116,18 +119,8 @@ const WorkbenchActions = ({
   const profileImageSrc = userProfilePic ? bufferToBase64(userProfilePic) : '/default-avatar.png';
   return (
     <div className="workbench-header">
-      {/* Title with better UI */}
-      <Typography
-        variant="h5"
-        sx={{
-          fontWeight: "bold",
-          color: "var(--primary-color)",
-          padding: "10px 0",
-          textAlign: "center",
-        }}
-      >
-        {layoutTitle}
-      </Typography>
+<EditableTitle layoutTitle={layoutTitle} setLayoutTitle = {setLayoutTitle} />
+
 
      
     {/* Add user info display with enhanced styling */}
@@ -220,6 +213,7 @@ const WorkbenchActions = ({
     setShowLayoutList={setShowLayoutList}
     isDeleting={isDeleting}
     mode="layout" // Handles layout selection
+    layoutType = {layoutType}
   />
 )}
 
