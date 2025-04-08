@@ -1,6 +1,16 @@
 {
   "dependencies": {
+    "react-responsive-carousel": "^3.2.23",
     "y-websocket": "^3.0.0",
     "y-websocket-server": "^1.0.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  },
+  "scripts": {
+    "start": "concurrently \"npm run client\" \"npm run server\" \"npm run yws\"",
+    "client": "npm --prefix client run dev",
+    "server": "npm --prefix server run dev",
+    "yws": "npx y-websocket --port 1234"
   }
 }

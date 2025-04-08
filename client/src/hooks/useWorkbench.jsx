@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useMemo , useCallback } from 'react';
-import { getCellDimensions } from '../utils/gridHelpers';
 import { saveAs } from "file-saver";
 import {SERVER_URL} from '../Urls';
 import axios from "axios";
@@ -9,33 +8,7 @@ import { useParams } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { useNavigate } from "react-router-dom";
 
-// const ydoc = new Y.Doc();
-// const provider = new WebsocketProvider('ws://localhost:1234', 'workbench-room', ydoc);
-// const ySections = ydoc.getArray('sections');
-
-// const ydoc = useMemo(() => new Y.Doc(), []);
-// const provider = useMemo(() => 
-//   new WebsocketProvider(
-//     'ws://localhost:1234', 
-//     'workbench-room', 
-//     ydoc,
-//     { connect: true }
-//   ),
-//   [ydoc]
-// );
-// const ySections = useMemo(() => ydoc.getArray('sections'), [ydoc]);
-// console.table("provider",provider);
-
-// // At the top of the file, outside the hook
-// const ydoc = new Y.Doc();
-// const wsProvider = new WebsocketProvider('ws://localhost:1234', 'workbench-room', ydoc);
-
-
-//----------------------------------------------------
-
-// Utility for managing Yjs documents and providers per layout
 // Utility for managing Yjs documents and providers per layout
 const layoutDocsManager = (() => {
   const activeDocuments = new Map();
@@ -117,8 +90,6 @@ const layoutDocsManager = (() => {
 
 const useWorkbench = () => {
 
-
-  
   // Constants
   const defaultTitle = "default";
   const [showSetupForm, setShowSetupForm] = useState(true);
@@ -128,12 +99,45 @@ const useWorkbench = () => {
   const [gutterWidth, setGutterWidth] = useState(10);
   const [userID, setUserID] = useState("60d21b4667d0d8992e610c85");
   const token =localStorage.getItem("token");
-  // Stage dimensions (minus toolbox width)
-  const cellWidth = 100;
-  const cellHeight = 50;
+ 
 
   const [userProfilePic, setUserProfilePic] = useState("");
   const [CurrentLayout,setCurrentLayout] = useState("");
+
+  const [isDeleting, setIsDeleting] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
+
+   // Workbench items and layout state
+  //const [items, setSections] = useState([]);
+  const [sections, setSections] = useState([]);
+  const [sectionId, setSectionId] = useState(''); // Ensure ID type matches
+  
+
+  
+  //city,dueDate,Status,layoutType
+const [city, setCity] = useState("Pune");
+const [dueDate, setDueDate] = useState(() => {
+  const today = new Date().toISOString().split("T")[0]; 
+  return today;
+});
+
+const [taskStatus, setTaskStatus] = useState("Pending");
+const [layoutType, setLayoutType] = useState("Page");
+
+//handle image download and pdf
+const [hideGrid, setHideGrid] = useState(false);          // State to control grid visibility
+const [hideBackground, setHideBackground] = useState(false);  // State to control background visibility
+
+
+  
+
+   // Stage dimensions (minus toolbox width)
+   const cellWidth = 100;
+   const cellHeight = 50;
+
+
+
+
 // Fetch user info from the backend
   const fetchUser = async() =>
   {
@@ -155,8 +159,7 @@ const useWorkbench = () => {
     }
   };
 
-  const [isDeleting, setIsDeleting] = useState(null);
-  const [openModal, setOpenModal] = useState(false);
+ 
 
   const handleDeleteLayout = async (layout) => {
     const confirmReload = window.confirm("Are you sure you want to delete the layout?");
@@ -206,415 +209,11 @@ const useWorkbench = () => {
 
   const userId = userID;
   console.log("userId : -",userId);
-  // const defaultTitle = "default";
-
-//city,dueDate,Status,layoutType
-const [city, setCity] = useState("Pune");
-const [dueDate, setDueDate] = useState(() => {
-  const today = new Date().toISOString().split("T")[0]; 
-  return today;
-});
-
-const [taskStatus, setTaskStatus] = useState("Pending");
-const [layoutType, setLayoutType] = useState("Page");
-
-//handle image download and pdf
-const [hideGrid, setHideGrid] = useState(false);          // State to control grid visibility
-const [hideBackground, setHideBackground] = useState(false);  // State to control background visibility
 
 
-  
-  // Setup & grid configuration
-
-
-  // Workbench items and layout state
-  //const [items, setSections] = useState([]);
-  const [sections, setSections] = useState([]);
-  const [sectionId, setSectionId] = useState(''); // Ensure ID type matches
-  
-  //  // Helper function: Sync local sections state to Yjs
-  //  const syncYjsSections = () => {
-  //   console.log("Syncing Yjs sections with local state:", sections);
-  //   ySections.delete(0, ySections.length);
-  //   sections.forEach(sec => ySections.push([sec]));
-  //   console.log("Yjs sections after sync:", ySections.toArray());
-  // };
-
-
-  // // ---------------------------
-  //   // Yjs Integration: Synchronization Helpers
-  //   // ---------------------------
-  //   // Observe remote changes in Yjs and update local sections state
-  //   useEffect(() => {
-  //     const updateLocalSections = (event) => {
-  //       console.log("Yjs sections updated:", event);
-  //       const remoteSections = ySections.toArray();
-  //       console.log("Remote sections received:", remoteSections);
-  //       setSections(remoteSections);
-  //     };
-  
-  //     ySections.observeDeep(updateLocalSections);
-  //     return () => {
-  //       ySections.unobserveDeep(updateLocalSections);
-  //     };
-  //   }, []);
-  //===============================================================
-
-  // State declarations
-//   const [isLocalUpdate, setIsLocalUpdate] = useState(false);
-//   const [isInitialized, setIsInitialized] = useState(false);
-  
-//   const [activeEditors, setActiveEditors] = useState([]);
-//   // Get the shared map from Yjs
-//   // Add active users count state
-// const [activeUsersCount, setActiveUsersCount] = useState(0);
-//   const ySectionsMap = useMemo(() => ydoc.getMap('sections'), []);
-
-//   // Initialize WebSocket provider with proper error handling
-//   useEffect(() => {
-//     const handleSync = (isSynced) => {
-//       try {
-//         if (isSynced && !isInitialized) {
-//           // Get initial data from Yjs
-//           const existingSections = Array.from(ySectionsMap.entries()).map(([_, value]) => {
-//             try {
-//               return typeof value === 'string' ? JSON.parse(value) : value;
-//             } catch (error) {
-//               console.error('Error parsing section:', error);
-//               return null;
-//             }
-//           }).filter(Boolean);
-
-//           if (existingSections.length > 0) {
-//             setSections(existingSections);
-//             console.log('Initial sections loaded:', existingSections);
-//           }
-//           setIsInitialized(true);
-//         }
-//       } catch (error) {
-//         console.error('Sync error:', error);
-//       }
-//     };
-//     // Check immediately if already synced
-//   if (wsProvider.synced && !isInitialized) {
-//     handleSync(true);
-//   }
-//     wsProvider.on('sync', handleSync);
-    
-//     // Error handling
-//     wsProvider.on('connection-error', (error) => {
-//       console.error('WebSocket connection error:', error);
-//     });
-
-//     return () => {
-//       wsProvider.off('sync', handleSync);
-//     };
-//   }, [ySectionsMap]);
-
-
-//    // Sync function to update Yjs when local changes occur
-//    const syncToYjs = useCallback((updatedSections) => {
-//     // console.log("ms:",updatedSections);
-    
-//     // if (!isInitialized) {
-//     // handleSync(true);
-//     // console.log("ms0:",updatedSections);
-//     // }
-
-//     console.log("m1:",updatedSections);
-//     try {
-//       setIsLocalUpdate(true);
-//       ydoc.transact(() => {
-//         // Clear existing data
-//         ySectionsMap.clear();
-        
-//         // Add updated sections
-//         updatedSections.forEach(section => {
-//           const sectionWithPositions = {
-//             ...section,
-//             x: section.gridX * (cellWidth + gutterWidth),
-//             y: section.gridY * cellHeight,
-//             items: section.items?.map(item => ({
-//               ...item,
-//               x: item.gridX * (cellWidth + gutterWidth),
-//               y: item.gridY * cellHeight
-//             })) || []
-//           };
-//           ySectionsMap.set(section.id, JSON.stringify(sectionWithPositions));
-//         });
-//       });
-//     } catch (error) {
-//       console.error('Error syncing to Yjs:', error);
-//     } finally {
-//       setIsLocalUpdate(false);
-//     }
-//   }, [ySectionsMap, isInitialized, cellWidth, cellHeight, gutterWidth]);
-
-
-//   // Add awareness to Yjs
-//   useEffect(() => {
-//     if (!wsProvider) return;
-
-//     const awareness = wsProvider.awareness;
-
-//     // Set local user state
-//     awareness.setLocalState({
-//       user: {
-//         id: userID,
-//         profilePic: userProfilePic,
-//         name: userID // You can add more user info here
-//       }
-//     });
-
-//     // Handle awareness changes
-//     const handleChange = () => {
-//       const states = Array.from(awareness.getStates());
-//       const editors = states
-//         .map(([clientId, state]) => state.user)
-//         .filter(Boolean);
-//       setActiveEditors(editors);
-//     };
-
-//     awareness.on('change', handleChange);
-//     return () => awareness.off('change', handleChange);
-//   }, [wsProvider, userID, userProfilePic]);
-
-
-
-//   // Listen for remote changes
-//   useEffect(() => {
-
-//   //    // Check immediately if already synced
-//   // if (wsProvider.synced && !isInitialized) {
-//   //   handleSync(true);
-//   // }
-
-
-//     const handleYjsUpdate = () => {
-//       if (isLocalUpdate) return;
-
-//       try {
-//         const remoteSections = Array.from(ySectionsMap.entries()).map(([_, value]) => {
-//           try {
-//             const section = typeof value === 'string' ? JSON.parse(value) : value;
-//             return {
-//               ...section,
-//               items: section.items?.map(item => ({
-//                 ...item,
-//                 x: item.gridX * (cellWidth + gutterWidth),
-//                 y: item.gridY * cellHeight
-//               })) || []
-//             };
-//           } catch (error) {
-//             console.error('Error parsing remote section:', error);
-//             return null;
-//           }
-//         }).filter(Boolean);
-
-//         if (remoteSections.length > 0) {
-//           setSections(remoteSections);
-//         }
-//       } catch (error) {
-//         console.error('Error processing remote update:', error);
-//       }
-//     };
-
-//     ySectionsMap.observe(handleYjsUpdate);
-//     return () => ySectionsMap.unobserve(handleYjsUpdate);
-//   }, [ySectionsMap, isLocalUpdate, cellWidth, cellHeight, gutterWidth]);
-
-//   // Update all functions that modify sections to use syncToYjs
-//   const updateSectionsAndSync = useCallback((newSections) => {
-//     setSections(newSections);
-    
-//     syncToYjs(newSections);
-  
-//   }, [syncToYjs]);
-//   //====================================================================
 
  
-//   // State declarations
-//   const [isLocalUpdate, setIsLocalUpdate] = useState(false);
-//   const [isInitialized, setIsInitialized] = useState(false);
-  
-//   const [activeEditors, setActiveEditors] = useState([]);
-//   // Get the shared map from Yjs
-//   // Add active users count state
-// const [activeUsersCount, setActiveUsersCount] = useState(0);
-//   const ySectionsMap = useMemo(() => ydoc.getMap('sections'), []);
 
-//   // Initialize WebSocket provider with proper error handling
-//   useEffect(() => {
-//     const handleSync = (isSynced) => {
-//       try {
-//         if (isSynced && !isInitialized) {
-//           // Get initial data from Yjs
-//           const existingSections = Array.from(ySectionsMap.entries()).map(([_, value]) => {
-//             try {
-//               return typeof value === 'string' ? JSON.parse(value) : value;
-//             } catch (error) {
-//               console.error('Error parsing section:', error);
-//               return null;
-//             }
-//           }).filter(Boolean);
-
-//           if (existingSections.length > 0) {
-//             setSections(existingSections);
-//             console.log('Initial sections loaded:', existingSections);
-//           }
-//           setIsInitialized(true);
-//         }
-//       } catch (error) {
-//         console.error('Sync error:', error);
-//       }
-//     };
-//     // Check immediately if already synced
-//   if (wsProvider.synced && !isInitialized) {
-//     handleSync(true);
-//   }
-//     wsProvider.on('sync', handleSync);
-    
-//     // Error handling
-//     wsProvider.on('connection-error', (error) => {
-//       console.error('WebSocket connection error:', error);
-//     });
-
-//     return () => {
-//       wsProvider.off('sync', handleSync);
-//     };
-//   }, [ySectionsMap]);
-
-
-//    // Sync function to update Yjs when local changes occur
-//    const syncToYjs = useCallback((updatedSections) => {
-//     // console.log("ms:",updatedSections);
-    
-//     // if (!isInitialized) {
-//     // handleSync(true);
-//     // console.log("ms0:",updatedSections);
-//     // }
-
-//     console.log("m1:",updatedSections);
-//     try {
-//       setIsLocalUpdate(true);
-//       ydoc.transact(() => {
-//         // Clear existing data
-//         ySectionsMap.clear();
-        
-//         // Add updated sections
-//         updatedSections.forEach(section => {
-//           const sectionWithPositions = {
-//             ...section,
-//             x: section.gridX * (cellWidth + gutterWidth),
-//             y: section.gridY * cellHeight,
-//             items: section.items?.map(item => ({
-//               ...item,
-//               x: item.gridX * (cellWidth + gutterWidth),
-//               y: item.gridY * cellHeight
-//             })) || []
-//           };
-//           ySectionsMap.set(section.id, JSON.stringify(sectionWithPositions));
-//         });
-//       });
-//     } catch (error) {
-//       console.error('Error syncing to Yjs:', error);
-//     } finally {
-//       setIsLocalUpdate(false);
-//     }
-//   }, [ySectionsMap, isInitialized, cellWidth, cellHeight, gutterWidth]);
-
-
-//   // Add awareness to Yjs
-//   useEffect(() => {
-//     if (!wsProvider) return;
-
-//     const awareness = wsProvider.awareness;
-
-//     // Set local user state
-//     awareness.setLocalState({
-//       user: {
-//         id: userID,
-//         profilePic: userProfilePic,
-//         name: userID // You can add more user info here
-//       }
-//     });
-
-//     // Handle awareness changes
-//     const handleChange = () => {
-//       const states = Array.from(awareness.getStates());
-//       const editors = states
-//         .map(([clientId, state]) => state.user)
-//         .filter(Boolean);
-//       setActiveEditors(editors);
-//     };
-
-//     awareness.on('change', handleChange);
-//     return () => awareness.off('change', handleChange);
-//   }, [wsProvider, userID, userProfilePic]);
-
-
-
-//   // Listen for remote changes
-//   useEffect(() => {
-
-//   //    // Check immediately if already synced
-//   // if (wsProvider.synced && !isInitialized) {
-//   //   handleSync(true);
-//   // }
-
-
-//     const handleYjsUpdate = () => {
-//       if (isLocalUpdate) return;
-
-//       try {
-//         const remoteSections = Array.from(ySectionsMap.entries()).map(([_, value]) => {
-//           try {
-//             const section = typeof value === 'string' ? JSON.parse(value) : value;
-//             return {
-//               ...section,
-//               items: section.items?.map(item => ({
-//                 ...item,
-//                 x: item.gridX * (cellWidth + gutterWidth),
-//                 y: item.gridY * cellHeight
-//               })) || []
-//             };
-//           } catch (error) {
-//             console.error('Error parsing remote section:', error);
-//             return null;
-//           }
-//         }).filter(Boolean);
-
-//         if (remoteSections.length > 0) {
-//           setSections(remoteSections);
-//         }
-//       } catch (error) {
-//         console.error('Error processing remote update:', error);
-//       }
-//     };
-
-//     ySectionsMap.observe(handleYjsUpdate);
-//     return () => ySectionsMap.unobserve(handleYjsUpdate);
-//   }, [ySectionsMap, isLocalUpdate, cellWidth, cellHeight, gutterWidth]);
-
-//   // Update all functions that modify sections to use syncToYjs
-//   const updateSectionsAndSync = useCallback((newSections) => {
-//     setSections(newSections);
-    
-//     syncToYjs(newSections);
-  
-//   }, [syncToYjs]);
-
-
-
-
-
-//   //=====================================================================
-
-//-----------------------------------------------------------
-  // Yjs document and provider
-
-
-   // State declarations
    const [isLocalUpdate, setIsLocalUpdate] = useState(false);
    const [isInitialized, setIsInitialized] = useState(false);
    const [activeEditors, setActiveEditors] = useState([]);
@@ -870,53 +469,7 @@ const [hideBackground, setHideBackground] = useState(false);  // State to contro
     };
   };
 
-  //add horizontal/vertical black lines:
-  
-    // // Image upload handler
-    // const handleImageUpload = (sectionId, e) => {
-    //   console.log("image : -", e);
-    //   const file = e.target.files[0];
-    
-    //   if (file) {
-    //     const reader = new FileReader();
-    //     reader.onloadend = () => {
-    //       const base64data = reader.result;
-    //       const defaultSize = { cols: 2, rows: 2, label: '2×2' };
-    //       const imageItem = addImageItem(defaultSize);
-    //       imageItem.src = base64data; // Set uploaded image source
-    
-    //       setSections(prevSections =>
-    //         prevSections.map(section => {
-    //           if (section.id !== sectionId) return section; // Skip if not the correct section
-    
-    //           // Check available space before adding the image
-    //           const bestPosition = findBestPositionForItem(imageItem, section.items, section.sizeInfo);
-    //           if (!bestPosition) {
-    //             alert("No space available in section!");
-    //             return section;
-    //           }
-    
-    //           // Assign correct position before adding the image
-    //           imageItem.gridX = bestPosition.gridX;
-    //           imageItem.gridY = bestPosition.gridY;
-    //           imageItem.x = imageItem.gridX * (cellWidth + gutterWidth);
-    //           imageItem.y = imageItem.gridY * cellHeight;
-    
-    //           return { ...section, items: [...section.items, imageItem] };
-    //         })
-    //       );
-    
-    //       setSelectedId(imageItem.id);
-
-    //       // Sync to Yjs
-    //      // Only sync after state update is complete
-    // syncYjsSections()
-    //     };
-    
-    //     reader.readAsDataURL(file);
-    //   }
-    // };
-    
+ 
     const handleImageUpload = (sectionId, e) => {
       console.log("image : -", e);
       const file = e.target.files[0];
@@ -972,74 +525,6 @@ const [positionDisplay, setPositionDisplay] = useState({
   isSection: false
 });
 
-    // const addItemToSection = (sectionId, size, type, e = null) => {
-    //   let newItem;
-    
-    //   if (type === "text") {
-    //     newItem = addTextBox(size);
-    //   } else {
-    //     newItem = addImageItem(size);
-    //   }
-    
-    //   setSections(prevSections =>
-    //     prevSections.map(section => {
-    //       if (section.id !== sectionId) return section; // Skip if not the target section
-    
-    //       const bestPosition = findBestPositionForItem(newItem, section.items, section.sizeInfo);
-    
-    //       if (!bestPosition) {
-    //         alert('No space available in section!');
-    //         return section;
-    //       }
-    
-    //       // Assign position
-    //       newItem = {
-    //         ...newItem,
-    //         gridX: bestPosition.gridX,
-    //         gridY: bestPosition.gridY,
-    //         x: bestPosition.gridX * (cellWidth + gutterWidth),
-    //         y: bestPosition.gridY * cellHeight,
-    //       };
-    
-    //       return { ...section, items: [...section.items, newItem] };
-    //     })
-    //   );
-    
-    //   setSelectedId(newItem.id);
-    //   // Sync to Yjs
-    //    // Only sync after state update is complete
-    // syncYjsSections()
-    // };
-    
-  
-    // const addNewSection = (size) => {
-    //   // if (!newBoxContent && newBoxType === 'text') {
-    //   //   alert('Please enter text content for the new box');
-    //   //   return;
-    //   // }
-    //   const newSection = addSection(size)
-    
-    //   const position = findBestPositionForBox(newSection, sections, columns, rows);
-    //   if (!position) {
-    //     alert('No space available for new box');
-    //     return;
-    //   }
-    //   console.log("position: - ",position);
-    //   newSection.gridX = position.gridX;
-    //   newSection.gridY = position.gridY;
-    //   newSection.x = newSection.gridX * cellWidth + (newSection.gridX) * gutterWidth;
-    //   newSection.y = newSection.gridY * cellHeight;
-    //   setSections(prev => [...prev, newSection]);
-    //   setSelectedId(newSection.id);
-    //   setSectionId(newSection.id);
-    //   // Sync to Yjs
-    //    // Only sync after state update is complete
-    // syncYjsSections()
-    // };
-  
-  
-  // Debugging useEffect to log sections when they change
- 
   const addItemToSection = (sectionId, size, type, e = null) => {
     let newItem;
   
@@ -1312,31 +797,7 @@ const [positionDisplay, setPositionDisplay] = useState({
     }
   };
 
-//   const loadLayoutFromSelected = (layout) => {
-//     if (layout.gridSettings && layout.gridSettings.gutterWidth !== undefined) {
-//       setColumns(layout.gridSettings.columns);
-//       setRows(layout.gridSettings.rows);
-//       setGutterWidth(layout.gridSettings.gutterWidth);
-//     }
-//     const recalculatedSections = layout.sections.map(section => ({
-//       ...section,
-//       x: section.gridX * cellWidth + (section.gridX * gutterWidth),
-//       y: section.gridY * cellHeight 
-//     }));
 
-//     setSections(recalculatedSections);
-//     console.log("Sections array:", layout.sections);
-//     setLayoutTitle(layout.title);
-//     setShowLayoutList(false);
-//     setShowSetupForm(false);
-// //changes
-//      // Only sync after state update is complete
-//     syncYjsSections()
-//     console.log("Loaded layout:", layout);
-//     console.log("Yjs synced:", ySections.toArray());
-//   };
-
-  
   const addTextBox = (size) => {
     return {
       id: 'text-' + Date.now(),
@@ -1375,164 +836,8 @@ const [positionDisplay, setPositionDisplay] = useState({
       gridY: 0
     };
   };
-  
 
-  
-// // Helper function to update sections
-// const updateSections = (selectedId, sections, updateFn) => {
-//   //yjs
-//    // Only sync after state update is complete
-//     syncYjsSections()
-//   return sections.map(section => ({
-//     ...section,
-//     items: section.items.map(item => 
-//       item.id === selectedId && item.type === 'text'
-//         ? updateFn(item)
-//         : item
-//     )
-      
-//   }));
-
-
-// };
-
-// // Text change handler for text boxes
-// const handleTextChange = (e) => {
-//   const newText = e.target.value;
-//   setTextValue(newText);
-
-//   if (selectedId) {
-//     setSections(prevSections => updateSections(selectedId, prevSections, item => ({
-//       ...item,
-//       text: newText
-//     })));
-//     //yjs
-//    // Only sync after state update is complete
-//     syncYjsSections()
-//   }
-// };
-
-// // Toggle text formatting
-// const toggleFormat = (format) => {
-//   if (format === 'align') {
-//     const alignments = ['left', 'center', 'right'];
-//     const currentIndex = alignments.indexOf(textFormatting.align);
-//     const nextIndex = (currentIndex + 1) % alignments.length;
-
-//     setTextFormatting(prev => ({ ...prev, align: alignments[nextIndex] }));
-
-//     if (selectedId) {
-//       setSections(prevSections => updateSections(selectedId, prevSections, item => ({
-//         ...item,
-//         align: alignments[nextIndex]
-//       })));
-//       //yjs
-//    // Only sync after state update is complete
-//     syncYjsSections()
-//     }
-//     return;
-//   }
-//   setTextFormatting(prev => {
-//     const updated = { ...prev, [format]: !prev[format] };
-
-//     if (selectedId) {
-//       setSections(prevSections => updateSections(selectedId, prevSections, item => {
-//         const fontStyle = [
-//           updated.bold ? 'bold' : '',
-//           updated.italic ? 'italic' : ''
-//         ].join(' ').trim();
-
-//         const textDecoration = updated.underline ? 'underline' : '';
-
-//         return { ...item, fontStyle, textDecoration };
-//       }));
-//       //yjs
-//    // Only sync after state update is complete
-//     syncYjsSections()
-//     }
-
-//     return updated;
-//   });
-// };
-
-//   // Change font family handler
-//   const changeFontFamily = (newFont) => {
-//     setTextFormatting(prev => {
-//       const updated = { ...prev, fontFamily: newFont };
-  
-//       if (selectedId) {
-//         setSections(prevSections => updateSections(selectedId, prevSections, item => ({
-//           ...item,
-//           fontFamily: newFont
-//         })));
-//         //yjs
-//    // Only sync after state update is complete
-//     syncYjsSections()
-//       }
-  
-//       return updated;
-//     });
-//   };
-
-// // Change font size handler
-// const changeFontSize = (change) => {
-//   setTextFormatting(prev => {
-//     const newSize = Math.max(8, Math.min(72, prev.fontSize + change));
-//     const updated = { ...prev, fontSize: newSize };
-
-//     if (selectedId) {
-//       setSections(prevSections => updateSections(selectedId, prevSections, item => ({
-//         ...item,
-//         fontSize: newSize
-//       })));
-//       //yjs
-//    // Only sync after state update is complete
-//     syncYjsSections()
-//     }
-
-//     return updated;
-//   });
-// };
-
-// // Change color for selected item
-// const changeItemColor = (color) => {
-//   if (selectedId) {
-//     setSections(prevSections => updateSections(selectedId, prevSections, item => ({
-//       ...item,
-//       fill: color
-//     })));
-//     //yjs
-//    // Only sync after state update is complete
-//     syncYjsSections()
-//   }
-// };
-
-// // Delete selected section or item
-// const deleteSelected = () => {
-//   if (!selectedId) return;
-
-//   setSections(prevSections => 
-//     prevSections
-//       .map(section => {
-//         if (section.id === selectedId) return null; // Remove section
-//         return { ...section, items: section.items.filter(item => item.id !== selectedId) }; // Filter out item
-//       })
-//       .filter(Boolean) // Remove null values (deleted sections)
-//   );
-
-//   setSelectedId(null);
-//   //yjs
-//    // Only sync after state update is complete
-//     syncYjsSections()
-// };
-
-
-
-  // Convert dataURL to Blob
-  
-
-  // Helper function to update sections with proper Yjs sync
-const updateSections = (selectedId, sections, updateFn) => {
+  const updateSections = (selectedId, sections, updateFn) => {
   return sections.map(section => ({
     ...section,
     items: section.items.map(item => 
@@ -1833,212 +1138,6 @@ const deleteSelected = () => {
     return { snappedWidth, snappedHeight, colSpan, rowSpan };
   };
 
-
-
-// Transformer onTransformEnd handler
-// const handleTransformEnd = (e) => {
-//   console.log("end : - ");
-//   const node = e.target;
-//   if (!selectedId || !sectionId) return;
-
-//   const section = sections.find(sec => sec.id === sectionId);
-//   if (!section) return;
-
-//   const { snappedWidth, snappedHeight, colSpan, rowSpan } = handleTransformEndHelper(
-//     node,
-//     cellWidth,
-//     gutterWidth,
-//     cellHeight,
-//     stageSize
-//   );
-
-//   // Compute new gridX, gridY inside section
-//   const newGridX = Math.round((node.x() - section.x) / (cellWidth + gutterWidth));
-//   const newGridY = Math.round((node.y() - section.y) / cellHeight);
-
-//   // Ensure grid position doesn't exceed section boundaries
-//   const maxGridX = (section.width - snappedWidth) / (cellWidth + gutterWidth);
-//   const maxGridY = (section.height - snappedHeight) / cellHeight;
-
-//   setSections(prevSections =>
-//     prevSections.map(sec =>
-//       sec.id === sectionId
-//         ? {
-//             ...sec,
-//             items: sec.items.map(item =>
-//               item.id === selectedId
-//                 ? {
-//                     ...item,
-//                     width: snappedWidth,
-//                     height: snappedHeight,
-//                     gridX: Math.max(0, Math.min(maxGridX, newGridX)),
-//                     gridY: Math.max(0, Math.min(maxGridY, newGridY)),
-//                     sizeInfo: { cols: colSpan, rows: rowSpan },
-//                   }
-//                 : item
-//             ),
-//           }
-//         : sec
-//     )
-//   );
-// // Sync to Yjs
-//  // Only sync after state update is complete
-//     syncYjsSections()
-//   // Reset transformation
-//   node.scaleX(1);
-//   node.scaleY(1);
-// };
-
-// const handleTransformEnd = (e) => {
-//   console.log("Transform end");
-//   const node = e.target;
-//   if (!selectedId || !sectionId) return;
-
-//   const section = sections.find(sec => sec.id === sectionId);
-//   if (!section) return;
-
-//   const { snappedWidth, snappedHeight, colSpan, rowSpan } = handleTransformEndHelper(
-//     node,
-//     cellWidth,
-//     gutterWidth,
-//     cellHeight,
-//     stageSize
-//   );
-
-//   // Compute new gridX, gridY inside section
-//   const newGridX = Math.round((node.x() - section.x) / (cellWidth + gutterWidth));
-//   const newGridY = Math.round((node.y() - section.y) / cellHeight);
-
-//   // Ensure grid position doesn't exceed section boundaries
-//   const maxGridX = (section.width - snappedWidth) / (cellWidth + gutterWidth);
-//   const maxGridY = (section.height - snappedHeight) / cellHeight;
-
-//   // Create updated sections array
-//   const updatedSections = sections.map(sec =>
-//     sec.id === sectionId
-//       ? {
-//           ...sec,
-//           items: sec.items.map(item =>
-//             item.id === selectedId
-//               ? {
-//                   ...item,
-//                   width: snappedWidth,
-//                   height: snappedHeight,
-//                   gridX: Math.max(0, Math.min(maxGridX, newGridX)),
-//                   gridY: Math.max(0, Math.min(maxGridY, newGridY)),
-//                   sizeInfo: { cols: colSpan, rows: rowSpan },
-//                 }
-//               : item
-//           ),
-//         }
-//       : sec
-//   );
-
-//   // Update sections and sync with Yjs in one go
-//   // updateSectionsAndSync(updatedSections);
-//   setTimeout(() => {
-//     updateSectionsAndSync(updatedSections);
-// }, 0);
-//   // Reset transformation
-//   node.scaleX(1);
-//   node.scaleY(1);
-// };
-
-
-// const handleTransformEnd = (e) => {
-//   console.log("Transform end");
-//   const node = e.target;
-//   if (!selectedId || !sectionId) return;
-
-//   const section = sections.find(sec => sec.id === sectionId);
-//   if (!section) return;
-
-//   const { snappedWidth, snappedHeight, colSpan, rowSpan } = handleTransformEndHelper(
-//     node,
-//     cellWidth,
-//     gutterWidth,
-//     cellHeight,
-//     stageSize
-//   );
-
-//   // Get absolute position of the node
-//   const absoluteX = node.x();
-//   const absoluteY = node.y();
-
-//   // Calculate gridX and gridY directly based on absolute positions
-//   // This is the key change - using absolute values instead of calculating relative to section
-//   const gridX = Math.round(absoluteX / (cellWidth + gutterWidth));
-//   const gridY = Math.round(absoluteY / cellHeight);
-
-//   // Calculate section's grid position
-//   const sectionGridX = Math.round(section.x / (cellWidth + gutterWidth));
-//   const sectionGridY = Math.round(section.y / cellHeight);
-
-//   // Calculate item's position relative to section in grid coordinates
-//   const relativeGridX = gridX - sectionGridX;
-//   const relativeGridY = gridY - sectionGridY;
-
-//   // Calculate max allowed positions to ensure item stays within section boundaries
-//   const sectionWidthInCells = Math.floor(section.width / (cellWidth + gutterWidth));
-//   const sectionHeightInCells = Math.floor(section.height / cellHeight);
-  
-//   const itemWidthInCells = Math.ceil(snappedWidth / (cellWidth + gutterWidth));
-//   const itemHeightInCells = Math.ceil(snappedHeight / cellHeight);
-  
-//   const maxGridX = Math.max(0, sectionWidthInCells - itemWidthInCells);
-//   const maxGridY = Math.max(0, sectionHeightInCells - itemHeightInCells);
-
-//   // Ensure grid position is within bounds
-//   const boundedGridX = Math.max(0, Math.min(maxGridX, relativeGridX));
-//   const boundedGridY = Math.max(0, Math.min(maxGridY, relativeGridY));
-
-//   console.log("Transform calculations:", {
-//     absoluteX, 
-//     absoluteY,
-//     gridX, 
-//     gridY,
-//     sectionGridX,
-//     sectionGridY,
-//     relativeGridX,
-//     relativeGridY,
-//     boundedGridX,
-//     boundedGridY,
-//     sectionWidthInCells,
-//     itemWidthInCells
-//   });
-
-//   // Create updated sections array
-//   const updatedSections = sections.map(sec =>
-//     sec.id === sectionId
-//       ? {
-//           ...sec,
-//           items: sec.items.map(item =>
-//             item.id === selectedId
-//               ? {
-//                   ...item,
-//                   width: snappedWidth,
-//                   height: snappedHeight,
-//                   gridX: boundedGridX,  // Use bounded values
-//                   gridY: boundedGridY,
-//                   sizeInfo: { cols: colSpan, rows: rowSpan },
-//                 }
-//               : item
-//           ),
-//         }
-//       : sec
-//   );
-
-//   // Update sections and sync with Yjs
-//   // Using setTimeout to ensure the UI updates properly before syncing
-//   setTimeout(() => {
-//     updateSectionsAndSync(updatedSections);
-//   }, 0);
-
-//   // Reset transformation
-//   node.scaleX(1);
-//   node.scaleY(1);
-// };
-
 const handleTransformEnd = (e) => {
   console.log("Transform end");
   const node = e.target;
@@ -2216,44 +1315,6 @@ const findBestPositionForBox = (item, fixedItems, columns, rows, originalPositio
   return possiblePositions.length > 0 ? possiblePositions[0] : null;
 };
 
-
-
-
-// // addBox function for predefined sizes
-// const addPredefineditem = (size,type) => {
-//   // if (!newBoxContent && newBoxType === 'text') {
-//   //   alert('Please enter text content for the new box');
-//   //   return;
-//   // }
-//   let newItem;
-//   if(type == "box")
-//   newItem = addBox(size);
-//   else if(type == "text")
-//   newItem = addTextBox(size);
-//   else
-//   newItem = addImageItem(size);
-
-//   const position = findBestPositionForBox(newItem, items, columns, rows);
-//   if (!position) {
-//     alert('No space available for new box');
-//     return;
-//   }
-//   console.log("position: - ",position);
-//   newItem.gridX = position.gridX;
-//   newItem.gridY = position.gridY;
-//   newItem.x = newItem.gridX * cellWidth + (newItem.gridX) * gutterWidth;
-//   newItem.y = newItem.gridY * cellHeight;
-//   setSections(prev => [...prev, newItem]);
-//   setSelectedId(newItem.id);
-//   //yjs
-//    // Only sync after state update is complete
-//     syncYjsSections()
-  
-// };
-
-
-// Cascade reposition all boxes that would be displaced
-
 const addPredefinedItem = (size, type) => {
   // Create new item based on type
   let newItem;
@@ -2407,59 +1468,6 @@ const resetItemPosition = (e, id, currentItem) => {
   }
 };
 
-// // Handle item drag inside a section
-// const handleItemDragEnd = (e, itemId, sectionId) => {
-//   setSections(prevSections =>
-//     prevSections.map(section => {
-//       if (section.id !== sectionId) return section; // Ignore other sections
-
-//       const currentItem = section.items.find(item => item.id === itemId);
-//       if (!currentItem || !dragPreviewPosition) {
-//         resetDragState();
-//         return section;
-//       }
-
-//       const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
-//       if (newGridX === currentItem.gridX && newGridY === currentItem.gridY) {
-//         resetDragState();
-//         return section;
-//       }
-
-//       // Reposition items inside the section
-//       const repositionResult = repositionItemsInSection(currentItem, { gridX: newGridX, gridY: newGridY }, section);
-      
-//       if (repositionResult.success) {
-//         return {
-//           ...section,
-//           items: section.items.map(item =>
-//             repositionResult.newPositions[item.id]
-//               ? {
-//                   ...item,
-//                   gridX: repositionResult.newPositions[item.id].gridX,
-//                   gridY: repositionResult.newPositions[item.id].gridY,
-//                   x: repositionResult.newPositions[item.id].gridX * (cellWidth + gutterWidth),
-//                   y: repositionResult.newPositions[item.id].gridY * cellHeight
-//                 }
-//               : item
-//           )
-//         };
-//       } else {
-//         alert("Cannot move item: No available space.");
-//         resetItemPosition(e, itemId, currentItem); // Pass event here
-//         return section;
-//       }
-//     })
-//   );
-//   console.log("Local drag end update applied for item:", itemId);
-// // Sync to Yjs
-//  // Only sync after state update is complete
-//     syncYjsSections()
-//   resetDragState();
-// };
-  
-  
-  // Handle item dragging
-  
   const handleItemDragEnd = (e, itemId, sectionId) => {
     setSnapLines([]); // Clear snap lines
   
@@ -2515,34 +1523,7 @@ const resetItemPosition = (e, id, currentItem) => {
     resetDragState();
   };
   
-  
-  // const handleItemDragMove = (e, itemId, sectionId) => {
-  //   if (!draggingBox) return;
-  //   const shape = e.target;
-  //   const pixelPosition = { x: shape.x(), y: shape.y() };
-  //   const gridPosition = snapToGrid(pixelPosition);
-  
-  //   const currentSection = sections.find(section => section.id === sectionId);
-  //   if (!currentSection) return;
-    
-  //   const currentItem = currentSection.items.find(item => item.id === itemId);
-  //   if (!currentItem) return;
-  
-  //   const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), currentSection.sizeInfo.cols - currentItem.sizeInfo.cols);
-  //   const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), currentSection.sizeInfo.rows - currentItem.sizeInfo.rows);
-  
-  //   setSnapLines(generateSnapLines(currentItem, { gridX: clampedGridX, gridY: clampedGridY }));
-  //   shape.position({
-  //     x: clampedGridX * (cellWidth + gutterWidth),
-  //     y: clampedGridY * cellHeight
-  //   });
-  //   setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
-  // };
-  
-  // Snap to grid logic for sections
-  
-  // In handleItemDragMove
-const handleItemDragMove = (e, itemId, sectionId) => {
+  const handleItemDragMove = (e, itemId, sectionId) => {
   if (!draggingBox) return;
 
   const shape = e.target;
@@ -2590,25 +1571,6 @@ setPositionDisplay({
       gridY: Math.max(0, gridY)
     };
   };
-  
-  // Generate snapping lines
-  // const generateSnapLines = (currentItem, gridPos) => {
-  //   if (!currentItem) return [];
-  
-  //   const lines = [];
-  //   const leftX = gridPos.gridX * (cellWidth + gutterWidth);
-  //   const rightX = leftX + (currentItem.sizeInfo.cols * cellWidth) + ((currentItem.sizeInfo.cols - 1) * gutterWidth);
-  //   const topY = gridPos.gridY * cellHeight;
-  //   const bottomY = topY + (currentItem.sizeInfo.rows * cellHeight);
-  
-  //   lines.push({ points: [leftX, 0, leftX, stageSize.height], stroke: '#2196F3', strokeWidth: 1, dash: [5, 5] });
-  //   lines.push({ points: [rightX, 0, rightX, stageSize.height], stroke: '#2196F3', strokeWidth: 1, dash: [5, 5] });
-  //   lines.push({ points: [0, topY, stageSize.width, topY], stroke: '#2196F3', strokeWidth: 1, dash: [5, 5] });
-  //   lines.push({ points: [0, bottomY, stageSize.width, bottomY], stroke: '#2196F3', strokeWidth: 1, dash: [5, 5] });
-  
-  //   return lines;
-  // };
-
   const generateSnapLines = (item, gridPos, container) => {
     if (!item || !gridPos || !container) return [];
   
@@ -2739,98 +1701,6 @@ setPositionDisplay({
     }, canvasSection));
   };
     
-    // const handleDragMove = (e, id) => {
-    //   if (!draggingBox) return;
-    //   const shape = e.target;
-    //   const pixelPosition = { x: shape.x(), y: shape.y() };
-    //   const gridPosition = snapToGrid(pixelPosition);
-    //   const currentBox = sections.find(b => b.id === id);
-    //   if (!currentBox) return;
-    
-    //   const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), columns - currentBox.sizeInfo.cols);
-    //   const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), rows - currentBox.sizeInfo.rows);
-    
-    //   setSnapLines(generateSnapLines(currentBox, { gridX: clampedGridX, gridY: clampedGridY }));
-    //   shape.position({
-    //     x: clampedGridX * (cellWidth + gutterWidth),
-    //     y: clampedGridY * cellHeight
-    //   });
-    //   setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
-    // };
-    
-    
-    // const handleDragEnd = (e, id) => {
-    //   setSnapLines([]);
-    //   const currentBox = sections.find(b => b.id === id);
-      
-    //   if (!currentBox || !dragPreviewPosition) {
-    //     resetDragState();
-    //     return;
-    //   }
-    
-    //   const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
-    //   if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
-    //     resetDragState();
-    //     return;
-    //   }
-    
-    //   const repositionResult = repositionBoxes(currentBox, { gridX: newGridX, gridY: newGridY }, sections, columns, rows);
-      
-    //   if (repositionResult.success) {
-    //     setSections(prevBoxes =>
-    //       prevBoxes.map(box =>
-    //         repositionResult.newPositions[box.id]
-    //           ? {
-    //               ...box,
-    //               gridX: repositionResult.newPositions[box.id].gridX,
-    //               gridY: repositionResult.newPositions[box.id].gridY,
-    //               x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
-    //               y: repositionResult.newPositions[box.id].gridY * cellHeight,
-    //             }
-    //           : box
-    //       )
-    //     );
-    //   } else {
-    //     alert("Cannot move item: No available space.");
-    //     resetBoxPosition(e, id, currentBox); // ✅ Pass event `e`
-    //   }
-    //   //yjs
-    //    // Only sync after state update is complete
-    // syncYjsSections()
-    //   resetDragState();
-    // };
-
-// ✅ Fix: Pass `e` as a parameter to prevent ReferenceError
-
-// const handleDragMove = (e, id) => {
-//   if (!draggingBox) return;
-  
-//   const shape = e.target;
-//   const pixelPosition = { x: shape.x(), y: shape.y() };
-//   const gridPosition = snapToGrid(pixelPosition);
-//   const currentBox = sections.find(b => b.id === id);
-  
-//   if (!currentBox) return;
-
-//   const clampedGridX = Math.min(Math.max(0, gridPosition.gridX), columns - currentBox.sizeInfo.cols);
-//   const clampedGridY = Math.min(Math.max(0, gridPosition.gridY), rows - currentBox.sizeInfo.rows);
-
-//   // Clear existing snap lines and generate new ones
-//   setSnapLines(generateSnapLines(currentBox, { 
-//     gridX: clampedGridX, 
-//     gridY: clampedGridY 
-//   }));
-
-//   // Update position
-//   shape.position({
-//     x: clampedGridX * (cellWidth + gutterWidth),
-//     y: clampedGridY * cellHeight
-//   });
-  
-//   setDragPreviewPosition({ gridX: clampedGridX, gridY: clampedGridY });
-// };
-
-// In handleDragMove, update it to pass section context correctly
 const handleDragMove = (e, id) => {
   if (!draggingBox) return;
   
@@ -2950,120 +1820,6 @@ const resetBoxPosition = (e, id, currentBox) => {
   }
 };
     
-    
-  
-// Drag end handler (snapping)
-// const handleDragEnd = (e) => {
-//   const id = e.target.id();
-//   const shape = e.target;
-//   const totalCellWidth = cellWidth + gutterWidth;
-//   const colIndex = Math.round(shape.x() / totalCellWidth);
-//   const rowIndex = Math.round(shape.y() / cellHeight);
-//   const maxColIndex = columns - (items.find(i => i.id === id)?.sizeInfo?.cols || 1);
-//   const boundedColIndex = Math.min(Math.max(0, colIndex), maxColIndex);
-//   const boundedX = boundedColIndex * totalCellWidth;
-//   const maxRowIndex = rows - (items.find(i => i.id === id)?.sizeInfo?.rows || 1);
-//   const boundedRowIndex = Math.min(Math.max(0, rowIndex), maxRowIndex);
-//   const boundedY = boundedRowIndex * cellHeight;
-//   const updatedItems = items.map(item =>
-//     item.id === id ? { ...item, x: boundedX, y: boundedY} : item
-//   );
-//   setSections(updatedItems);
-// };
-
-// const handleDragEnd = (e, id) => {
-//   setSnapLines([]); // Clear snap lines
-  
-//   const currentBox = items.find(b => b.id === id);
-//   if (!currentBox || !dragPreviewPosition) {
-//     setDraggingBox(null);
-//     setDragPreviewPosition(null);
-//     setDragStatus(null);
-//     return;
-//   }
-
-//   const { gridX: newGridX, gridY: newGridY } = dragPreviewPosition;
-  
-//   // No movement, just reset
-//   if (newGridX === currentBox.gridX && newGridY === currentBox.gridY) {
-//     setDraggingBox(null);
-//     setDragPreviewPosition(null);
-//     setDragStatus(null);
-//     return;
-//   }
-
-//   // Try repositioning
-//   const repositionResult = repositionBoxes(
-//     currentBox,
-//     { gridX: newGridX, gridY: newGridY },
-//     items,
-//     columns,
-//     rows
-//   );
-
-//   if (repositionResult.success) {
-//     // Update the state with new positions
-//     setSections(prevBoxes =>
-//       prevBoxes.map(box => {
-//         if (repositionResult.newPositions[box.id]) {
-//           return {
-//             ...box,
-//             gridX: repositionResult.newPositions[box.id].gridX,
-//             gridY: repositionResult.newPositions[box.id].gridY,
-//             x: repositionResult.newPositions[box.id].gridX * (cellWidth + gutterWidth),
-//             y: repositionResult.newPositions[box.id].gridY * cellHeight,
-//           };
-//         }
-//         return box;
-//       })
-//     );
-//   } else {
-//     // If invalid, reset position visually
-//     const stageNode = e.target.getStage();
-//     const layer = stageNode.findOne('Layer');
-//     const group = layer.findOne(`#${id}`);
-
-//     if (group) {
-//       group.to({
-//         x: currentBox.gridX * (cellWidth + gutterWidth),
-//         y: currentBox.gridY * cellHeight,
-//         duration: 0.3
-//       });
-//     }
-//   }
-
-//   setDraggingBox(null);
-//   setDragPreviewPosition(null);
-//   setDragStatus(null);
-// };
-
-
-
-
-// // addCustomBox uses custom inputs for width/height
-// const addCustomBox = () => {
-//   // if (!newBoxContent && newBoxType === 'text') {
-//   //   alert('Please enter text content for the new box');
-//   //   return;
-//   // }
-//   const newBox = {
-//     id: `box${boxes.length + 1}`,
-//     width: newBoxWidth,
-//     height: newBoxHeight,
-//     type: newBoxType,
-//     text: newBoxType === 'text' ? newBoxContent : 'Image'
-//   };
-//   const position = findBestPositionForBox(newBox, boxes, columns, rows);
-//   if (!position) {
-//     alert('No space available for new box');
-//     return;
-//   }
-//   newBox.gridX = position.gridX;
-//   newBox.gridY = position.gridY;
-//   setBoxes([...boxes, newBox]);
-//   setNewBoxContent('');
-// };
-
 const saveLayoutWithImage = async () => {
   const stage = stageRef.current;
   const dataURL = stage.toDataURL({ pixelRatio: 2 }); // or 3 for high-res
@@ -3175,18 +1931,6 @@ const ErrorState = ({ error }) => (
   </div>
 );
 
-// Update the error check in your component:
-// useEffect(() => {
-// if (error) {
-//   return <ErrorState error={error} />;
-// }
-// }, [error]);
-
-// useEffect(() => {
-//   if (layoutid) {
-//     fetchLayoutById();
-//   }
-// }, [layoutid]);
 if (isLoading) {
   LoadingState();
 }
@@ -3296,8 +2040,6 @@ return {
     CurrentLayout,
     setCurrentLayout,
 };
-
-
 };
 
 export default useWorkbench;

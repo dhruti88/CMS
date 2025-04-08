@@ -1,6 +1,5 @@
-import React, { Children } from "react";
+import React from "react";
 import { Button } from "@mui/material";
-import "tailwindcss";
 import colors from "../../../theme/colors";
 
 const CustomButton = ({

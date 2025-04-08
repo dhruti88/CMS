@@ -1,101 +1,3 @@
-// import React, { useEffect, useState, useContext } from "react";
-// import { useNavigate } from "react-router-dom";
-// import axios from "axios";
-// import SelectionBar from "../atoms/SelectionBar";
-// import NewsList from "../atoms/NewsList";
-// import Pagination from "../atoms/Pagination";
-// import Footer from "../atoms/Footer";
-// import { useAuth } from "../../context/AuthContext"; 
-// import { WorkbenchContext } from '../../context/WorkbenchContext';
-// const MyLayouts = () => {
-//   const [newsItems, setNewsItems] = useState([]);
-//   const [filteredItems, setFilteredItems] = useState([]);
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const itemsPerPage = 8;
-//   const navigate = useNavigate();
-//   const { user } = useAuth();  // assume your context provides this
-//   const workbenchProps = useContext(WorkbenchContext);
-//   // const { loadLayoutFromSelected } = workbenchProps; // assume your context provides this
-//   // your loadLayout function
-//   const loadLayout = (item) => {
-//     setTimeout(() => navigate(`/page/${item._id}`), 10);
-//     workbenchProps.loadLayoutFromSelected(item);
-//   };
-
-//   // Fetch layouts from backend using token from localStorage
-//   useEffect(() => {
-//     const fetchLayouts = async () => {
-//       const token = localStorage.getItem("token");
-    
-//       if (!token) {
-//         console.error("No token found. Please log in.");
-//         navigate("/signin");
-//         return;
-//       }
-    
-//       try {
-//         const response = await axios.get("http://localhost:8000/api/my-layouts", {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         });
-    
-//         console.log("Fetched layouts:", response.data.layouts);
-//         setNewsItems(response.data.layouts);
-//         setFilteredItems(response.data.layouts);
-//       } catch (error) {
-//         console.error("Error fetching layouts:", error.response?.data?.error || error.message);
-//       }
-//     };
-    
-//     fetchLayouts();
-//   }, [user, navigate]);
-
-//   // Filtering Logic
-//   const handleSearch = (filters) => {
-//     const filtered = newsItems.filter((item) => {
-//       const formattedDueDate = item.duedate
-//         ? new Date(item.duedate).toISOString().split("T")[0]
-//         : "";
-  
-//       return (
-//         (!filters.city || item.city?.toLowerCase() === filters.city.toLowerCase()) &&
-//         (!filters.dueDate || formattedDueDate === filters.dueDate) &&
-//         (!filters.taskStatus || item.taskstatus?.toLowerCase() === filters.taskStatus.toLowerCase()) &&
-//         (!filters.title || item.title?.toLowerCase().includes(filters.title.toLowerCase())) &&
-//         (!filters.layoutType || item.layouttype?.toLowerCase() === filters.layoutType.toLowerCase()) &&
-//         (!filters.rows || item.gridSettings?.rows === Number(filters.rows)) &&
-//         (!filters.cols || item.gridSettings?.columns === Number(filters.cols))
-//       );
-//     });
-  
-//     setFilteredItems(filtered);
-//     setCurrentPage(1);
-//   };
-  
-//   // Pagination Logic
-//   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-//   const paginatedItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-//   return (
-//     <div className="news-container">
-//       <SelectionBar onSearch={handleSearch} />
-//       {/* Pass loadLayout into NewsList so each item can call it on click */}
-//       <NewsList 
-//         newsItems={paginatedItems} 
-//         onItemClick={loadLayout} 
-//       />
-//       <Pagination 
-//         currentPage={currentPage} 
-//         totalPages={totalPages} 
-//         setCurrentPage={setCurrentPage} 
-//       />
-//       <Footer />
-//     </div>
-//   );
-// };
-
-// export default MyLayouts;
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -240,14 +142,8 @@ const MyLayouts = () => {
   };
 
   return (
-    <Container maxWidth="xl">
-      <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 2, bgcolor: 'background.paper' }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 600, color: 'primary.main' }}>
-          My Layouts
-        </Typography>
-        
-        <SelectionBar onSearch={handleSearch} />
-      </Paper>
+    <Container maxWidth="xl" sx = {{mt : "80px"}}> 
+        <SelectionBar onSearch={handleSearch}/>
 
       {loading ? (
         <Grid container spacing={3}>

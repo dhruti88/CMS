@@ -6,7 +6,7 @@ import colors from "../../../theme/colors";
 import ProfileMenu from "../../molecules/ProfileMenu";
 import { SERVER_URL } from "../../../Urls";
 import { logout } from "../../../utils/logout";
-import CustomButton from "../button/CustomButton"; // Import your custom button
+import CustomButton from "../button/CustomButton"; 
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -41,7 +41,6 @@ const Navbar = () => {
     } catch (error) {
       console.error("Error fetching user data:", error);
       await logout();
-      // navigate("/signin"); // Redirect to Sign-In page if token is invalid
     }
   };
 
@@ -74,11 +73,9 @@ const Navbar = () => {
           <>
           <CustomButton onClick={() => navigate("/home")}>Home</CustomButton>
             <CustomButton onClick={() => navigate("/mylayout")}>My Layouts</CustomButton>
-            {/* Only call handleWorkbenchClick here */}
-            
             <CustomButton onClick={handleWorkbenchClick}>Workbench</CustomButton>
             <CustomButton onClick={() => navigate("/history")}>History</CustomButton>
-            <ProfileMenu user={user} token={token} /> {/* Pass user and token to ProfileMenu */}
+            <ProfileMenu user={user} token={token} /> 
           </>
         )}
       </div>

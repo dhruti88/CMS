@@ -1,9 +1,6 @@
-import { Typography, Card, Container } from '@mui/material';
+import { Container } from '@mui/material';
 import { useNavigate } from 'react-router-dom'; // Import navigate
-import SignIn from '../../SignIn.jsx';
-import CustomButton from '../atoms/button/CustomButton.jsx'; // Ensure this is imported
-import colors from '../../theme/colors.jsx';
-import Navbar from '../atoms/navbar/NavBar.jsx';
+import SignIn from '../../SignIn.jsx'
 
 const SignInPage = () => {
   const navigate = useNavigate(); // Initialize navigate function
