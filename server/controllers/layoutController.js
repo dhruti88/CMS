@@ -48,42 +48,6 @@ export const saveLayout = async (req, res) => {
       layout = await Layout.findById(layoutId);
     }
 
-    // if (layout) {
-    //   layout.sections = sections;
-    //   layout.gridSettings = gridSettings;
-    //   layout.updatedAt = new Date();
-
-    //   if (imageData) {
-    //     layout.stageImage = {
-    //       data: imageData.buffer,
-    //       contentType: imageData.contentType,
-    //     };
-    //   }
-
-    //   await logLayoutAction(layout, 'updated', userId);
-    //   await layout.save();
-    // } else {
-    //   layout = new Layout({
-    //     userId,
-    //     title,
-    //     sections,
-    //     gridSettings,
-    //     layouttype,
-    //     city,
-    //     publishingdate: duedate,
-    //     taskstatus: status,
-    //     stageImage: imageData
-    //       ? {
-    //           data: imageData.buffer,
-    //           contentType: imageData.contentType,
-    //         }
-    //       : undefined,
-    //   });
-
-    //   await logLayoutAction(layout, 'created', userId);
-    //   await layout.save();
-    // }
-
     if (layout) {
       // Update existing layout
       layout.sections = sections;
@@ -192,19 +156,6 @@ export const getAllLayouts = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
-  
-
-// export const deleteLayout = async (req, res) => {
-//     try {
-//       const { userId, title } = req.query;
-//       const layout = await Layout.findOneAndDelete({title });
-//       console.log('Deleted layout:', layout);
-//       res.json({ success: true, layout });
-//     } catch (error) {
-//       console.error('Error deleting layout:', error);
-//       res.status(500).json({ error: error.message });
-//     }
-//   };
 
 export const deleteLayout = async (req, res) => {
     try {

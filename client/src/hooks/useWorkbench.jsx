@@ -447,16 +447,6 @@ if (!e) {
 console.log(data.layout._id);
 localStorage.setItem('layoutid', data.layout._id);
 
-// // Wait until the localStorage item is set
-// const checkLocalStorage = () => {
-//   if (localStorage.getItem('layoutid') === data.layout._id) {
-// console.log("LocalStorage set successfully");
-//   } else {
-// setTimeout(checkLocalStorage, 10); // Retry after 100ms
-//   }
-// };
-
-// checkLocalStorage();
 return data;
 }
 } catch (error) {
@@ -1678,10 +1668,10 @@ return {
     setTaskStatus,
     layoutType,
     setLayoutType,
-    setHideGrid,        // New state function to hide grid
-    setHideBackground,  // New state function to hide background
-    hideGrid,       // New prop to control grid visibility
-    hideBackground, // New prop to control background visibility
+    setHideGrid,       
+    setHideBackground,  
+    hideGrid,      
+    hideBackground,
     changeFontFamily,
     handleDeleteLayout,
     isDeleting,

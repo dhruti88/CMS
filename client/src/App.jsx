@@ -14,7 +14,6 @@ import LayoutHistory from './components/pages/LayoutHistory'
 import Navbar from './components/atoms/navbar/NavBar';
 import ErrorBoundary from './components/pages/ErrorBoundry';
 import { WorkbenchProvider } from './context/WorkbenchContext';
-import DummyWorkPage from './components/pages/dummyWorkPage';
 
 function App() {
   return (

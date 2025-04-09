@@ -15,7 +15,6 @@ export const verifyFirebaseToken = async (req, res, next) => {
      
     const decodedToken = await admin.auth().verifyIdToken(token); // Verify token
     
-
      // Check if the user's email is from searce.com
      if (!decodedToken.email || !decodedToken.email.endsWith("@searce.com")) {
       logger.warn(`Access denied for user: ${decodedToken.email}`);
