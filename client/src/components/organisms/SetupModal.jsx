@@ -1,14 +1,19 @@
 import React, { useContext } from 'react';
 import { TextField, MenuItem, Select, FormControl, InputLabel, Button, Typography, Grid, Box } from "@mui/material";
 import { WorkbenchContext } from '../../context/WorkbenchContext';
+import { useNavigate } from "react-router-dom";
 
 const SetupModal = () => {
   const workbenchProps = useContext(WorkbenchContext);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     workbenchProps.setShowSetupForm(false);
-    workbenchProps.saveLayout({ e: 0 });
+    // if(localStorage.getItem("layoutid")) localStorage.removeItem("layoutid");
+    const data = await workbenchProps.saveLayout({ e: 0 });
+    console.log("workbend data", data);
+    navigate(`/page/${data.layout._id}`);
   };
 
   return (

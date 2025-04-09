@@ -96,12 +96,14 @@ const MyLayouts = () => {
     setCurrentPage(1);
   };
 
+  let totalPages = 0, paginatedItems = 0;
   // Pagination Logic
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-  const paginatedItems = filteredItems.slice(
+  if(filteredItems)
+  { totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    paginatedItems = filteredItems.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
-  );
+  );}
 
   // Helper function to format date
   const formatDate = (dateString) => {
@@ -265,14 +267,14 @@ const MyLayouts = () => {
           ) : (
             <Box sx={{ textAlign: 'center', width: '100%', py: 8 }}>
               <Typography variant="h6" color="text.secondary">
-                No layouts found matching your filters
+                No layouts found!
               </Typography>
             </Box>
           )}
         </Grid>
       )}
 
-      {filteredItems.length > 0 && (
+      {filteredItems && filteredItems.length > 0 && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 3 }}>
           <Pagination
             currentPage={currentPage}

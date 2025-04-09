@@ -8,7 +8,7 @@ import { TextField, MenuItem, Select, FormControl, Grid, InputLabel, CircularPro
 import { CheckCircle, PauseCircle } from '@mui/icons-material';
 import { WorkbenchContext } from '../../context/WorkbenchContext';
 
-const Toolbox = () => {
+const Toolbox = ({openReplacementPanel}) => {
   const workbenchProps = useContext(WorkbenchContext);
 
   // Find selected section
@@ -390,7 +390,7 @@ const Toolbox = () => {
         <ToolboxSection title="Section Replacement">
           <div className="replacement-button-container">
             <Button
-              onClick={workbenchProps.openReplacementPanel}
+              onClick={openReplacementPanel}
               className="replacement-button"
             >
               Replace Section

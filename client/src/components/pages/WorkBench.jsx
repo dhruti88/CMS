@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import SetupModal from '../organisms/SetupModal';
 import { WorkbenchContext } from '../../context/WorkbenchContext';
 import { Box, CircularProgress, Typography } from '@mui/material';
@@ -44,17 +44,11 @@ const LoadingState2 = () => (
 const WorkBench = () => {
   const navigate = useNavigate(); // Initialize navigate function
   const workbenchProps = useContext(WorkbenchContext);
-
-  useEffect(() => {
-    if (!workbenchProps.showSetupForm && localStorage.getItem('layoutid')) {
-      console.log("sf", workbenchProps.showSetupForm);
-      const layoutid = localStorage.getItem('layoutid');
-      setTimeout(() => navigate(`/page/${layoutid}`), 100);
-    }
-  }, [workbenchProps.showSetupForm, navigate]);
-
+  
   return (
     <div className="cms-container">
+      
+      {/* <SetupModal /> */}
       {workbenchProps.showSetupForm ? (
         <SetupModal />
       ) : (

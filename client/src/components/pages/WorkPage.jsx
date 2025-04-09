@@ -1,19 +1,38 @@
 import React, { useEffect, useContext, useState } from 'react';
-import SetupModal from '../organisms/SetupModal';
 import WorkbenchActions from '../organisms/WorkbenchActions';
 import WorkbenchCanvas from '../organisms/WorkbenchCanvas';
 import Toolbox from '../organisms/Toolbox';
 import { WorkbenchContext } from '../../context/WorkbenchContext';
-import CustomButton from '../atoms/button/CustomButton';
-import Navbar from '../atoms/navbar/NavBar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from "react-router-dom";
 import LoadLayoutAndSection from '../organisms/LoadLayoutAndSection';
+
 
 const WorkPage = () => {
   const navigate = useNavigate();
   const workbenchProps = useContext(WorkbenchContext);
   const [targetSectionIdForReplacement, setTargetSectionIdForReplacement] = useState(null);
   const [showReplacementPanel, setShowReplacementPanel] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { layoutid } = useParams();
+
+  useEffect(() => {
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            if(layoutid) {
+                console.log("Layout ID from URL:", layoutid);
+                await workbenchProps.fetchLayoutById(layoutid);
+            }
+        } catch (error) {
+            console.log("Error fetching layout by ID:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+    fetchData();
+  }, []);
+
+  
 
   const openReplacementPanel = async () => {
     // Check if there are sections and a section is currently selected
@@ -81,41 +100,37 @@ const WorkPage = () => {
     console.log('Replacement completed', replacementSection);
   };
 
-  useEffect(() => {
-    if (!workbenchProps.showSetupForm && localStorage.getItem('layoutid')) {
-      console.log("sf", workbenchProps.showSetupForm);
-      const layoutid = localStorage.getItem('layoutid');
-      setTimeout(() => navigate(`/page/${layoutid}`), 100);
-    }
-  }, [workbenchProps.showSetupForm, navigate]);
-
   return (
     <div className="cms-container">
-      {workbenchProps.showSetupForm ? (
-        <SetupModal />
-      ) : (
-        <>
-          <Navbar>
-            <CustomButton onClick={() => navigate("/signup")}>Sign up</CustomButton>
-          </Navbar>
-          <div className="workbench-container">
-            <WorkbenchActions />
-            <WorkbenchCanvas />
-          </div>
-          <Toolbox/>
-          {showReplacementPanel && (
-            <LoadLayoutAndSection
-              availableLayouts={workbenchProps.availableLayouts}
-              targetSection={workbenchProps.sections.find(sec => sec.id === targetSectionIdForReplacement)}
-              onReplaceSection={handleReplaceSection}
-              setShowLayoutList={setShowReplacementPanel} // Used to close panel
-              mode="section" // Handles section replacement
-              selectedId={workbenchProps.selectedId}
-              sectionId={workbenchProps.sectionId}
-            />
-          )}
-        </>
-      )}
+        {loading ? (
+            <>
+            <div className="cms-cont">
+                <div className="loading-state">
+                <h2>Loading layout...</h2>
+                <p>Please wait while we prepare your workspace</p>
+                </div>
+            </div>
+          </>
+        ) : (
+            <>
+              <div className="workbench-container">
+                    <WorkbenchActions />
+                    <WorkbenchCanvas />
+                </div>
+                <Toolbox openReplacementPanel = {openReplacementPanel} />
+                {showReplacementPanel && (
+                    <LoadLayoutAndSection
+                    availableLayouts={workbenchProps.availableLayouts}
+                    targetSection={workbenchProps.sections.find(sec => sec.id === targetSectionIdForReplacement)}
+                    onReplaceSection={handleReplaceSection}
+                    setShowLayoutList={setShowReplacementPanel} // Used to close panel
+                    mode="section" // Handles section replacement
+                    selectedId={workbenchProps.selectedId}
+                    sectionId={workbenchProps.sectionId}
+                    />
+                )}
+            </>
+        )}
     </div>
   );
 };

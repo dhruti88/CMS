@@ -1,18 +1,20 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import colors from "../../../theme/colors";
 import ProfileMenu from "../../molecules/ProfileMenu";
 import { SERVER_URL } from "../../../Urls";
 import { logout } from "../../../utils/logout";
 import CustomButton from "../button/CustomButton"; 
+import { WorkbenchContext } from "../../../context/WorkbenchContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(null);
   const token = localStorage.getItem("token");
+  const workbenchProps = useContext(WorkbenchContext);
 
   useEffect(() => {
     if (token) {
@@ -21,13 +23,26 @@ const Navbar = () => {
   }, [token]);
 
   const handleWorkbenchClick = () => {
-    if (location.pathname === "/page") {
-      const confirmReload = window.confirm("Are you sure you want to reload the page?");
+    const pathSegments = location.pathname.split("/").filter(Boolean);
+    
+    // If path starts with "page" and has more than one segment, it means there's an id or extra segment
+    if (pathSegments[0] === "page" && pathSegments.length >= 1) {
+      const confirmReload = window.confirm("Are you sure you want to create new workbench?");
       if (confirmReload) {
-        window.location.reload();
+        localStorage.removeItem("layoutid");
+        window.location.href = "/page";
       }
     } else {
-      navigate("/page");
+      const layoutID = localStorage.getItem("layoutid");
+      console.log("layoutID : -", layoutID);
+      if (layoutID) {
+        navigate(`/page/${layoutID}`);
+      }
+      else  
+      {
+        workbenchProps.setShowSetupForm(true);
+        navigate("/page");
+      }
     }
   };
 
@@ -43,6 +58,8 @@ const Navbar = () => {
       await logout();
     }
   };
+
+  const isOnLayoutPage = /^\/page\/[^/]+$/.test(location.pathname);
 
   return (
     <nav className="navbar">
@@ -73,7 +90,9 @@ const Navbar = () => {
           <>
           <CustomButton onClick={() => navigate("/home")}>Home</CustomButton>
             <CustomButton onClick={() => navigate("/mylayout")}>My Layouts</CustomButton>
-            <CustomButton onClick={handleWorkbenchClick}>Workbench</CustomButton>
+            <CustomButton onClick={handleWorkbenchClick}>
+              {isOnLayoutPage ? "New Design" : "Workbench"}
+            </CustomButton>
             <CustomButton onClick={() => navigate("/history")}>History</CustomButton>
             <ProfileMenu user={user} token={token} /> 
           </>
