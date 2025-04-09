@@ -139,6 +139,8 @@ if (token) {
 }
 }, [token]);
 
+
+const [layoutid,setlayoutid] = useState(null);
 //call useYjsManager 
 const {
 activeEditors,
@@ -146,6 +148,7 @@ activeUsersCount,
 updateSectionsAndSync,
 userId,
 } = useYjsManager({
+layoutid,
 cellWidth,
 cellHeight,
 gutterWidth,
@@ -316,6 +319,7 @@ setSectionId(newSection.id);
 };
 
 useEffect(() => {
+console.log("laytoutid : -- ",layoutid);
 console.log("Updated sections:", sections);
 }, [sections]);
 
@@ -1502,7 +1506,6 @@ const resetBoxPosition = (e, id, currentBox) => {
 
 const [isLoading, setIsLoading] = useState(true);
 const [error, setError] = useState(null);
-const { layoutid } = useParams();
 
 const fetchLayoutById = async (id) => {
   try {
@@ -1686,6 +1689,8 @@ return {
     LoadingState,
     CurrentLayout,
     setCurrentLayout,
+    layoutid,
+    setlayoutid,
 };
 };
 

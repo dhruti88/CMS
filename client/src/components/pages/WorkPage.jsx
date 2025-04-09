@@ -20,6 +20,7 @@ const WorkPage = () => {
         setLoading(true);
         try {
             if(layoutid) {
+              workbenchProps.setlayoutid(layoutid);
                 console.log("Layout ID from URL:", layoutid);
                 await workbenchProps.fetchLayoutById(layoutid);
             }
