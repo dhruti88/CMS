@@ -76,10 +76,10 @@ const LoadLayoutAndSection = ({
 
   const loadLayout=(item)=>
   {
-   
-    
-    setTimeout(()=> navigate(`/page/${item._id}`),10);
-    loadLayoutFromSelected(item);
+    // setTimeout(()=> navigate(`/page/${item._id}`),10);
+    setShowLayoutList(false);
+    setTimeout(()=> window.open(`/page/${item._id}`, '_blank'),10);
+    // loadLayoutFromSelected(item);
   };
 
   return (
