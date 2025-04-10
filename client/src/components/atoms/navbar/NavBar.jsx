@@ -18,7 +18,7 @@ const Navbar = () => {
   const token = localStorage.getItem("token");
   const workbenchProps = useContext(WorkbenchContext);
   const [theme, setTheme] = useState(
-    localStorage.getItem('theme') || 
+    'light' || localStorage.getItem('theme') || 
     (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
   );
 
