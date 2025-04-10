@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Tooltip, IconButton, TextField } from "@mui/material";
 import { Delete } from "@mui/icons-material";
-import "./LoadLayoutAndSection.css"; // Keep consistent styling
+import "../../styles/LoadLayoutAndSection.css"; // Keep consistent styling
 import { useNavigate } from "react-router-dom";
 const LoadLayoutAndSection = ({ 
   availableLayouts, 
