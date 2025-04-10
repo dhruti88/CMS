@@ -2,11 +2,11 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
     const getPageNumbers = () => {
         let startPage = Math.max(1, currentPage - 1);
         let endPage = Math.min(totalPages, startPage + 3);
-        
+
         if (endPage === totalPages) {
             startPage = Math.max(1, totalPages - 3);
         }
-        
+
         return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
     };
 
@@ -16,9 +16,9 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
                 Previous
             </button>
             {getPageNumbers().map((num) => (
-                <button 
-                    key={num} 
-                    className={currentPage === num ? 'active' : ''} 
+                <button
+                    key={num}
+                    className={currentPage === num ? 'active' : ''}
                     onClick={() => setCurrentPage(num)}
                 >
                     {num}

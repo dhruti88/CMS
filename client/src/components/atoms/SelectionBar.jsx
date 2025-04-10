@@ -21,13 +21,13 @@ const SelectionBar = ({ onSearch }) => {
       <FormControl>
         <InputLabel sx={{ background: "#f1f3f4", px: 0.5 }}>City</InputLabel>
         <Select value={city} onChange={(e) => setCity(e.target.value)}>
-                <MenuItem value="Pune">Pune</MenuItem>
-                <MenuItem value="Ahmedabad">Ahmedabad</MenuItem>
-                <MenuItem value="Mumbai">Mumbai</MenuItem>
+          <MenuItem value="Pune">Pune</MenuItem>
+          <MenuItem value="Ahmedabad">Ahmedabad</MenuItem>
+          <MenuItem value="Mumbai">Mumbai</MenuItem>
         </Select>
       </FormControl>
 
-      <TextField type="date"/>
+      <TextField type="date" />
 
       <FormControl>
         <InputLabel sx={{ background: "#f1f3f4", px: 0.5 }}>Status</InputLabel>
@@ -46,21 +46,21 @@ const SelectionBar = ({ onSearch }) => {
         </Select>
       </FormControl>
 
-<TextField 
-  label="Rows" 
-  type="number" 
-  value={rows} 
-  onChange={(e) => setRows(e.target.value)} 
-  sx={{ width: "50px" }} 
-/>
+      <TextField
+        label="Rows"
+        type="number"
+        value={rows}
+        onChange={(e) => setRows(e.target.value)}
+        sx={{ width: "50px" }}
+      />
 
-<TextField 
-  label="Cols" 
-  type="number" 
-  value={cols} 
-  onChange={(e) => setCols(e.target.value)} 
-  sx={{ width: "50px" }} 
-/>
+      <TextField
+        label="Cols"
+        type="number"
+        value={cols}
+        onChange={(e) => setCols(e.target.value)}
+        sx={{ width: "50px" }}
+      />
       <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
 
       <CustomButton onClick={handleSearch} sx={{ width: "120px" }}>Search</CustomButton>

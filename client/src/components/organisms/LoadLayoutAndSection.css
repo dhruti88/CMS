@@ -17,6 +17,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -28,8 +29,8 @@
     border-radius: 12px;
     width: 400px;
     max-width: 90%;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 
-                0 10px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1),
+        0 10px 20px rgba(0, 0, 0, 0.08);
     transform: scale(0.9);
     animation: scaleUp 0.3s ease-out forwards;
     border: 1px solid rgba(0, 0, 0, 0.05);
@@ -40,6 +41,7 @@
         transform: scale(0.9);
         opacity: 0;
     }
+
     to {
         transform: scale(1);
         opacity: 1;
@@ -101,6 +103,7 @@
     font-weight: 500;
     color: #1e40af;
 }
+
 /* 
 .section-item.selected {
     background-color: #e6f2ff;
@@ -142,48 +145,48 @@
 
 .search-container {
     margin-bottom: 15px;
-  }
-  
-  .section-search-input {
+}
+
+.section-search-input {
     width: 100%;
     padding: 10px;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     font-size: 14px;
-  }
-  
-  .no-sections {
+}
+
+.no-sections {
     text-align: center;
     color: #6b7280;
     padding: 20px;
-  }
+}
 
-  /* Add these to your existing CSS */
+/* Add these to your existing CSS */
 .section-item-main {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-  }
-  
-  .section-item-details {
+}
+
+.section-item-details {
     font-size: 0.75em;
     color: #6b7280;
     margin-top: 4px;
-  }
-  
-  .section-item-size {
+}
+
+.section-item-size {
     color: #6b7280;
     font-size: 0.8em;
     padding-right: 10px;
-  }
-  
-  .section-item {
+}
+
+.section-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
+}
 
-  .panel-title {
+.panel-title {
     text-align: center;
     font-weight: bold;
     color: #2c3e50;
@@ -208,7 +211,7 @@
 }
 
 
-  /* Layout Title */
+/* Layout Title */
 .layout-title {
     font-size: 1rem;
     font-weight: 600;

@@ -17,7 +17,7 @@ const SetupModal = () => {
   };
 
   return (
-    <Box 
+    <Box
       sx={{
         position: "fixed",
         top: 0,
@@ -30,7 +30,7 @@ const SetupModal = () => {
         backgroundColor: "rgba(0, 0, 0, 0.3)", // Optional: Dark overlay effect
       }}
     >
-      <Box 
+      <Box
         sx={{
           width: 450,
           p: 3,
@@ -46,25 +46,25 @@ const SetupModal = () => {
         <Typography variant="h6" fontWeight="bold" mb={2} textAlign="center">
           Layout Details
         </Typography>
-        
+
         <form onSubmit={handleSubmit} style={{ width: "100%" }}>
           <Grid container spacing={2}>
             {/* Layout Title */}
             <Grid item xs={12}>
-              <TextField 
-                label="Layout Title" 
-                fullWidth 
-                value={workbenchProps.layoutTitle} 
-                onChange={(e) => workbenchProps.setLayoutTitle(e.target.value)} 
+              <TextField
+                label="Layout Title"
+                fullWidth
+                value={workbenchProps.layoutTitle}
+                onChange={(e) => workbenchProps.setLayoutTitle(e.target.value)}
               />
             </Grid>
-  
+
             {/* City & Publishing Date */}
             <Grid item xs={6}>
               <FormControl fullWidth>
                 <InputLabel sx={{ background: "#ffffff", px: 0.5 }}>City</InputLabel>
-                <Select 
-                  value={workbenchProps.city} 
+                <Select
+                  value={workbenchProps.city}
                   onChange={(e) => workbenchProps.setCity(e.target.value)}
                 >
                   <MenuItem value="Pune">Pune</MenuItem>
@@ -74,22 +74,22 @@ const SetupModal = () => {
               </FormControl>
             </Grid>
             <Grid item xs={6}>
-              <TextField 
-                label="Publishing Date" 
-                type="date" 
-                fullWidth 
-                InputLabelProps={{ shrink: true }} 
-                value={workbenchProps.dueDate} 
-                onChange={(e) => workbenchProps.setDueDate(e.target.value)} 
+              <TextField
+                label="Publishing Date"
+                type="date"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                value={workbenchProps.dueDate}
+                onChange={(e) => workbenchProps.setDueDate(e.target.value)}
               />
             </Grid>
-  
+
             {/* Layout Type */}
             <Grid item xs={6}>
               <FormControl fullWidth>
                 <InputLabel sx={{ background: "#ffffff", px: 0.5 }}>Layout Type</InputLabel>
-                <Select 
-                  value={workbenchProps.layoutType} 
+                <Select
+                  value={workbenchProps.layoutType}
                   onChange={(e) => workbenchProps.setLayoutType(e.target.value)}
                 >
                   <MenuItem value="Page">Page</MenuItem>
@@ -97,46 +97,46 @@ const SetupModal = () => {
                 </Select>
               </FormControl>
             </Grid>
-  
+
             {/* Rows & Columns */}
             <Grid item xs={6}>
-              <TextField 
-                label="Rows" 
-                type="number" 
-                fullWidth 
-                inputProps={{ min: 1 }} 
-                value={workbenchProps.rows} 
-                onChange={(e) => workbenchProps.setRows(Math.max(1, parseInt(e.target.value) || 12))} 
+              <TextField
+                label="Rows"
+                type="number"
+                fullWidth
+                inputProps={{ min: 1 }}
+                value={workbenchProps.rows}
+                onChange={(e) => workbenchProps.setRows(Math.max(1, parseInt(e.target.value) || 12))}
               />
             </Grid>
             <Grid item xs={6}>
-              <TextField 
-                label="Columns" 
-                type="number" 
-                fullWidth 
-                inputProps={{ min: 1 }} 
-                value={workbenchProps.columns} 
-                onChange={(e) => workbenchProps.setColumns(Math.max(1, parseInt(e.target.value) || 1))} 
+              <TextField
+                label="Columns"
+                type="number"
+                fullWidth
+                inputProps={{ min: 1 }}
+                value={workbenchProps.columns}
+                onChange={(e) => workbenchProps.setColumns(Math.max(1, parseInt(e.target.value) || 1))}
               />
             </Grid>
-  
+
             {/* Gutter Width */}
             <Grid item xs={6}>
-              <TextField 
-                label="Gutter Width" 
-                type="number" 
-                fullWidth 
-                inputProps={{ min: 0 }} 
-                value={workbenchProps.gutterWidth} 
-                onChange={(e) => workbenchProps.setGutterWidth(Math.max(0, parseInt(e.target.value) || 10))} 
+              <TextField
+                label="Gutter Width"
+                type="number"
+                fullWidth
+                inputProps={{ min: 0 }}
+                value={workbenchProps.gutterWidth}
+                onChange={(e) => workbenchProps.setGutterWidth(Math.max(0, parseInt(e.target.value) || 10))}
               />
             </Grid>
-            
+
             {/* Submit Button */}
             <Grid item xs={12} display="flex" justifyContent="center">
-              <Button 
-                type="submit" 
-                variant="contained" 
+              <Button
+                type="submit"
+                variant="contained"
                 sx={{
                   mt: 2,
                   px: 3,

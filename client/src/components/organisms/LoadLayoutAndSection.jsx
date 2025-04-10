@@ -3,29 +3,29 @@ import { Tooltip, IconButton, TextField } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import "./LoadLayoutAndSection.css"; // Keep consistent styling
 import { useNavigate } from "react-router-dom";
-const LoadLayoutAndSection = ({ 
-  availableLayouts, 
-  targetSection, 
-  onReplaceSection, 
-  loadLayoutFromSelected, 
-  handleDeleteLayout, 
-  setShowLayoutList, 
-  isDeleting, 
+const LoadLayoutAndSection = ({
+  availableLayouts,
+  targetSection,
+  onReplaceSection,
+  loadLayoutFromSelected,
+  handleDeleteLayout,
+  setShowLayoutList,
+  isDeleting,
   layouttype,
   mode = "layout" // "layout" or "section"
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   useEffect(() => {
-    
+
     if (!availableLayouts) return;
-  
+
     if (mode === "section") {
       // Extract selected section's size
       const { rows: selectedRows, cols: selectedCols } = targetSection?.sizeInfo || {};
-  
+
       // Flatten sections from layouts where layouttype is "Section"
       const allSections = availableLayouts
         .filter(layout => layout.layouttype === "Section") // Filter layouts with layouttype "Section"
@@ -35,7 +35,7 @@ const LoadLayoutAndSection = ({
             layoutName: layout.title || "Unnamed Layout",
           }))
         );
-  
+
       // Filter sections based on search term and matching size
       const filtered = allSections.filter(sec => {
         const { rows, cols } = sec.sizeInfo || {};
@@ -48,17 +48,17 @@ const LoadLayoutAndSection = ({
             .includes(searchTerm.toLowerCase())
         );
       });
-  
+
       setFilteredItems(filtered);
     } else {
       // Filter layouts based only on search term
       const filtered = availableLayouts
         .filter(layout => layout.title.toLowerCase().includes(searchTerm.toLowerCase()));
-  
+
       setFilteredItems(filtered);
     }
   }, [availableLayouts, searchTerm, mode, targetSection]);
-  
+
 
   // Close modal when clicking outside
   const handleOverlayClick = (e) => {
@@ -74,11 +74,10 @@ const LoadLayoutAndSection = ({
     setShowLayoutList(false);
   };
 
-  const loadLayout=(item)=>
-  {
-   
-    
-    setTimeout(()=> navigate(`/page/${item._id}`),10);
+  const loadLayout = (item) => {
+
+
+    setTimeout(() => navigate(`/page/${item._id}`), 10);
     loadLayoutFromSelected(item);
   };
 
@@ -132,8 +131,8 @@ const LoadLayoutAndSection = ({
                 {mode === "layout" && (
                   <div className="section-item-actions">
                     <Tooltip title="Delete Layout">
-                      <IconButton 
-                        onClick={() => handleDeleteLayout(item)} 
+                      <IconButton
+                        onClick={() => handleDeleteLayout(item)}
                         disabled={isDeleting === item._id}
                         className={isDeleting === item._id ? "icon-disabled" : "icon-accent"}
                       >

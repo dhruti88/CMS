@@ -8,7 +8,7 @@ import { TextField, MenuItem, Select, FormControl, Grid, InputLabel, CircularPro
 import { CheckCircle, PauseCircle } from '@mui/icons-material';
 import { WorkbenchContext } from '../../context/WorkbenchContext';
 
-const Toolbox = ({openReplacementPanel}) => {
+const Toolbox = ({ openReplacementPanel }) => {
   const workbenchProps = useContext(WorkbenchContext);
 
   // Find selected section
@@ -36,15 +36,15 @@ const Toolbox = ({openReplacementPanel}) => {
       prevSections.map((section) =>
         section.id === workbenchProps.selectedId
           ? {
-              ...section,
-              borderStyle: {
-                left: section.borderStyle?.left || false,
-                right: section.borderStyle?.right || false,
-                top: section.borderStyle?.top || false,
-                bottom: section.borderStyle?.bottom || false,
-                [border]: !section.borderStyle?.[border], // Toggle specific border
-              },
-            }
+            ...section,
+            borderStyle: {
+              left: section.borderStyle?.left || false,
+              right: section.borderStyle?.right || false,
+              top: section.borderStyle?.top || false,
+              bottom: section.borderStyle?.bottom || false,
+              [border]: !section.borderStyle?.[border], // Toggle specific border
+            },
+          }
           : section
       )
     );
@@ -239,9 +239,9 @@ const Toolbox = ({openReplacementPanel}) => {
                 {selectedSection
                   ? `Col: ${selectedSection.gridX}, Row: ${selectedSection.gridY}`
                   : `Col: ${Math.round(
-                      selectedItem?.x /
-                        (workbenchProps.cellWidth + workbenchProps.gutterWidth)
-                    ) || 0}, 
+                    selectedItem?.x /
+                    (workbenchProps.cellWidth + workbenchProps.gutterWidth)
+                  ) || 0}, 
                      Row: ${Math.round(selectedItem?.y / workbenchProps.cellHeight) || 0}`}
               </span>
             </div>
@@ -290,14 +290,14 @@ const Toolbox = ({openReplacementPanel}) => {
 
             {(workbenchProps.layoutType === "Page" ||
               workbenchProps.selectedId !== workbenchProps.sectionId) && (
-              <Button
-                className="delete-button"
-                onClick={workbenchProps.deleteSelected}
-                title="Delete selected item"
-              >
-                Delete Item
-              </Button>
-            )}
+                <Button
+                  className="delete-button"
+                  onClick={workbenchProps.deleteSelected}
+                  title="Delete selected item"
+                >
+                  Delete Item
+                </Button>
+              )}
           </>
         ) : (
           <p className="no-selection">
@@ -315,9 +315,8 @@ const Toolbox = ({openReplacementPanel}) => {
                 <Button
                   key={`line-${border}`}
                   onClick={() => toggleBorder(border)}
-                  className={`size-button ${
-                    selectedSection.borderStyle?.[border] ? 'active' : ''
-                  }`}
+                  className={`size-button ${selectedSection.borderStyle?.[border] ? 'active' : ''
+                    }`}
                 >
                   {border}
                 </Button>
