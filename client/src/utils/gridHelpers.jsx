@@ -22,7 +22,7 @@ export const getGridLines = (columns, rows,stageWidth,stageHeight, gutterWidth, 
         y={0}
         width={gutterWidth}
         height={stageHeight}
-        fill={colors?.grays?.[3] || "#ccc"}
+        fill="white"
         stroke="black"
         strokeWidth={1}
       />
@@ -38,7 +38,7 @@ export const getGridLines = (columns, rows,stageWidth,stageHeight, gutterWidth, 
         y={i * cellHeight}
         width={stageWidth}
         height={1}
-        fill={colors?.grays?.[4] || "#ddd"}
+        fill="white"
       />
     );
   }

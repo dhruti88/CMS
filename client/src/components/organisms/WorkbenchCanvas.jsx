@@ -95,7 +95,7 @@ const WorkbenchCanvas = () => {
   }, [zoomLevel, workbenchProps.stageSize, workbenchProps.stageRef]);
 
   return (
-    <div className="workbench-container" style={{ border: '2px solid black' }}>
+    <div className="workbench-container">
       <PositionDisplay position={workbenchProps.positionDisplay} />
       <Stage
         ref={workbenchProps.stageRef}
@@ -119,7 +119,7 @@ const WorkbenchCanvas = () => {
               y={0}
               width={workbenchProps.stageSize.width}
               height={workbenchProps.stageSize.height}
-              fill="gray"
+              fill="#d3dfeb"
               onClick={() => workbenchProps.setSelectedId(null)}
               onTap={() => workbenchProps.setSelectedId(null)}
             />
@@ -141,22 +141,27 @@ const WorkbenchCanvas = () => {
             >
               {!workbenchProps.hideBackground && (
                 <Rect
-                  width={section.width}
-                  height={section.height}
-                  fill=""
-                  stroke="red"
-                  strokeWidth={2}
-                  onTap={(e) => {
-                    workbenchProps.transformerRef.current?.nodes([]);
-                    workbenchProps.transformerRef.current?.getLayer()?.batchDraw();
-                    workbenchProps.setSelectedId(section.id);
-                  }}
-                  onClick={(e) => {
-                    workbenchProps.transformerRef.current?.nodes([]);
-                    workbenchProps.transformerRef.current?.getLayer()?.batchDraw();
-                    workbenchProps.setSelectedId(section.id);
-                  }}
-                />
+                width={section.width}
+                height={section.height}
+                fill=""
+                stroke={workbenchProps.selectedId === section.id ? "red" : "#2563EB"}
+                strokeWidth={2}
+                shadowColor={workbenchProps.selectedId === section.id ? "red" : null}
+                shadowBlur={workbenchProps.selectedId === section.id ? 1 : 0}
+                // shadowOffset={workbenchProps.selectedId === section.id ? { x: 1, y: 1 } : { x: 0, y: 0 }}
+                // shadowOpacity={workbenchProps.selectedId === section.id ? 50 : 0}
+                onTap={(e) => {
+                  workbenchProps.transformerRef.current?.nodes([]);
+                  workbenchProps.transformerRef.current?.getLayer()?.batchDraw();
+                  workbenchProps.setSelectedId(section.id);
+                }}
+                onClick={(e) => {
+                  workbenchProps.transformerRef.current?.nodes([]);
+                  workbenchProps.transformerRef.current?.getLayer()?.batchDraw();
+                  workbenchProps.setSelectedId(section.id);
+                }}
+              />
+              
               )}
 
               {/* Left Border (-offset) */}
@@ -259,6 +264,11 @@ const WorkbenchCanvas = () => {
           <Transformer
             ref={workbenchProps.transformerRef}
             rotateEnabled={false}
+            borderStroke={workbenchProps.selectedId ? "red" : "transparent"}
+            borderStrokeWidth={2}
+            anchorStroke={workbenchProps.selectedId ? "red" : "transparent"}
+            anchorFill={workbenchProps.selectedId ? "white" : "transparent"}
+            anchorSize={8}
             boundBoxFunc={(oldBox, newBox) => {
               if (!workbenchProps.selectedId || !workbenchProps.sectionId) return oldBox;
 

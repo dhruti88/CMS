@@ -114,7 +114,7 @@ const WorkPage = () => {
           </>
         ) : (
             <>
-              <div className="workbench-container">
+              <div className="left-container">
                     <WorkbenchActions />
                     <WorkbenchCanvas />
                 </div>
