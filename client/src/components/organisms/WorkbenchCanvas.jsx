@@ -1,431 +1,24 @@
-
-// import React, { useState } from 'react';
-// import { Stage, Layer, Rect, Text, Transformer, Group } from 'react-konva';
-// import URLImage from '../atoms/URLImage';
-// import { getGridLines } from '../../utils/gridHelpers';
-
-// const WorkbenchCanvas = ({
-//   stageSize,
-//   stageScale,
-//   toolMode,
-//   handleWheel,
-//   stageRef,
-//   items,
-//   selectedId,
-//   setSelectedId,
-//   handleItemDragEnd,
-//   cellWidth,
-//   cellHeight,
-//   gutterWidth,
-//   transformerRef,
-//   setItems,
-//   handleTransformEnd,
-//   handleItemDragStart,
-//   handleItemDragMove,
-//   sections,
-//   setSectionId,
-//   handleDragStart,
-//   handleDragEnd,
-//   handleDragMove,
-//   columns,
-//   rows
-// }) => {
-//   const [draggingItem, setDraggingItem] = useState(false); // Track if an item is being dragged
-
-//   const gridLines = getGridLines(
-//     columns,rows,
-//     stageSize.width,
-//     stageSize.height,
-//     gutterWidth,
-//     { grays: ['#202124', '#3c4043', '#5f6368', '#dadce0', '#f1f3f4'] }
-//   );
-
-//   return (
-//     <div className="workbench-container" style={{ border: '2px solid black' }}>
-//       <Stage
-//         ref={stageRef}
-//         width={stageSize.width}
-//         height={stageSize.height}
-//         scaleX={stageScale}
-//         scaleY={stageScale}
-//         draggable={toolMode === 'hand'}
-//         onWheel={handleWheel}
-//         onClick={(e) => {
-//           if (toolMode === 'pointer' && e.target === e.target.getStage()) {
-//             setSelectedId(null);
-//           }
-//         }}
-//         className="konva-stage"
-//       >
-//         <Layer>
-//           <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="gray" />
-//           {gridLines}
-
-//           {sections.map((section) => (
-//             <Group
-//               key={section.id}
-//               x={section.x}
-//               y={section.y}
-//               draggable={!draggingItem} // Prevent section dragging when an item is dragged
-//               onDragStart={(e) => {
-//                 if (!draggingItem) {
-//                   handleDragStart(e, section.id);
-//                   setSelectedId(section.id);
-//                 }
-//               }}
-//               onDragMove={(e) => {
-//                 if (!draggingItem) {
-//                   handleDragMove(e, section.id);
-//                 }
-//               }}
-//               onDragEnd={(e) => {
-//                 if (!draggingItem) {
-//                   handleDragEnd(e, section.id);
-//                 }
-//               }}
-//               onTap={() => setSectionId(section.id)}
-//             >
-//               <Rect width={section.width} height={section.height} fill="" stroke="red" strokeWidth={2} 
-//               onTap={() => setSectionId(section.id)}
-//               onClick={() => setSectionId(section.id)}/>
-
-// {section.items.map((item) =>
-//   item.type === "text" ? (
-//     <Text
-//       key={item.id}
-//                   id={item.id}
-//                   x={item.x}
-//                   y={item.y}
-//                   width={item.width}
-//                   height={item.height}
-//                   text={item.text}
-//                   fontSize={item.fontSize}
-//                   fontStyle={item.fontStyle}
-//                   fontFamily={item.fontFamily}
-//                   fill={item.fill}
-//                   align={item.align}
-//                   padding={item.padding}
-//                   backgroundFill={item.backgroundFill}
-
-//                   textDecoration={item.textDecoration}
-//                   draggable
-//       onClick={() => {
-//         setSelectedId(item.id);
-//         setSectionId(section.id);
-//       }}
-//       onTap={() => setSelectedId(item.id)}
-//       onDragStart={(e) => {
-//         setDraggingItem(true); // Prevent section movement
-//         handleItemDragStart(e, item.id, section.id);
-//         setSelectedId(item.id);
-//       }}
-//       onDragMove={(e) => handleItemDragMove(e, item.id, section.id)}
-//       onDragEnd={(e) => {
-//         setDraggingItem(false); // Re-enable section movement
-//         handleItemDragEnd(e, item.id, section.id);
-//       }}
-//       perfectDrawEnabled={false}
-//     />
-//   ) : item.type === "image" ? (
-//     <URLImage
-//       key={item.id}
-//       id={item.id}
-//       x={item.x}
-//       y={item.y}
-//       width={item.width}
-//       height={item.height}
-//       src={item.src}
-//       draggable
-//       onClick={() => setSelectedId(item.id)}
-//       onTap={() => setSelectedId(item.id)}
-//       onDragStart={(e) => {
-//         setDraggingItem(true); // Prevent section movement
-//         handleItemDragStart(e, item.id, section.id);
-//         setSelectedId(item.id);
-//       }}
-//       onDragMove={(e) => handleItemDragMove(e, item.id, section.id)}
-//       onDragEnd={(e) => {
-//         setDraggingItem(false); // Re-enable section movement
-//         handleItemDragEnd(e, item.id, section.id);
-//       }}
-//       perfectDrawEnabled={false}
-//     />
-//   ) : null
-// )}
-
-//             </Group>
-//           ))}
-
-//           <Transformer
-//             ref={transformerRef}
-//             boundBoxFunc={(oldBox, newBox) => {
-//               const totalCellWidth = cellWidth + gutterWidth;
-//               const colSpan = Math.round((newBox.width + gutterWidth) / totalCellWidth);
-//               const snappedWidth = colSpan * cellWidth + (colSpan - 1) * gutterWidth;
-//               const rowSpan = Math.round(newBox.height / cellHeight);
-//               const snappedHeight = rowSpan * cellHeight;
-//               const minWidth = cellWidth;
-//               const minHeight = cellHeight;
-//               const maxWidth = stageSize.width;
-//               const maxHeight = stageSize.height;
-//               return {
-//                 ...newBox,
-//                 width: Math.max(minWidth, Math.min(maxWidth, snappedWidth)),
-//                 height: Math.max(minHeight, Math.min(maxHeight, snappedHeight)),
-//               };
-//             }}
-//             onTransformEnd={handleTransformEnd}
-//           />
-//         </Layer>
-//       </Stage>
-//     </div>
-//   );
-// };
-
-// export default WorkbenchCanvas;
-
-
-
-// // import React from 'react';
-// // import { Stage, Layer, Rect, Text, Transformer, Group } from 'react-konva';
-// // import URLImage from '../atoms/URLImage';
-// // import { getGridLines } from '../../utils/gridHelpers';
-
-// // const WorkbenchCanvas = ({
-// //   stageSize,
-// //   stageScale,
-// //   toolMode,
-// //   handleWheel,
-// //   stageRef,
-// //   items,
-// //   selectedId,
-// //   setSelectedId,
-// //   handleItemDragEnd,
-// //   cellWidth,
-// //   cellHeight,
-// //   gutterWidth,
-// //   transformerRef,
-// //   setItems,
-// //   handleTransformEnd,
-// //   handleItemDragStart,
-// //   handleItemDragMove,
-// //   sections,
-// //   setSectionId,
-// //   handleDragStart,
-// //   handleDragEnd,
-// //   handleDragMove,
-// // }) => {
-// //   // Build grid lines using the helper
-// //   const gridLines = getGridLines(
-// //     stageSize.width,
-// //     stageSize.height,
-// //     cellWidth,
-// //     cellHeight,
-// //     gutterWidth,
-// //     { grays: ['#202124', '#3c4043', '#5f6368', '#dadce0', '#f1f3f4'] }
-// //   );
-
-// //   return (
-// //     <div className="workbench-container" style={{ border: '2px solid black' }}>
-// //       <Stage
-// //         ref={stageRef}
-// //         width={stageSize.width}
-// //         height={stageSize.height}
-// //         scaleX={stageScale}
-// //         scaleY={stageScale}
-// //         draggable={toolMode === 'hand'}
-// //         onWheel={handleWheel}
-// //         onClick={(e) => {
-// //           if (toolMode === 'pointer' && e.target === e.target.getStage()) {
-// //             setSelectedId(null);
-// //           }
-// //         }}
-// //         className="konva-stage"
-// //       >
-// //         <Layer>
-// //           <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="gray" />
-// //           {gridLines}
-
-
-// //           {sections.map((section) => (
-// //             <Group key={section.id} x={section.x} y={section.y} draggable
-// //             onClick={() => setSectionId(section.id)}
-// //                                onDragStart={(e) => { handleDragStart(e,section.id); setSelectedId(section.id); }}
-// //                                onDragMove={(e) => handleDragMove(e,section.id)}
-// //                                onDragEnd={(e) => handleDragEnd(e,section.id)}>
-// //               <Rect width={section.width} height={section.height} fill="" stroke="black" strokeWidth={2} 
-// //               />
-// //               {section.items.map((item) => (
-// //                  <Rect
-// //                  key={item.id}
-// //                  id={item.id}
-// //                  x={item.x}
-// //                  y={item.y}
-// //                  width={item.width}
-// //                  height={item.height}
-// //                  fill={item.fill}
-// //                  stroke={item.stroke}
-// //                  strokeWidth={item.strokeWidth}
-// //                  draggable
-// //                  onClick={() => (setSelectedId(item.id) , setSectionId(section.id))}
-// //                  onTap={() => setSelectedId(item.id)}
-// //                  onDragStart={(e) => { handleItemDragStart(e, item.id,section.id); setSelectedId(item.id); }}
-// //                  onDragMove={(e) => handleItemDragMove(e, item.id,section.id)}
-// //                  onDragEnd={(e) => handleItemDragEnd(e, item.id,section.id)}
-// //                  perfectDrawEnabled={false}
-// //                />
-// //               ))}
-// //             </Group>
-// //           ))}
-
-
-// //           {/* {items.map((item) => {
-// //             if (item.type === 'box') {
-// //               return (
-// //                 <Rect
-// //                   key={item.id}
-// //                   id={item.id}
-// //                   x={item.x}
-// //                   y={item.y}
-// //                   width={item.width}
-// //                   height={item.height}
-// //                   fill={item.fill}
-// //                   stroke={item.stroke}
-// //                   strokeWidth={item.strokeWidth}
-// //                   draggable
-// //                   onClick={() => setSelectedId(item.id)}
-// //                   onTap={() => setSelectedId(item.id)}
-// //                  // onDragStart={(e) => { handleItemDragStart(e, item.id,sectionId); setSelectedId(item.id); }}
-// //                  // onDragMove={(e) => handleItemDragMove(e, item.id,sectionId)}
-// //                  // onDragEnd={(e) => handleItemDragEnd(e, item.id,sectionId)}
-// //                   perfectDrawEnabled={false}
-// //                 />
-// //               );
-// //             } 
-// //             //Add to switch case
-// //             else if (item.type === 'text') {
-// //               return (
-// //                 <Text
-// //                   key={item.id}
-// //                   id={item.id}
-// //                   x={item.x}
-// //                   y={item.y}
-// //                   width={item.width}
-// //                   height={item.height}
-// //                   text={item.text}
-// //                   fontSize={item.fontSize}
-// //                   fontStyle={item.fontStyle}
-// //                   fontFamily={item.fontFamily}
-// //                   fill={item.fill}
-// //                   align={item.align}
-// //                   padding={item.padding}
-// //                   backgroundFill={item.backgroundFill}
-// //                   draggable
-// //                   onClick={() => setSelectedId(item.id)}
-// //                   onTap={() => setSelectedId(item.id)}
-// //                  // onDragStart={(e) => { handleItemDragStart(e, item.id,sectionId); setSelectedId(item.id); }}
-// //                  // onDragMove={(e) => handleItemDragMove(e, item.id,sectionId)}
-// //                  // onDragEnd={(e) => handleItemDragEnd(e, item.id,sectionId)}
-// //                   textDecoration={item.textDecoration}
-// //                   perfectDrawEnabled={false}
-// //                 />
-// //               );
-// //             } else if (item.type === 'image') {
-// //               return (
-// //                 <URLImage
-// //                   key={item.id}
-// //                   id={item.id}
-// //                   x={item.x}
-// //                   y={item.y}
-// //                   width={item.width}
-// //                   height={item.height}
-// //                   src={item.src}
-// //                   draggable
-// //                   onClick={() => setSelectedId(item.id)}
-// //                   onTap={() => setSelectedId(item.id)}
-// //                  // onDragStart={(e) => { handleItemDragStart(e, item.id,sectionId); setSelectedId(item.id); }}
-// //                  // onDragMove={(e) => handleItemDragMove(e, item.id,sectionId)}
-// //                  // onDragEnd={(e) => handleItemDragEnd(e, item.id,sectionId)}
-// //                   perfectDrawEnabled={false}
-// //                 />
-// //               );
-// //             }
-// //             return null;
-// //           })} */}
-// //           <Transformer
-// //             ref={transformerRef}
-// //             boundBoxFunc={(oldBox, newBox) => {
-// //               const totalCellWidth = cellWidth + gutterWidth;
-// //               const colSpan = Math.round((newBox.width + gutterWidth) / totalCellWidth);
-// //               const snappedWidth = colSpan * cellWidth + (colSpan - 1) * gutterWidth;
-// //               const rowSpan = Math.round(newBox.height / cellHeight);
-// //               const snappedHeight = rowSpan * cellHeight;
-// //               const minWidth = cellWidth;
-// //               const minHeight = cellHeight;
-// //               const maxWidth = stageSize.width;
-// //               const maxHeight = stageSize.height;
-// //               return {
-// //                 ...newBox,
-// //                 width: Math.max(minWidth, Math.min(maxWidth, snappedWidth)),
-// //                 height: Math.max(minHeight, Math.min(maxHeight, snappedHeight)),
-// //               };
-// //             }}
-// //             onTransformEnd={handleTransformEnd}
-// //           />
-// //         </Layer>
-// //       </Stage>
-// //     </div>
-// //   );
-// // };
-
-// // export default WorkbenchCanvas;
-import React, { useState, useEffect } from 'react';
-import { Stage, Layer, Rect, Text, Transformer, Group } from 'react-konva';
+import React, { useState, useEffect, useContext } from 'react';
+import { Stage, Layer, Rect, Text, Transformer, Group, Line } from 'react-konva';
 import URLImage from '../atoms/URLImage';
 import { getGridLines } from '../../utils/gridHelpers';
-import { Line } from "react-konva";
+import { WorkbenchContext } from '../../context/WorkbenchContext'; // Adjust the path as needed
 
-const WorkbenchCanvas = ({
-  stageSize,
-  stageScale,
-  toolMode,
-  handleWheel,
-  stageRef,
-  selectedId,
-  setSelectedId,
-  handleItemDragEnd,
-  cellWidth,
-  cellHeight,
-  gutterWidth,
-  transformerRef,
-  handleTransformEnd,
-  handleItemDragStart,
-  handleItemDragMove,
-  sections,
-  setSectionId,
-  handleDragStart,
-  handleDragEnd,
-  handleDragMove,
-  sectionId,
-  columns,
-  rows,
-  hideGrid, 
-  snapLines,      // New prop to control grid visibility
-  hideBackground, 
-  // New prop to control background visibility
-  positionDisplay,
-}) => {
+const WorkbenchCanvas = () => {
+  const workbenchProps = useContext(WorkbenchContext);
   const [draggingItem, setDraggingItem] = useState(false);
 
   const gridLines = getGridLines(
-    columns,rows,
-    stageSize.width,
-    stageSize.height,
-    gutterWidth,
+    workbenchProps.columns,
+    workbenchProps.rows,
+    workbenchProps.stageSize.width,
+    workbenchProps.stageSize.height,
+    workbenchProps.gutterWidth,
     { grays: ['#202124', '#3c4043', '#5f6368', '#dadce0', '#f1f3f4'] }
   );
 
-  const offset = (gutterWidth / 2);
+  const offset = workbenchProps.gutterWidth / 2;
+  
   const PositionDisplay = ({ position }) => {
     if (!position.show) return null;
   
@@ -459,17 +52,17 @@ const WorkbenchCanvas = ({
   };
 
   useEffect(() => {
-    if (!selectedId || !transformerRef.current) {
-      transformerRef.current?.nodes([]);
-      transformerRef.current?.getLayer()?.batchDraw();
+    if (!workbenchProps.selectedId || !workbenchProps.transformerRef.current) {
+      workbenchProps.transformerRef.current?.nodes([]);
+      workbenchProps.transformerRef.current?.getLayer()?.batchDraw();
       return;
     }
 
     let selectedItem = null;
     let selectedSection = null;
 
-    for (const section of sections) {
-      const item = section.items.find(i => i.id === selectedId);
+    for (const section of workbenchProps.sections) {
+      const item = section.items.find(i => i.id === workbenchProps.selectedId);
       if (item) {
         selectedItem = item;
         selectedSection = section;
@@ -479,121 +72,133 @@ const WorkbenchCanvas = ({
 
     if (!selectedItem) return;
 
-    const selectedNode = stageRef.current.findOne(`#${selectedId}`);
+    const selectedNode = workbenchProps.stageRef.current.findOne(`#${workbenchProps.selectedId}`);
 
     if (selectedNode) {
-      transformerRef.current.nodes([selectedNode]);
-      transformerRef.current.getLayer().batchDraw();
+      workbenchProps.transformerRef.current.nodes([selectedNode]);
+      workbenchProps.transformerRef.current.getLayer().batchDraw();
     }
-  }, [selectedId, sections]);
-  
+  }, [workbenchProps.selectedId, workbenchProps.sections, workbenchProps.transformerRef, workbenchProps.stageRef]);
+
   const [zoomLevel, setZoomLevel] = useState(1);
 
   useEffect(() => {
     const container = document.querySelector('.workbench-container');
-    if (!container || !stageRef.current) return;
+    if (!container || !workbenchProps.stageRef.current) return;
   
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
   
     // Directly adjust the stage size using the ref
-    stageRef.current.width(Math.max(stageSize.width, containerWidth));
-    stageRef.current.height(Math.max(stageSize.height, containerHeight));
-  }, [zoomLevel, stageSize]);
-  
-
+    workbenchProps.stageRef.current.width(Math.max(workbenchProps.stageSize.width, containerWidth));
+    workbenchProps.stageRef.current.height(Math.max(workbenchProps.stageSize.height, containerHeight));
+  }, [zoomLevel, workbenchProps.stageSize, workbenchProps.stageRef]);
 
   return (
-    <div className="workbench-container" style={{border: '2px solid black' }}>
-      <PositionDisplay position={positionDisplay} />
+    <div className="workbench-container">
+      <PositionDisplay position={workbenchProps.positionDisplay} />
       <Stage
-        ref={stageRef}
-        width={stageSize.width}
-        height={stageSize.height}
-        scaleX={stageScale}
-        scaleY={stageScale}
-        draggable={toolMode === 'hand'}
-        onWheel={handleWheel}
+        ref={workbenchProps.stageRef}
+        width={workbenchProps.stageSize.width}
+        height={workbenchProps.stageSize.height}
+        scaleX={workbenchProps.stageScale}
+        scaleY={workbenchProps.stageScale}
+        draggable={workbenchProps.toolMode === 'hand'}
+        onWheel={workbenchProps.handleWheel}
         onClick={(e) => {
-          if (toolMode === 'pointer' && e.target === e.target.getStage()) {
-            setSelectedId(null);
+          if (workbenchProps.toolMode === 'pointer' && e.target === e.target.getStage()) {
+            workbenchProps.setSelectedId(null);
           }
         }}
-        
         className="konva-stage"
       >
         <Layer>
-        {!hideBackground && (
-          <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="gray" 
-          onClick={() => setSelectedId(null)}
-          onTap={() => setSelectedId(null)} />
-        )}
-        {!hideGrid && gridLines}
+          {!workbenchProps.hideBackground && (
+            <Rect
+              x={0}
+              y={0}
+              width={workbenchProps.stageSize.width}
+              height={workbenchProps.stageSize.height}
+              fill="#d3dfeb"
+              onClick={() => workbenchProps.setSelectedId(null)}
+              onTap={() => workbenchProps.setSelectedId(null)}
+            />
+          )}
+          {!workbenchProps.hideGrid && gridLines}
 
-          {sections.map((section) => (
+          {workbenchProps.sections.map((section) => (
             <Group
-            key={section.id}
-            id={section.id}  // ✅ Make sure this matches 'section-<timestamp>'
-            x={section.x}
-            y={section.y}
-            draggable={!draggingItem}
-            onDragStart={(e) => !draggingItem && handleDragStart(e, section.id)}
-            onDragMove={(e) => !draggingItem && handleDragMove(e, section.id)}
-            onDragEnd={(e) => !draggingItem && handleDragEnd(e, section.id)}
-            onClick={() => setSectionId(section.id)}
-            onTap={() => setSectionId(section.id)}
+              key={section.id}
+              id={section.id}
+              x={section.x}
+              y={section.y}
+              draggable={!draggingItem}
+              onDragStart={(e) => !draggingItem && workbenchProps.handleDragStart(e, section.id)}
+              onDragMove={(e) => !draggingItem && workbenchProps.handleDragMove(e, section.id)}
+              onDragEnd={(e) => !draggingItem && workbenchProps.handleDragEnd(e, section.id)}
+              onClick={() => workbenchProps.setSectionId(section.id)}
+              onTap={() => workbenchProps.setSectionId(section.id)}
             >
-              {!hideBackground && (
-                 <Rect width={section.width} height={section.height} fill="" stroke="red" strokeWidth={2} 
-                 onTap={(e) => {
-                  transformerRef.current?.nodes([]);
-                  transformerRef.current?.getLayer()?.batchDraw();
-                  setSelectedId(section.id);
+              {!workbenchProps.hideBackground && (
+                <Rect
+                width={section.width}
+                height={section.height}
+                fill=""
+                stroke={workbenchProps.selectedId === section.id ? "red" : "#2563EB"}
+                strokeWidth={2}
+                shadowColor={workbenchProps.selectedId === section.id ? "red" : null}
+                shadowBlur={workbenchProps.selectedId === section.id ? 1 : 0}
+                // shadowOffset={workbenchProps.selectedId === section.id ? { x: 1, y: 1 } : { x: 0, y: 0 }}
+                // shadowOpacity={workbenchProps.selectedId === section.id ? 50 : 0}
+                onTap={(e) => {
+                  workbenchProps.transformerRef.current?.nodes([]);
+                  workbenchProps.transformerRef.current?.getLayer()?.batchDraw();
+                  workbenchProps.setSelectedId(section.id);
                 }}
                 onClick={(e) => {
-                  transformerRef.current?.nodes([]);
-                  transformerRef.current?.getLayer()?.batchDraw();
-                  setSelectedId(section.id);
+                  workbenchProps.transformerRef.current?.nodes([]);
+                  workbenchProps.transformerRef.current?.getLayer()?.batchDraw();
+                  workbenchProps.setSelectedId(section.id);
                 }}
+              />
+              
+              )}
+
+              {/* Left Border (-offset) */}
+              {section.borderStyle.left && (
+                <Line
+                  points={[-offset, 0, -offset, section.height]}
+                  stroke={section.borderColor || "black"}
+                  strokeWidth={section.borderWidth || 2}
                 />
-            )}
+              )}
 
-{/* Left Border (-5px) */}
-{section.borderStyle.left && (
-  <Line
-    points={[-offset, 0, -offset, section.height]}
-    stroke={section.borderColor || "black"}
-    strokeWidth={section.borderWidth || 2}
-  />
-)}
+              {/* Right Border (+offset) */}
+              {section.borderStyle.right && (
+                <Line
+                  points={[section.width + offset, 0, section.width + offset, section.height]}
+                  stroke={section.borderColor || "black"}
+                  strokeWidth={section.borderWidth || 2}
+                />
+              )}
 
-{/* Right Border (+offsetpx) */}
-{section.borderStyle.right && (
-  <Line
-    points={[section.width + offset, 0, section.width + offset, section.height]}
-    stroke={section.borderColor || "black"}
-    strokeWidth={section.borderWidth || 2}
-  />
-)}
+              {/* Top Border */}
+              {section.borderStyle.top && (
+                <Line
+                  points={[0, 0, section.width, 0]}
+                  stroke={section.borderColor || "black"}
+                  strokeWidth={section.borderWidth || 2}
+                />
+              )}
 
-{/* Top Border (Normal) */}
-{section.borderStyle.top && (
-  <Line
-    points={[0, 0, section.width, 0]}
-    stroke={section.borderColor || "black"}
-    strokeWidth={section.borderWidth || 2}
-  />
-)}
-
-{/* Bottom Border (Normal) */}
-{section.borderStyle.bottom && (
-  <Line
-    points={[0, section.height, section.width, section.height]}
-    stroke={section.borderColor || "black"}
-    strokeWidth={section.borderWidth || 2}
-  />
-)}
-
+              {/* Bottom Border */}
+              {section.borderStyle.bottom && (
+                <Line
+                  points={[0, section.height, section.width, section.height]}
+                  stroke={section.borderColor || "black"}
+                  strokeWidth={section.borderWidth || 2}
+                />
+              )}
 
               {section.items.map((item) =>
                 item.type === "text" ? (
@@ -610,21 +215,20 @@ const WorkbenchCanvas = ({
                     fontFamily={item.fontFamily}
                     fill={item.fill}
                     align={item.align}
-                    // padding={item.padding}
                     textDecoration={item.textDecoration}
                     draggable
                     onClick={() => {
-                      setSelectedId(item.id);
-                      setSectionId(section.id);
+                      workbenchProps.setSelectedId(item.id);
+                      workbenchProps.setSectionId(section.id);
                     }}
                     onDragStart={(e) => {
                       setDraggingItem(true);
-                      handleItemDragStart(e, item.id, section.id);
+                      workbenchProps.handleItemDragStart(e, item.id, section.id);
                     }}
-                    onDragMove={(e) => handleItemDragMove(e, item.id, section.id)}
+                    onDragMove={(e) => workbenchProps.handleItemDragMove(e, item.id, section.id)}
                     onDragEnd={(e) => {
                       setDraggingItem(false);
-                      handleItemDragEnd(e, item.id, section.id);
+                      workbenchProps.handleItemDragEnd(e, item.id, section.id);
                     }}
                     perfectDrawEnabled={false}
                   />
@@ -638,17 +242,17 @@ const WorkbenchCanvas = ({
                     height={item.height}
                     src={item.src}
                     draggable
-                    onClick={() => setSelectedId(item.id)}
-                    onTap={() => setSelectedId(item.id)}
+                    onClick={() => workbenchProps.setSelectedId(item.id)}
+                    onTap={() => workbenchProps.setSelectedId(item.id)}
                     onDragStart={(e) => {
-                      setDraggingItem(true); // Prevent section movement
-                      handleItemDragStart(e, item.id, section.id);
-                      setSelectedId(item.id);
+                      setDraggingItem(true);
+                      workbenchProps.handleItemDragStart(e, item.id, section.id);
+                      workbenchProps.setSelectedId(item.id);
                     }}
-                    onDragMove={(e) => handleItemDragMove(e, item.id, section.id)}
+                    onDragMove={(e) => workbenchProps.handleItemDragMove(e, item.id, section.id)}
                     onDragEnd={(e) => {
-                      setDraggingItem(false); // Re-enable section movement
-                      handleItemDragEnd(e, item.id, section.id);
+                      setDraggingItem(false);
+                      workbenchProps.handleItemDragEnd(e, item.id, section.id);
                     }}
                     perfectDrawEnabled={false}
                   />
@@ -658,91 +262,94 @@ const WorkbenchCanvas = ({
           ))}
 
           <Transformer
-            ref={transformerRef}
-            rotateEnabled={false} 
+            ref={workbenchProps.transformerRef}
+            rotateEnabled={false}
+            borderStroke={workbenchProps.selectedId ? "red" : "transparent"}
+            borderStrokeWidth={2}
+            anchorStroke={workbenchProps.selectedId ? "red" : "transparent"}
+            anchorFill={workbenchProps.selectedId ? "white" : "transparent"}
+            anchorSize={8}
             boundBoxFunc={(oldBox, newBox) => {
-              if (!selectedId || !sectionId) return oldBox;
-            
-              const section = sections.find(sec => sec.id === sectionId);
+              if (!workbenchProps.selectedId || !workbenchProps.sectionId) return oldBox;
+
+              const section = workbenchProps.sections.find(sec => sec.id === workbenchProps.sectionId);
               if (!section) return oldBox;
-            
-              const selectedItem = section.items.find(i => i.id === selectedId);
+
+              const selectedItem = section.items.find(i => i.id === workbenchProps.selectedId);
               if (!selectedItem) return oldBox;
-            
-              const otherItems = section.items.filter(i => i.id !== selectedId);
-              console.log("section : - ",section,"new box : -",newBox, "old box : -",oldBox);
-            
+
+              const otherItems = section.items.filter(i => i.id !== workbenchProps.selectedId);
+              console.log("section : - ", section, "new box : -", newBox, "old box : -", oldBox);
+
               // Section boundaries
               const sectionLeft = section.x;
               const sectionRight = section.x + section.width;
               const sectionTop = section.y;
               const sectionBottom = section.y + section.height;
-            
+
               // Grid calculations
-              const totalCellWidth = cellWidth + gutterWidth;
+              const totalCellWidth = workbenchProps.cellWidth + workbenchProps.gutterWidth;
               const newGridX = Math.round((newBox.x - section.x) / totalCellWidth);
-              const newGridY = Math.round((newBox.y - section.y) / cellHeight);
-              const colSpan = Math.max(1, Math.round((newBox.width + gutterWidth) / totalCellWidth));
-              const rowSpan = Math.max(1, Math.round(newBox.height / cellHeight));
-              //console.log("colSpan : -",colSpan,"rowSpan : -",rowSpan);
-              const snappedWidth = colSpan * cellWidth + (colSpan - 1) * gutterWidth;
-              const snappedHeight = rowSpan * cellHeight;
-            
+              const newGridY = Math.round((newBox.y - section.y) / workbenchProps.cellHeight);
+              const colSpan = Math.max(1, Math.round((newBox.width + workbenchProps.gutterWidth) / totalCellWidth));
+              const rowSpan = Math.max(1, Math.round(newBox.height / workbenchProps.cellHeight));
+              const snappedWidth = colSpan * workbenchProps.cellWidth + (colSpan - 1) * workbenchProps.gutterWidth;
+              const snappedHeight = rowSpan * workbenchProps.cellHeight;
+
               let canExpandLeft = true, canExpandRight = true, canExpandTop = true, canExpandBottom = true;
-            
+
               // **Check for collisions**
               otherItems.forEach(item => {
-                console.log("otheritem : -",item);
-                const itemGridX = Math.round((item.x) / totalCellWidth);
-                const itemGridY = Math.round((item.y) / cellHeight);
+                const itemGridX = Math.round(item.x / totalCellWidth);
+                const itemGridY = Math.round(item.y / workbenchProps.cellHeight);
                 const itemColSpan = Math.round(item.width / totalCellWidth);
-                const itemRowSpan = Math.round(item.height / cellHeight);
-            
+                const itemRowSpan = Math.round(item.height / workbenchProps.cellHeight);
+
                 const itemRight = itemGridX + itemColSpan;
                 const itemBottom = itemGridY + itemRowSpan;
                 const newRight = newGridX + colSpan;
                 const newBottom = newGridY + rowSpan;
-            
+
                 // **Stop left expansion if another item is in the way**
                 if (newGridX < selectedItem.gridX && itemRight > newGridX && itemGridY < newBottom && itemBottom > newGridY) {
                   canExpandLeft = false;
                 }
-            
+
                 // **Stop right expansion if another item is in the way**
                 if (newRight > selectedItem.gridX + selectedItem.sizeInfo.cols && itemGridX < newRight && itemRight > newGridX && itemGridY < newBottom && itemBottom > newGridY) {
                   canExpandRight = false;
                 }
-            
+
                 // **Stop top expansion if another item is in the way**
                 if (newGridY < selectedItem.gridY && itemBottom > newGridY && itemGridX < newRight && itemRight > newGridX) {
                   canExpandTop = false;
                 }
-            
+
                 // **Stop bottom expansion if another item is in the way**
                 if (newBottom > selectedItem.gridY + selectedItem.sizeInfo.rows && itemGridY < newBottom && itemBottom > newGridY && itemGridX < newRight && itemRight > newGridX) {
                   canExpandBottom = false;
                 }
               });
-            
-              // **Adjust Left Expansion** (Move `x` position left)
+
+              // **Adjust Left Expansion**
               const adjustedX = canExpandLeft
                 ? Math.max(sectionLeft, section.x + newGridX * totalCellWidth)
                 : section.x + selectedItem.gridX * totalCellWidth;
-            
-              // **Adjust Top Expansion** (Move `y` position up)
+
+              // **Adjust Top Expansion**
               const adjustedY = canExpandTop
-                ? Math.max(sectionTop, section.y + newGridY * cellHeight)
-                : section.y + selectedItem.gridY * cellHeight;
-            
+                ? Math.max(sectionTop, section.y + newGridY * workbenchProps.cellHeight)
+                : section.y + selectedItem.gridY * workbenchProps.cellHeight;
+
               // **Width & Height Adjustments**
               const adjustedWidth = canExpandRight
                 ? Math.min(snappedWidth, sectionRight - adjustedX)
-                : selectedItem.sizeInfo.cols * totalCellWidth - gutterWidth;
-            
+                : selectedItem.sizeInfo.cols * totalCellWidth - workbenchProps.gutterWidth;
+
               const adjustedHeight = canExpandBottom
                 ? Math.min(snappedHeight, sectionBottom - adjustedY)
-                : selectedItem.sizeInfo.rows * cellHeight;
-            
+                : selectedItem.sizeInfo.rows * workbenchProps.cellHeight;
+
               return {
                 ...oldBox,
                 x: adjustedX,
@@ -751,17 +358,14 @@ const WorkbenchCanvas = ({
                 height: adjustedHeight,
               };
             }}
-            
-            
-
             onTransformEnd={(e) => {
               console.log("Transform End Triggered");
-              handleTransformEnd(e);
+              workbenchProps.handleTransformEnd(e);
             }}
           />
 
-          {/* Your other Stage content */}
-          {snapLines.map((line, i) => (
+          {/* Render snap lines */}
+          {workbenchProps.snapLines.map((line, i) => (
             <Line
               key={`snapline-${i}`}
               points={line.points}
@@ -777,200 +381,3 @@ const WorkbenchCanvas = ({
 };
 
 export default WorkbenchCanvas;
-
-
-
-
-// import React from 'react';
-// import { Stage, Layer, Rect, Text, Transformer, Group } from 'react-konva';
-// import URLImage from '../atoms/URLImage';
-// import { getGridLines } from '../../utils/gridHelpers';
-
-// const WorkbenchCanvas = ({
-//   stageSize,
-//   stageScale,
-//   toolMode,
-//   handleWheel,
-//   stageRef,
-//   items,
-//   selectedId,
-//   setSelectedId,
-//   handleItemDragEnd,
-//   cellWidth,
-//   cellHeight,
-//   gutterWidth,
-//   transformerRef,
-//   setItems,
-//   handleTransformEnd,
-//   handleItemDragStart,
-//   handleItemDragMove,
-//   sections,
-//   setSectionId,
-//   handleDragStart,
-//   handleDragEnd,
-//   handleDragMove,
-// }) => {
-//   // Build grid lines using the helper
-//   const gridLines = getGridLines(
-//     stageSize.width,
-//     stageSize.height,
-//     cellWidth,
-//     cellHeight,
-//     gutterWidth,
-//     { grays: ['#202124', '#3c4043', '#5f6368', '#dadce0', '#f1f3f4'] }
-//   );
-
-//   return (
-//     <div className="workbench-container" style={{ border: '2px solid black' }}>
-//       <Stage
-//         ref={stageRef}
-//         width={stageSize.width}
-//         height={stageSize.height}
-//         scaleX={stageScale}
-//         scaleY={stageScale}
-//         draggable={toolMode === 'hand'}
-//         onWheel={handleWheel}
-//         onClick={(e) => {
-//           if (toolMode === 'pointer' && e.target === e.target.getStage()) {
-//             setSelectedId(null);
-//           }
-//         }}
-//         className="konva-stage"
-//       >
-//         <Layer>
-//           <Rect x={0} y={0} width={stageSize.width} height={stageSize.height} fill="gray" />
-//           {gridLines}
-
-
-//           {sections.map((section) => (
-//             <Group key={section.id} x={section.x} y={section.y} draggable
-//             onClick={() => setSectionId(section.id)}
-//                                onDragStart={(e) => { handleDragStart(e,section.id); setSelectedId(section.id); }}
-//                                onDragMove={(e) => handleDragMove(e,section.id)}
-//                                onDragEnd={(e) => handleDragEnd(e,section.id)}>
-//               <Rect width={section.width} height={section.height} fill="" stroke="black" strokeWidth={2} 
-//               />
-//               {section.items.map((item) => (
-//                  <Rect
-//                  key={item.id}
-//                  id={item.id}
-//                  x={item.x}
-//                  y={item.y}
-//                  width={item.width}
-//                  height={item.height}
-//                  fill={item.fill}
-//                  stroke={item.stroke}
-//                  strokeWidth={item.strokeWidth}
-//                  draggable
-//                  onClick={() => (setSelectedId(item.id) , setSectionId(section.id))}
-//                  onTap={() => setSelectedId(item.id)}
-//                  onDragStart={(e) => { handleItemDragStart(e, item.id,section.id); setSelectedId(item.id); }}
-//                  onDragMove={(e) => handleItemDragMove(e, item.id,section.id)}
-//                  onDragEnd={(e) => handleItemDragEnd(e, item.id,section.id)}
-//                  perfectDrawEnabled={false}
-//                />
-//               ))}
-//             </Group>
-//           ))}
-
-
-//           {/* {items.map((item) => {
-//             if (item.type === 'box') {
-//               return (
-//                 <Rect
-//                   key={item.id}
-//                   id={item.id}
-//                   x={item.x}
-//                   y={item.y}
-//                   width={item.width}
-//                   height={item.height}
-//                   fill={item.fill}
-//                   stroke={item.stroke}
-//                   strokeWidth={item.strokeWidth}
-//                   draggable
-//                   onClick={() => setSelectedId(item.id)}
-//                   onTap={() => setSelectedId(item.id)}
-//                  // onDragStart={(e) => { handleItemDragStart(e, item.id,sectionId); setSelectedId(item.id); }}
-//                  // onDragMove={(e) => handleItemDragMove(e, item.id,sectionId)}
-//                  // onDragEnd={(e) => handleItemDragEnd(e, item.id,sectionId)}
-//                   perfectDrawEnabled={false}
-//                 />
-//               );
-//             } 
-//             //Add to switch case
-//             else if (item.type === 'text') {
-//               return (
-//                 <Text
-//                   key={item.id}
-//                   id={item.id}
-//                   x={item.x}
-//                   y={item.y}
-//                   width={item.width}
-//                   height={item.height}
-//                   text={item.text}
-//                   fontSize={item.fontSize}
-//                   fontStyle={item.fontStyle}
-//                   fontFamily={item.fontFamily}
-//                   fill={item.fill}
-//                   align={item.align}
-//                   padding={item.padding}
-//                   backgroundFill={item.backgroundFill}
-//                   draggable
-//                   onClick={() => setSelectedId(item.id)}
-//                   onTap={() => setSelectedId(item.id)}
-//                  // onDragStart={(e) => { handleItemDragStart(e, item.id,sectionId); setSelectedId(item.id); }}
-//                  // onDragMove={(e) => handleItemDragMove(e, item.id,sectionId)}
-//                  // onDragEnd={(e) => handleItemDragEnd(e, item.id,sectionId)}
-//                   textDecoration={item.textDecoration}
-//                   perfectDrawEnabled={false}
-//                 />
-//               );
-//             } else if (item.type === 'image') {
-//               return (
-//                 <URLImage
-//                   key={item.id}
-//                   id={item.id}
-//                   x={item.x}
-//                   y={item.y}
-//                   width={item.width}
-//                   height={item.height}
-//                   src={item.src}
-//                   draggable
-//                   onClick={() => setSelectedId(item.id)}
-//                   onTap={() => setSelectedId(item.id)}
-//                  // onDragStart={(e) => { handleItemDragStart(e, item.id,sectionId); setSelectedId(item.id); }}
-//                  // onDragMove={(e) => handleItemDragMove(e, item.id,sectionId)}
-//                  // onDragEnd={(e) => handleItemDragEnd(e, item.id,sectionId)}
-//                   perfectDrawEnabled={false}
-//                 />
-//               );
-//             }
-//             return null;
-//           })} */}
-//           <Transformer
-//             ref={transformerRef}
-//             boundBoxFunc={(oldBox, newBox) => {
-//               const totalCellWidth = cellWidth + gutterWidth;
-//               const colSpan = Math.round((newBox.width + gutterWidth) / totalCellWidth);
-//               const snappedWidth = colSpan * cellWidth + (colSpan - 1) * gutterWidth;
-//               const rowSpan = Math.round(newBox.height / cellHeight);
-//               const snappedHeight = rowSpan * cellHeight;
-//               const minWidth = cellWidth;
-//               const minHeight = cellHeight;
-//               const maxWidth = stageSize.width;
-//               const maxHeight = stageSize.height;
-//               return {
-//                 ...newBox,
-//                 width: Math.max(minWidth, Math.min(maxWidth, snappedWidth)),
-//                 height: Math.max(minHeight, Math.min(maxHeight, snappedHeight)),
-//               };
-//             }}
-//             onTransformEnd={handleTransformEnd}
-//           />
-//         </Layer>
-//       </Stage>
-//     </div>
-//   );
-// };
-
-// export default WorkbenchCanvas;

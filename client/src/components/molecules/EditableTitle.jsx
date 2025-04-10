@@ -49,7 +49,7 @@ const EditableTitle = ({ layoutTitle, setLayoutTitle }) => {
       variant="h5"
       onClick={handleTitleClick}
       sx={{
-        width: "150px", // ✅ consistent width
+        width: "150px", 
         fontWeight: "bold",
         color: "var(--primary-color)",
         padding: "10px 0",
@@ -58,7 +58,7 @@ const EditableTitle = ({ layoutTitle, setLayoutTitle }) => {
         userSelect: "none",
         overflow: "hidden",
         whiteSpace: "nowrap",
-        textOverflow: "ellipsis", // optional, for longer titles
+        textOverflow: "ellipsis", 
       }}
     >
       {layoutTitle}

@@ -27,7 +27,6 @@ const SelectionBar = ({ onSearch }) => {
         </Select>
       </FormControl>
 
-      {/* Due Date with dd-mm-yyyy conversion */}
       <TextField type="date"/>
 
       <FormControl>
@@ -47,7 +46,6 @@ const SelectionBar = ({ onSearch }) => {
         </Select>
       </FormControl>
 
-{/* Rows Input */}
 <TextField 
   label="Rows" 
   type="number" 
@@ -56,7 +54,6 @@ const SelectionBar = ({ onSearch }) => {
   sx={{ width: "50px" }} 
 />
 
-{/* Cols Input */}
 <TextField 
   label="Cols" 
   type="number" 
@@ -64,9 +61,6 @@ const SelectionBar = ({ onSearch }) => {
   onChange={(e) => setCols(e.target.value)} 
   sx={{ width: "50px" }} 
 />
-
-
-
       <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
 
       <CustomButton onClick={handleSearch} sx={{ width: "120px" }}>Search</CustomButton>

@@ -133,7 +133,7 @@ const LayoutHistory = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Card sx={{ maxWidth: 1200, margin: 'auto', mt: 4 }}>
+      <Card sx={{ maxWidth: 1200, margin: 'auto', mt: "100px" }}>
         <CardHeader
           title="Layout History"
           subheader={`${historyEntries.length} entries found`}
