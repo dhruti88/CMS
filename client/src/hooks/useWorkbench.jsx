@@ -392,7 +392,7 @@ const useWorkbench = () => {
     accent: ['#ea4335', '#fbbc04', '#34a853'],
     grays: ['#202124', '#3c4043', '#5f6368', '#dadce0', '#f1f3f4']
   };
-
+  const {layoutid: layoutID} = useParams();
   // Layout endpoints
   const saveLayout = async ({ e = 1 }) => {
     console.log(taskStatus);
@@ -421,7 +421,8 @@ const useWorkbench = () => {
         }
       }
 
-      const layoutID = localStorage.getItem('layoutid');
+      // const {layoutid} = useParams();
+      // const layoutID = layoutid;
       const layoutData = {
         userId,
         title: layoutTitle,
@@ -1587,16 +1588,16 @@ const useWorkbench = () => {
     }
   }, [layoutid]);
 
-  const { layoutid: x } = useParams();
+  // const { layoutid: x } = useParams();
 
-  useEffect(() => {
-    console.log("layoutid : check11", x);
-    if (!check && window.location.pathname === `/page/${layoutid}`) {
-      setCheck(true);
-      console.log("layoutid : check", x);
-      fetchLayoutById();
-    }
-  }, [check, x]);
+  // useEffect(() => {
+  //   console.log("layoutid : check11", x);
+  //   if (!check && window.location.pathname === `/page/${layoutid}`) {
+  //     setCheck(true);
+  //     console.log("layoutid : check", x);
+  //     fetchLayoutById();
+  //   }
+  // }, [check, x]);
 
   //=================================
   return {

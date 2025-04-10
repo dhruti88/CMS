@@ -5,7 +5,7 @@ import SignUp from './SignUp';
 import HomePage from "./components/pages/HomePage"; // Create this for the main app/dashboard
 import LandingPage from './components/pages/LandingPage';
 import WorkBench from './components/pages/WorkBench';
-import WorkPage from './components/pages/WorkPage';
+import WorkPageWrapper from './components/pages/WorkPageWrapper';
 import ProtectedRoute from './hooks/ProtectedRoute';
 import PublicRoute from './hooks/PublicRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -14,12 +14,12 @@ import LayoutHistory from './components/pages/LayoutHistory'
 import Navbar from './components/atoms/navbar/NavBar';
 import ErrorBoundary from './components/pages/ErrorBoundry';
 import { WorkbenchProvider } from './context/WorkbenchContext';
+import WorkBenchWrapper from './components/pages/WorkBenchWrapper';
 
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-      <WorkbenchProvider>
         <Router>
           <Navbar />
           <Routes>
@@ -45,14 +45,14 @@ function App() {
             <Route path="/page" element={
               <ProtectedRoute>
                 <ErrorBoundary>
-                  <WorkBench/>
+                  <WorkBenchWrapper/>
                 </ErrorBoundary>
               </ProtectedRoute>
                }/>
-               <Route path="/page/:layoutid" element={
+               <Route path="/page/:layoutid" element={ 
               <ProtectedRoute>
                 <ErrorBoundary>
-                  <WorkPage/>
+                  <WorkPageWrapper/>
                 </ErrorBoundary>
               </ProtectedRoute>
                }/>
@@ -86,7 +86,6 @@ function App() {
                }/> 
              </Routes>
            </Router>
-           </WorkbenchProvider>
          </AuthProvider>
        </ErrorBoundary>
      );
