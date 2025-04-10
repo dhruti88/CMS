@@ -139,6 +139,8 @@ const useWorkbench = () => {
     }
   }, [token]);
 
+
+  const [layoutid, setlayoutid] = useState(null);
   //call useYjsManager 
   const {
     activeEditors,
@@ -146,6 +148,7 @@ const useWorkbench = () => {
     updateSectionsAndSync,
     userId,
   } = useYjsManager({
+    layoutid,
     cellWidth,
     cellHeight,
     gutterWidth,
@@ -184,7 +187,6 @@ const useWorkbench = () => {
       borderWidth: 2,                    // default border width
     }
   };
-
   // Item addition function
   const addBox = (size) => {
     return {
@@ -316,6 +318,7 @@ const useWorkbench = () => {
   };
 
   useEffect(() => {
+    console.log("laytoutid : -- ", layoutid);
     console.log("Updated sections:", sections);
   }, [sections]);
 
@@ -573,6 +576,8 @@ const useWorkbench = () => {
     setLayoutType(() => layout.layouttype);
 
     console.log("Loaded layout:", layout);
+
+
   };
 
 
@@ -754,7 +759,7 @@ const useWorkbench = () => {
     }
   };
 
-  // Zoom handlers
+  //Zoom handlers
   const handleWheel = (e) => {
     e.evt.preventDefault();
     const stage = e.target.getStage();
@@ -1500,7 +1505,6 @@ const useWorkbench = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { layoutid } = useParams();
 
   const fetchLayoutById = async (id) => {
     try {
@@ -1684,6 +1688,8 @@ const useWorkbench = () => {
     LoadingState,
     CurrentLayout,
     setCurrentLayout,
+    layoutid,
+    setlayoutid,
   };
 };
 

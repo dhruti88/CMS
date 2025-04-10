@@ -20,6 +20,7 @@ const WorkPage = () => {
         setLoading(true);
         try {
             if(layoutid) {
+              workbenchProps.setlayoutid(layoutid);
                 console.log("Layout ID from URL:", layoutid);
                 await workbenchProps.fetchLayoutById(layoutid);
             }
@@ -113,7 +114,7 @@ const WorkPage = () => {
           </>
         ) : (
             <>
-              <div className="workbench-container">
+              <div className="left-container">
                     <WorkbenchActions />
                     <WorkbenchCanvas />
                 </div>

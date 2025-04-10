@@ -30,25 +30,71 @@ body {
   background-color: var(--secondary-color);
   padding-top: 100px;
 }
-
 /* Workbench Styles */
+
+.left-container,
 .workbench-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: white;
-  overflow: auto; /* Allows scrolling */
+  background-color: #ffffff;
   padding: 10px;
+  margin-top: 10px;
+  border-radius: 10px;
+  overflow-x: auto; /* Better UX for horizontal overflow */
+  overflow-y: auto;
 }
+
+/* Specific border for workbench */
+.workbench-container {
+  border: 2px solid var(--primary-color);
+}
+
+/* ===== Scrollbar Styles ===== */
+
+/* Vertical scrollbar */
+.left-container::-webkit-scrollbar,
+.workbench-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px; /* Enables styling for horizontal scrollbar too */
+}
+
+/* Scrollbar track */
+.left-container::-webkit-scrollbar-track,
+.workbench-container::-webkit-scrollbar-track {
+  background: #ffffff;
+  border-radius: 20px;
+  margin: 3px 0; /* Vertical margin */
+}
+
+/* Scrollbar thumb */
+.left-container::-webkit-scrollbar-thumb,
+.workbench-container::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+  border-radius: 12px;
+  min-height: 20px; /* Simulated minimum size */
+}
+
+/* Scrollbar thumb hover */
+.left-container::-webkit-scrollbar-thumb:hover,
+.workbench-container::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+
+
 
 .workbench-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 5px;
   padding: 0 20px;
   height: var(--toolbar-height);
-  border-bottom: 1px solid var(--border-color);
+  border: 1px solid rgb(255, 255, 255) ;
   background-color: white;
+  box-shadow: 0 0 4px var(--primary-color);
+  border-radius: 10px;
   position: relative;
 }
 
@@ -152,11 +198,15 @@ body {
   /* Toolbox Styles */
   .toolbox {
     width: 320px;
-    background-color: var(--toolbox-bg);
+    background-color: white;
     border-left: 1px solid var(--border-color);
     overflow-y: auto;
     padding: 20px; /* Adjust spacing */
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
   }
+
+
   
   .toolbox-header {
     font-size: 24px;
