@@ -5,7 +5,7 @@ import SelectionBar from "../atoms/SelectionBar";
 import Pagination from "../atoms/Pagination";
 import Footer from "../atoms/Footer";
 import { useAuth } from "../../context/AuthContext";
-import { WorkbenchContext } from "../../context/WorkbenchContext";
+//import { WorkbenchContext } from "../../context/WorkbenchContext";
 import {
   Box,
   Grid,
@@ -41,11 +41,11 @@ const MyLayouts = () => {
 
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { loadLayoutFromSelected } = useContext(WorkbenchContext);
+  //const { loadLayoutFromSelected } = useContext(WorkbenchContext);
 
   // Load layout and navigate to editor
   const loadLayout = (item) => {
-    loadLayoutFromSelected(item);
+    //loadLayoutFromSelected(item);
     // slight delay to ensure context state is set before navigation
     setTimeout(() => navigate(`/page/${item._id}`), 10);
   };

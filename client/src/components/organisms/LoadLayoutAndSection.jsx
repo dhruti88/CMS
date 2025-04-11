@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Tooltip, IconButton, TextField } from "@mui/material";
 import { Delete } from "@mui/icons-material";
-import "./LoadLayoutAndSection.css"; // Keep consistent styling
+import "../../styles/LoadLayoutAndSection.css"; // Keep consistent styling
 import { useNavigate } from "react-router-dom";
 const LoadLayoutAndSection = ({
   availableLayouts,
@@ -74,11 +74,12 @@ const LoadLayoutAndSection = ({
     setShowLayoutList(false);
   };
 
-  const loadLayout = (item) => {
-
-
-    setTimeout(() => navigate(`/page/${item._id}`), 10);
-    loadLayoutFromSelected(item);
+  const loadLayout=(item)=>
+  {
+    // setTimeout(()=> navigate(`/page/${item._id}`),10);
+    setShowLayoutList(false);
+    setTimeout(()=> window.open(`/page/${item._id}`, '_blank'),10);
+    // loadLayoutFromSelected(item);
   };
 
   return (

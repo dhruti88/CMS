@@ -6,9 +6,28 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    background-color: #ffffff;
+    /* background-color: #ffffff; */
+    background-color: var(--background-color);
+    transition: background-color 0.3s ease;
   }/* Navigation bar */
   
+/* Navbar */
+/* .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px 10px 10px;
+  background: #f8f9fa;
+  z-index: 1000; 
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow:rgba(2, 31, 221, 0.07) 0rem 0.5rem 1rem;
+} */
+
 /* Navbar */
 .navbar {
   position: fixed;
@@ -19,11 +38,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px 10px 10px;
-  background: #f8f9fa;
-  z-index: 1000; /* Ensure it is above other content */
+  background: var(--nav-bg);
+  z-index: 1000;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
-  box-shadow:rgba(2, 31, 221, 0.07) 0rem 0.5rem 1rem;
+  box-shadow: var(--primary-shadow) 0rem 0.5rem 1rem;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
   
   /* Navigation button container */
@@ -32,7 +52,7 @@
   }
   
   /* Main content box */
-  .content-box {
+  /* .content-box {
     text-align: center;
     background:#f8f9fa;
     padding: 50px;
@@ -41,10 +61,26 @@
     max-width: 500px;
   }
   
+   */
+
+   .content-box {
+    text-align: center;
+    background: var(--card-bg);
+    padding: 50px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px var(--shadow-color);
+    max-width: 500px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+
   /* Subtext under the title */
   .subtext {
-    color: #333;
-    margin-top: 10px;
+    /* color: #333;
+    margin-top: 10px; */
+    color: var(--text-color);
+  margin-top: 10px;
+  transition: color 0.3s ease;
   }
   
   /* Button container */
@@ -65,3 +101,31 @@
     width: 100%;
   }
   
+
+  /* Dark Mode Toggle */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 15px;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  background-color: var(--secondary-color);
+  transition: background-color 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background-color: var(--hover-color);
+}
+
+.theme-toggle svg {
+  width: 24px;
+  height: 24px;
+  fill: var(--text-color);
+  transition: fill 0.3s ease;
+}
