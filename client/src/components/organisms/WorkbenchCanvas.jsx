@@ -18,10 +18,10 @@ const WorkbenchCanvas = () => {
   );
 
   const offset = workbenchProps.gutterWidth / 2;
-  
+
   const PositionDisplay = ({ position }) => {
     if (!position.show) return null;
-  
+
     return (
       <div
         style={{
@@ -85,10 +85,10 @@ const WorkbenchCanvas = () => {
   useEffect(() => {
     const container = document.querySelector('.workbench-container');
     if (!container || !workbenchProps.stageRef.current) return;
-  
+
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
-  
+
     // Directly adjust the stage size using the ref
     workbenchProps.stageRef.current.width(Math.max(workbenchProps.stageSize.width, containerWidth));
     workbenchProps.stageRef.current.height(Math.max(workbenchProps.stageSize.height, containerHeight));

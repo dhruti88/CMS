@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo , useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 
+// Layout document manager singleton - keeps track of all active Yjs documents
 const layoutDocsManager = (() => {
   const activeDocuments = new Map();
   const inactivityTimers = new Map();
@@ -18,7 +19,12 @@ const layoutDocsManager = (() => {
           ydoc
         );
         
-        activeDocuments.set(layoutId, { ydoc, wsProvider, activeUsers: new Set(), lastActivity: Date.now() });
+        activeDocuments.set(layoutId, { 
+          ydoc, 
+          wsProvider, 
+          activeUsers: new Set(), 
+          lastActivity: Date.now() 
+        });
       } else {
         // Update last activity time
         const docInfo = activeDocuments.get(layoutId);
@@ -73,6 +79,19 @@ const layoutDocsManager = (() => {
         if (inactivityTimers.has(layoutId)) {
           clearTimeout(inactivityTimers.get(layoutId));
           inactivityTimers.delete(layoutId);
+        }
+      }
+    },
+
+    // New method to handle user leaving a layout
+    userLeaveLayout: (layoutId, userId) => {
+      if (activeDocuments.has(layoutId)) {
+        const docInfo = activeDocuments.get(layoutId);
+        docInfo.activeUsers.delete(userId);
+        
+        // If no users remain, setup inactivity timer
+        if (docInfo.activeUsers.size === 0) {
+          layoutDocsManager.setupInactivityCheck(layoutId);
         }
       }
     }

@@ -169,9 +169,9 @@ const WorkbenchActions = () => {
                   sx={
                     editor.id === workbenchProps.userID
                       ? {
-                          border: '2px solid #44b700',
-                          boxShadow: '0 0 10px rgba(68, 183, 0, 0.5)',
-                        }
+                        border: '2px solid #44b700',
+                        boxShadow: '0 0 10px rgba(68, 183, 0, 0.5)',
+                      }
                       : {}
                   }
                 />

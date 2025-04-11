@@ -33,8 +33,8 @@ const ProfileMenu = ({ user, token }) => {
       const response = await axios.get(`${SERVER_URL}/api/users/profile-image/${user.uid}`, {
         responseType: 'blob', // Get image as blob
         headers: {
-            Authorization: `Bearer ${token}`
-          },
+          Authorization: `Bearer ${token}`
+        },
       });
 
       const imageURL = URL.createObjectURL(response.data); // Convert blob to URL
@@ -97,16 +97,16 @@ const ProfileMenu = ({ user, token }) => {
     }
   };
 
-const auth = getAuth();
+  const auth = getAuth();
 
-const handleLogout = async () => {
-  try {
-    await logout(); // Firebase sign out
-    alert("Successfully logged out!");
-  } catch (error) {
-    alert("Failed to log out. Please try again.");
-  }
-};
+  const handleLogout = async () => {
+    try {
+      await logout(); // Firebase sign out
+      alert("Successfully logged out!");
+    } catch (error) {
+      alert("Failed to log out. Please try again.");
+    }
+  };
 
   return (
     <>

@@ -10,7 +10,7 @@ const LandingPage = () => {
 
   return (
     <div className="landing-container">
-       <Navbar>
+      <Navbar>
         <CustomButton onClick={() => navigate("/signin")}>Sign in</CustomButton>
       </Navbar>
 
