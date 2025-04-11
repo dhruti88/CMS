@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo , useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 
+// Layout document manager singleton - keeps track of all active Yjs documents
 const layoutDocsManager = (() => {
   const activeDocuments = new Map();
   const inactivityTimers = new Map();
@@ -18,7 +19,12 @@ const layoutDocsManager = (() => {
           ydoc
         );
         
-        activeDocuments.set(layoutId, { ydoc, wsProvider, activeUsers: new Set(), lastActivity: Date.now() });
+        activeDocuments.set(layoutId, { 
+          ydoc, 
+          wsProvider, 
+          activeUsers: new Set(), 
+          lastActivity: Date.now() 
+        });
       } else {
         // Update last activity time
         const docInfo = activeDocuments.get(layoutId);
@@ -75,124 +81,153 @@ const layoutDocsManager = (() => {
           inactivityTimers.delete(layoutId);
         }
       }
+    },
+
+    // New method to handle user leaving a layout
+    userLeaveLayout: (layoutId, userId) => {
+      if (activeDocuments.has(layoutId)) {
+        const docInfo = activeDocuments.get(layoutId);
+        docInfo.activeUsers.delete(userId);
+        
+        // If no users remain, setup inactivity timer
+        if (docInfo.activeUsers.size === 0) {
+          layoutDocsManager.setupInactivityCheck(layoutId);
+        }
+      }
     }
   };
 })();
 
-
-const useYjsManager = ({ layoutid, cellWidth, cellHeight, gutterWidth, userID, userProfilePic, setSections }) => {
+const useYjsManager = ({  cellWidth, cellHeight, gutterWidth, userID, userProfilePic, setSections }) => {
+  // State for local updates and initialization
   const [isLocalUpdate, setIsLocalUpdate] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [activeEditors, setActiveEditors] = useState([]);
   const [activeUsersCount, setActiveUsersCount] = useState(0);
-  const userId = userID;
+  // const layoutId=layoutid;
+  // Track current layout ID using state so we can detect changes
+  const [currentLayoutId, setCurrentLayoutId] = useState(
+    localStorage.getItem('layoutid') || 'default-layout'
+  );
+  
+  // References to current doc and provider for cleanup
+  const docInfoRef = useRef(null);
+  
+  // Get document and provider for this specific layout - recreated when layoutId changes
+  const docInfo = useMemo(() => {
+    const info = layoutDocsManager.getOrCreateDoc(currentLayoutId);
+    docInfoRef.current = info; // Store reference for cleanup
+    return info;
+  }, [currentLayoutId]);
+  
+  const { ydoc, wsProvider } = docInfo;
+  
+  // Get the shared map from Yjs
+  // const ySectionsMap = useMemo(() => ydoc.getMap('sections'), [ydoc]);
+  const ySectionsMap = useMemo(() => ydoc.getMap(`sections`), [ydoc]);
 
-  const layoutId = layoutid;
-  console.log("Initialized useYjsManager with layoutId:", layoutId);
-
-  // Scoped layoutDocsManager (isolated per hook instance)
-  const layoutDocsManager = useMemo(() => {
-    const activeDocuments = new Map();
-    const inactivityTimers = new Map();
-    const INACTIVITY_TIMEOUT = 60000;
-
-    return {
-      getOrCreateDoc: (layoutId) => {
-        if (!activeDocuments.has(layoutId)) {
-          console.log(`Creating new Yjs document for layout: ${layoutId}`);
-          const ydoc = new Y.Doc();
-          const wsProvider = new WebsocketProvider(
-            'ws://localhost:1234',
-            `workbench-room-${layoutId}`,
-            ydoc
-          );
-          activeDocuments.set(layoutId, {
-            ydoc,
-            wsProvider,
-            activeUsers: new Set(),
-            lastActivity: Date.now()
-          });
+  // Watch for layout ID changes in localStorage
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'layoutid' && e.newValue !== currentLayoutId) {
+        // Clean up the old layout connection
+        if (docInfoRef.current) {
+          docInfoRef.current.activeUsers.delete(userID);
+          layoutDocsManager.setupInactivityCheck(currentLayoutId);
         }
-        return activeDocuments.get(layoutId);
-      },
-
-      setupInactivityCheck: (layoutId) => {
-        const docInfo = activeDocuments.get(layoutId);
-        if (!docInfo) return;
-
-        if (docInfo.activeUsers.size === 0) {
-          if (inactivityTimers.has(layoutId)) clearTimeout(inactivityTimers.get(layoutId));
-
-          const timer = setTimeout(() => {
-            console.log(`Cleaning up inactive layout: ${layoutId}`);
-            docInfo.wsProvider.disconnect();
-            docInfo.ydoc.destroy();
-            activeDocuments.delete(layoutId);
-            inactivityTimers.delete(layoutId);
-          }, INACTIVITY_TIMEOUT);
-
-          inactivityTimers.set(layoutId, timer);
-        }
-      },
-
-      cleanupDoc: (layoutId) => {
-        if (activeDocuments.has(layoutId)) {
-          const docInfo = activeDocuments.get(layoutId);
-          docInfo.wsProvider.disconnect();
-          docInfo.ydoc.destroy();
-          activeDocuments.delete(layoutId);
-          if (inactivityTimers.has(layoutId)) {
-            clearTimeout(inactivityTimers.get(layoutId));
-            inactivityTimers.delete(layoutId);
-          }
-        }
+        
+        // Reset initialization state
+        setIsInitialized(false);
+        
+        // Update layout ID state to trigger reconnection
+        setCurrentLayoutId(e.newValue || 'default-layout');
+        console.log(`Switching to layout: ${e.newValue || 'default-layout'}`);
       }
     };
-  }, []);
 
-  // Get or create document + provider
-  const docInfo = useMemo(() => layoutDocsManager.getOrCreateDoc(layoutId), [layoutDocsManager, layoutId]);
-  const { ydoc, wsProvider } = docInfo;
+    // Also listen for storage events from other tabs/windows
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Set up polling to check for direct localStorage changes in the same window
+    const intervalId = setInterval(() => {
+      const storedLayoutId = localStorage.getItem('layoutid') || 'default-layout';
+      if (storedLayoutId !== currentLayoutId) {
+        // Clean up the old layout connection
+        if (docInfoRef.current) {
+          docInfoRef.current.activeUsers.delete(userID);
+          layoutDocsManager.setupInactivityCheck(currentLayoutId);
+        }
+        
+        // Reset initialization state
+        setIsInitialized(false);
+        
+        // Update layout ID state
+        setCurrentLayoutId(storedLayoutId);
+        console.log(`Switching to layout: ${storedLayoutId}`);
+      }
+    }, 1000); // Check every second
 
-  const ySectionsMap = useMemo(() => ydoc.getMap(`sections-${layoutId}`), [ydoc, layoutId]);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(intervalId);
+    };
+  }, [currentLayoutId, userID]);
 
-  // Initialize from Yjs state on sync
+  // Initialize WebSocket provider with proper error handling
   useEffect(() => {
     const handleSync = (isSynced) => {
-      if (isSynced && !isInitialized) {
-        const existingSections = Array.from(ySectionsMap.entries()).map(([_, value]) => {
-          try {
-            return typeof value === 'string' ? JSON.parse(value) : value;
-          } catch (error) {
-            console.error('Error parsing section:', error);
-            return null;
-          }
-        }).filter(Boolean);
+      try {
+        if (isSynced && !isInitialized) {
+          // Get initial data from Yjs
+          const existingSections = Array.from(ySectionsMap.entries()).map(([_, value]) => {
+            try {
+              return typeof value === 'string' ? JSON.parse(value) : value;
+            } catch (error) {
+              console.error('Error parsing section:', error);
+              return null;
+            }
+          }).filter(Boolean);
 
-        if (existingSections.length > 0) {
-          setSections(existingSections);
-          console.log('Initial sections loaded:', existingSections);
+          if (existingSections.length > 0) {
+            setSections(existingSections);
+            console.log('Initial sections loaded for layout:', currentLayoutId, existingSections);
+          }
+          setIsInitialized(true);
         }
-        setIsInitialized(true);
+      } catch (error) {
+        console.error('Sync error:', error);
       }
     };
-
-    if (wsProvider.synced && !isInitialized) handleSync(true);
-
+    
+    // Check immediately if already synced
+    if (wsProvider.synced && !isInitialized) {
+      handleSync(true);
+    }
+    
     wsProvider.on('sync', handleSync);
-    wsProvider.on('connection-error', (error) => console.error('WebSocket connection error:', error));
+    
+    // Error handling
+    wsProvider.on('connection-error', (error) => {
+      console.error(`WebSocket connection error for layout ${currentLayoutId}:`, error);
+    });
 
-    return () => wsProvider.off('sync', handleSync);
-  }, [ySectionsMap, wsProvider, isInitialized]);
+    return () => {
+      wsProvider.off('sync', handleSync);
+    };
+  }, [ySectionsMap, wsProvider, isInitialized, currentLayoutId, setSections]);
 
-  // Sync to Yjs when local changes occur
+  // Sync function to update Yjs when local changes occur
   const syncToYjs = useCallback((updatedSections) => {
+    console.log(`Syncing to Yjs for layout ${currentLayoutId}:`, updatedSections);
     try {
       setIsLocalUpdate(true);
       ydoc.transact(() => {
+        // Clear existing data
         ySectionsMap.clear();
+        
+        // Add updated sections
         updatedSections.forEach(section => {
-          const sectionWithPos = {
+          const sectionWithPositions = {
             ...section,
             x: section.gridX * (cellWidth + gutterWidth),
             y: section.gridY * cellHeight,
@@ -202,7 +237,7 @@ const useYjsManager = ({ layoutid, cellWidth, cellHeight, gutterWidth, userID, u
               y: item.gridY * cellHeight
             })) || []
           };
-          ySectionsMap.set(section.id, JSON.stringify(sectionWithPos));
+          ySectionsMap.set(section.id, JSON.stringify(sectionWithPositions));
         });
       });
     } catch (error) {
@@ -210,110 +245,120 @@ const useYjsManager = ({ layoutid, cellWidth, cellHeight, gutterWidth, userID, u
     } finally {
       setIsLocalUpdate(false);
     }
-  }, [ydoc, ySectionsMap, cellWidth, cellHeight, gutterWidth]);
+  }, [ySectionsMap, cellWidth, cellHeight, gutterWidth, ydoc, currentLayoutId]);
 
-  // Awareness for multi-user tracking
+  // Add awareness to Yjs - track users per layout
   useEffect(() => {
     if (!wsProvider) return;
 
     const awareness = wsProvider.awareness;
 
+    // Set local user state
     awareness.setLocalState({
       user: {
         id: userID,
         profilePic: userProfilePic,
         name: userID,
-        layoutId
+        layoutId: currentLayoutId // Include layoutId to track which layout the user is editing
       }
     });
 
+    // Add user to active users set
     docInfo.activeUsers.add(userID);
 
+    // Handle awareness changes
     const handleChange = () => {
       const states = Array.from(awareness.getStates());
-
+      
+      // Filter only editors in this layout and remove duplicates by ID
       const uniqueEditorIds = new Set();
       const editors = states
-        .map(([_, state]) => state.user)
-        .filter(user => user?.layoutId === layoutId)
+        .map(([clientId, state]) => state.user)
+        .filter(user => user && user.layoutId === currentLayoutId)
         .filter(user => {
-          if (uniqueEditorIds.has(user.id)) return false;
+          if (uniqueEditorIds.has(user.id)) {
+            return false;
+          }
           uniqueEditorIds.add(user.id);
           return true;
         });
-
+      
       setActiveEditors(editors);
       setActiveUsersCount(editors.length);
+      
+      // Update active users count in the document info
       docInfo.activeUsers = new Set(editors.map(user => user.id));
-
-      if (editors.length === 0) {
-        layoutDocsManager.setupInactivityCheck(layoutId);
-      }
     };
 
     awareness.on('change', handleChange);
+    
+    // Initial call to set up state
     handleChange();
-
+    
     return () => {
+      // Proper cleanup when effect is re-run or unmounted
       awareness.off('change', handleChange);
-      docInfo.activeUsers.delete(userID);
-      if (docInfo.activeUsers.size === 0) {
-        layoutDocsManager.setupInactivityCheck(layoutId);
-      }
+      layoutDocsManager.userLeaveLayout(currentLayoutId, userID);
     };
-  }, [wsProvider, userID, userProfilePic, layoutId, docInfo]);
+  }, [wsProvider, userID, userProfilePic, currentLayoutId, docInfo]);
 
-  // Observe remote updates from Yjs
+  // Listen for remote changes
   useEffect(() => {
     const handleYjsUpdate = () => {
       if (isLocalUpdate) return;
 
-      const remoteSections = Array.from(ySectionsMap.entries()).map(([_, value]) => {
-        try {
-          const section = typeof value === 'string' ? JSON.parse(value) : value;
-          return {
-            ...section,
-            items: section.items?.map(item => ({
-              ...item,
-              x: item.gridX * (cellWidth + gutterWidth),
-              y: item.gridY * cellHeight
-            })) || []
-          };
-        } catch (error) {
-          console.error('Error parsing remote section:', error);
-          return null;
-        }
-      }).filter(Boolean);
+      try {
+        const remoteSections = Array.from(ySectionsMap.entries()).map(([_, value]) => {
+          try {
+            const section = typeof value === 'string' ? JSON.parse(value) : value;
+            return {
+              ...section,
+              items: section.items?.map(item => ({
+                ...item,
+                x: item.gridX * (cellWidth + gutterWidth),
+                y: item.gridY * cellHeight
+              })) || []
+            };
+          } catch (error) {
+            console.error('Error parsing remote section:', error);
+            return null;
+          }
+        }).filter(Boolean);
 
-      if (remoteSections.length > 0) setSections(remoteSections);
+        if (remoteSections.length > 0) {
+          setSections(remoteSections);
+        }
+      } catch (error) {
+        console.error('Error processing remote update:', error);
+      }
     };
 
     ySectionsMap.observe(handleYjsUpdate);
     return () => ySectionsMap.unobserve(handleYjsUpdate);
-  }, [ySectionsMap, isLocalUpdate, cellWidth, cellHeight, gutterWidth]);
+  }, [ySectionsMap, isLocalUpdate, cellWidth, cellHeight, gutterWidth, setSections]);
 
-  // External setter that syncs to Yjs
+  // Update all functions that modify sections to use syncToYjs
   const updateSectionsAndSync = useCallback((newSections) => {
     setSections(newSections);
     syncToYjs(newSections);
-  }, [syncToYjs]);
+  }, [syncToYjs, setSections]);
 
-  // Final cleanup on unmount
+  // Clean up when component unmounts
   useEffect(() => {
     return () => {
-      docInfo.wsProvider.destroy();
-      ydoc.destroy();
-      layoutDocsManager.cleanupDoc(layoutId);
+      // This will handle cleanup when the component unmounts completely
+      layoutDocsManager.userLeaveLayout(currentLayoutId, userID);
     };
-  }, [layoutId, userID, docInfo]);
-
+  }, [currentLayoutId, userID]);
+  
   return {
     activeEditors,
     activeUsersCount,
     updateSectionsAndSync,
-    syncToYjs,
+    syncToYjs, 
     isLocalUpdate,
-    userId,
+    userId: userID,
+    currentLayoutId,
   };
 };
 

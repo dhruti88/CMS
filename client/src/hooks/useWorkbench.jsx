@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import useYjsManager from './useYjsmanager';
+import useYjsManager from './useYjsManager';
 
 
 const useWorkbench = () => {
@@ -146,6 +146,8 @@ const useWorkbench = () => {
     activeEditors,
     activeUsersCount,
     updateSectionsAndSync,
+    syncToYjs,
+    isLocalUpdate,
     userId,
   } = useYjsManager({
     layoutid,
