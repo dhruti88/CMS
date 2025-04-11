@@ -4,9 +4,14 @@
   --border-color: #dadce0;
   --accent-color: #ea4335;
   --text-color: #202124;
+  --background-color: #ffffff;
   --toolbox-bg: #f8f9fa;
   --toolbar-height: 60px;
   --hover-color: #e8f0fe;
+  --card-bg: #ffffff;
+  --nav-bg: #f8f9fa;
+  --primary-shadow: rgba(2, 31, 221, 0.07);
+  --scroll-color: #b8c8ea;
 }
 /* Dark Theme Variables */
 [data-theme="dark"] {
@@ -24,6 +29,7 @@
   --shadow-color: rgba(0, 0, 0, 0.5);
   --shadow-strong: rgba(0, 0, 0, 0.7);
   --primary-shadow: rgba(77, 130, 244, 0.1);
+  --scroll-color: #b8c8ea;
 }
 
 * {
@@ -58,23 +64,26 @@ body {
 }
 /* Workbench Styles */
 
-.left-container,
-.workbench-container {
-  /* flex: 1;
-  display: flex;
-  flex-direction: column;
-  background-color: #ffffff;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 10px;
-  overflow-x: auto; 
-  overflow-y: auto; */
+.left-container{
   flex: 1;
   display: flex;
   flex-direction: column;
   background-color: var(--card-bg);
-  padding: 10px;
-  margin-top: 10px;
+  padding: 15px;
+  border-radius: 10px;
+  overflow-x: auto;
+  overflow-y: auto;
+  transition: background-color 0.3s ease;
+
+  box-shadow: 0 0 4px var(--primary-color);
+}
+.workbench-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-bg);
+  padding: 10px 0 0 10px;
+  /* top    right  bottom left */  
   border-radius: 10px;
   overflow-x: auto;
   overflow-y: auto;
@@ -90,31 +99,28 @@ body {
 /* ===== Scrollbar Styles ===== */
 
 /* Vertical scrollbar */
-.left-container::-webkit-scrollbar,
-.workbench-container::-webkit-scrollbar {
+.konva-stage::-webkit-scrollbar,.toolbox::-webkit-scrollbar {
   width: 8px;
   height: 8px; /* Enables styling for horizontal scrollbar too */
+  margin: 3px 3px; /* Vertical margin */
 }
 
 /* Scrollbar track */
-.left-container::-webkit-scrollbar-track,
-.workbench-container::-webkit-scrollbar-track {
+.konva-stage::-webkit-scrollbar-track,.toolbox::-webkit-scrollbar-track {
   background:var(--secondary-color);
   border-radius: 20px;
-  margin: 3px 0; /* Vertical margin */
+  margin: 3px 3px; /* Vertical margin */
 }
 
 /* Scrollbar thumb */
-.left-container::-webkit-scrollbar-thumb,
-.workbench-container::-webkit-scrollbar-thumb {
-  background: var(--secondary-color);
+.konva-stage::-webkit-scrollbar-thumb,.toolbox::-webkit-scrollbar-thumb {
+  background: var(--scroll-color);
   border-radius: 12px;
   min-height: 20px; /* Simulated minimum size */
 }
 
 /* Scrollbar thumb hover */
-.left-container::-webkit-scrollbar-thumb:hover,
-.workbench-container::-webkit-scrollbar-thumb:hover {
+.konva-stage::-webkit-scrollbar-thumb:hover,.toolbox::-webkit-scrollbar-thumb:hover {
   background: var(--primary-color);
 }
 
@@ -122,21 +128,10 @@ body {
 
 
 .workbench-header {
-  /* display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 5px;
-  padding: 0 20px;
-  height: var(--toolbar-height);
-  border: 1px solid rgb(255, 255, 255) ;
-  background-color: white;
-  box-shadow: 0 0 4px var(--primary-color);
-  border-radius: 10px;
-  position: relative; */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 5px;
+  margin-bottom: 15px;
   padding: 0 20px;
   height: var(--toolbar-height);
   border: 1px solid var(--card-bg);
@@ -160,9 +155,6 @@ body {
 
 /* Konva Stage */
 .konva-stage {
-  flex: 1;
-  min-width: 1000px;
-  min-height: 800px;
   overflow: auto;
 }
 
@@ -269,12 +261,12 @@ body {
     padding: 20px; 
     border: 2px solid var(--primary-color);
     border-radius: 10px; */
-    width: 320px;
+  width: 320px;
   background-color: var(--card-bg);
   border-left: 1px solid var(--border-color);
   overflow-y: auto;
   padding: 20px;
-  border: 2px solid var(--primary-color);
+  box-shadow: 0 0 4px var(--primary-color);
   border-radius: 10px;
   transition: background-color 0.3s ease, border-color 0.3s ease;
   }

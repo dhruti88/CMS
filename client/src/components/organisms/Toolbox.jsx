@@ -78,7 +78,7 @@ const Toolbox = ({ openReplacementPanel }) => {
         {/* Task Status & Layout Type */}
         <Grid item xs={6}>
           <FormControl fullWidth>
-            <InputLabel sx={{ background: "#f8f9fa", px: 0.5 }}>Task Status</InputLabel>
+            <InputLabel sx={{ background: "white", px: 0.5 }}>Task Status</InputLabel>
             <Select
               value={workbenchProps.taskStatus}
               onChange={(e) => workbenchProps.setTaskStatus(e.target.value)}
