@@ -1693,6 +1693,7 @@ const useWorkbench = () => {
     setCurrentLayout,
     layoutid,
     setlayoutid,
+    updateSectionsAndSync,
   };
 };
 
