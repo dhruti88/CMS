@@ -84,19 +84,34 @@ const WorkPage = () => {
     };
 
     // Use functional update to ensure correct state update
-    workbenchProps.setSections(prevSections =>
-      prevSections.map(section =>
-        section.id === targetSectionIdForReplacement
-          ? replacementSection
-          : section
-      )
-    );
+    // workbenchProps.setSections(prevSections =>
+    //   prevSections.map(section =>
+    //     section.id === targetSectionIdForReplacement
+    //     ? replacementSection
+    //     : section
+    //   )
+    // );
+      // Create the updated sections array by mapping the replacement into the current sections
+  const updatedSections = workbenchProps.sections.map((section) =>
+    section.id === targetSectionIdForReplacement ? replacementSection : section
+  );
 
+   // Update sections state and sync with Yjs in one go (similar to handleDragEnd)
+   workbenchProps.setSections(updatedSections);
+   workbenchProps.updateSectionsAndSync(updatedSections);
+ 
+   // Close the replacement panel and update the selected section
+   setShowReplacementPanel(false);
+   workbenchProps.setSelectedId(replacementSection.id);
+ 
     // Close the replacement panel
-    setShowReplacementPanel(false);
-
-    // Update selected section
-    workbenchProps.setSelectedId(replacementSection.id);
+    // setShowReplacementPanel(false);
+    
+    // // Update selected section
+    // workbenchProps.setSelectedId(replacementSection.id);
+    // // update
+    //workbenchProps.updateSectionsAndSync(workbenchProps.sections);
+    // workbenchProps.updateSectionsAndSync(sections);
 
     console.log('Replacement completed', replacementSection);
   };
