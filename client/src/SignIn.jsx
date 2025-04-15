@@ -1,5 +1,5 @@
 import * as React from 'react';
-import app, {auth} from './firebase/fireBaseConfig';
+import app, {auth} from './firebase/firebaseConfig.js';
 import {signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword }  from "firebase/auth"
 import { useNavigate } from "react-router-dom";
 import { SERVER_URL } from './Urls';
