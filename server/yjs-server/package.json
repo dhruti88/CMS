@@ -1,0 +1,18 @@
+{
+  "name": "yjs-server",
+  "version": "1.0.0",
+  "main": "yjs-server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node yjs-server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@y/websocket-server": "^0.1.1",
+    "ws": "^8.18.1",
+    "y-websocket": "^3.0.0"
+  }
+}

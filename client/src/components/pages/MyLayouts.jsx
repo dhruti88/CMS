@@ -31,6 +31,8 @@ import {
   TaskAlt,
   GridView
 } from "@mui/icons-material";
+import { SERVER_URL } from '../../Urls';
+
 
 const MyLayouts = () => {
   const [newsItems, setNewsItems] = useState([]);
