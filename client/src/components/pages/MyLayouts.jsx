@@ -62,7 +62,7 @@ const MyLayouts = () => {
       setLoading(true);
       try {
         const { data: { layouts } } = await axios.get(
-          "http://localhost:8000/api/my-layouts",
+          `${SERVER_URL}/api/my-layouts`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setNewsItems(layouts);
