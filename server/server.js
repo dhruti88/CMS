@@ -43,6 +43,7 @@ import app from "./app.js";
 import { logger } from "./utils/logger.js";
 import redis, { testConnection } from './redis.js';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -74,6 +75,15 @@ const startServer = async () => {
     redisConnected = false;
   }
 
+  
+  app.use(
+    cors({
+      origin: "*",
+      methods: ["*"],
+      credentials: true
+    })
+  )
+
   // Start the server regardless of Redis connection status
   app.listen(PORT, () => {
     if (redisConnected) {
@@ -85,7 +95,6 @@ const startServer = async () => {
     }
   });
 };
-
 
 // Improved error handling for the entire startup process
 startServer().catch(error => {
