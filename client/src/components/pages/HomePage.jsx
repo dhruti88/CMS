@@ -19,8 +19,10 @@ import HistoryIcon from "@mui/icons-material/History";
 import TipsAndUpdatesIcon from "@mui/icons-material/TipsAndUpdates";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { SERVER_URL } from "../../Urls";
 
 const HomePage = () => {
+  console.log(SERVER_URL + "AT HOME");
   const cardData = [
     {
       title: "My Layouts",

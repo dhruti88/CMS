@@ -87,6 +87,7 @@ const Navbar = () => {
 
   const fetchUserData = async () => {
     try {
+      console.log(SERVER_URL+"fetching user data");
       const response = await axios.get(`${SERVER_URL}/api/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
