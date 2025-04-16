@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "y-websocket --port $PORT"
+    "start": "y-websocket --host 216.24.57.4 --port $PORT"
   },
   "keywords": [],
   "author": "",
