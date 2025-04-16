@@ -4,13 +4,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "y-websocket --host 0.0.0.0 --port $PORT"
+    "start": "y-websocket --port $PORT"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@y/websocket-server": "^0.1.1"
+    "@y/websocket-server": "^0.1.1",
+    "dotenv": "^16.5.0"
   }
 }
