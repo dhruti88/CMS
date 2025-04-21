@@ -13,7 +13,9 @@ const SetupModal = () => {
     // if(localStorage.getItem("layoutid")) localStorage.removeItem("layoutid");
     const data = await workbenchProps.saveLayout({ e: 0 });
     console.log("workbend data", data);
+    // workbenchProps.setlayoutid(data.layout._id);
     navigate(`/page/${data.layout._id}`);
+    
   };
 
   return (

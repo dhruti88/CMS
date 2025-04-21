@@ -8,6 +8,8 @@ import { TextField, MenuItem, Select, FormControl, Grid, InputLabel, CircularPro
 import { CheckCircle, PauseCircle } from '@mui/icons-material';
 import { WorkbenchContext } from '../../context/WorkbenchContext';
 
+// import '../../styles/WorkBench.css';
+// import { Button, Box, Typography } from "@mui/material";
 const Toolbox = ({ openReplacementPanel }) => {
   const workbenchProps = useContext(WorkbenchContext);
 
@@ -190,7 +192,7 @@ const Toolbox = ({ openReplacementPanel }) => {
           />
         </div>
 
-        <div className="size-section">
+        {/* <div className="size-section">
           <h4>Upload Image</h4>
           <input
             type="file"
@@ -199,7 +201,51 @@ const Toolbox = ({ openReplacementPanel }) => {
               workbenchProps.handleImageUpload(workbenchProps.sectionId, e)
             }
           />
-        </div>
+        </div> */}
+
+
+<div className="size-section1">
+  <h3>Upload Image</h3>
+  {/* <h1></h1> */}
+  <input
+    id="image-upload"
+    type="file"
+    accept="image/*"
+    onChange={e =>
+      workbenchProps.handleImageUpload(workbenchProps.sectionId, e)
+    }
+    hidden
+  />
+  <label htmlFor="image-upload" className="upload-button1">
+    Choose Image
+  </label>
+</div>
+
+
+
+{/* <Box display="flex" alignItems="center" gap={2}>
+      <Typography variant="h6">Upload Image</Typography>
+      <Button
+        variant="contained"
+        component="label"
+        sx={{
+          borderRadius: 2,
+          textTransform: "none",
+          boxShadow: 3,
+          "&:hover": { boxShadow: 6 },
+        }}
+      >
+        Choose Image
+        <input
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(e) => handleImageUpload(sectionId, e)}
+        />
+      </Button>
+    </Box> */}
+
+
       </ToolboxSection>
 
       {/* Text Formatting Tools (only for text items) */}
@@ -385,7 +431,7 @@ const Toolbox = ({ openReplacementPanel }) => {
         </ul>
       </ToolboxSection>
 
-      {workbenchProps.layoutType === "Page" && (
+      {/* {workbenchProps.layoutType === "Page" && (
         <ToolboxSection title="Section Replacement">
           <div className="replacement-button-container">
             <Button
@@ -396,7 +442,22 @@ const Toolbox = ({ openReplacementPanel }) => {
             </Button>
           </div>
         </ToolboxSection>
-      )}
+      )} */}
+
+{workbenchProps.layoutType === "Page" && (
+  <ToolboxSection title="Section Replacement">
+    <div className="size-section1">
+      <Button
+        onClick={openReplacementPanel}
+        className="upload-button1"
+      >
+        Replace Section
+      </Button>
+    </div>
+  </ToolboxSection>
+)}
+
+
 
       {/* Layout Selection */}
       {workbenchProps.showLayoutList && (

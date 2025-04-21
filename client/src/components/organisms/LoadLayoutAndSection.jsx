@@ -12,6 +12,8 @@ const LoadLayoutAndSection = ({
   setShowLayoutList,
   isDeleting,
   layouttype,
+  // workbenchProps,
+  // setlayoutid,
   mode = "layout" // "layout" or "section"
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -78,7 +80,10 @@ const LoadLayoutAndSection = ({
   {
     // setTimeout(()=> navigate(`/page/${item._id}`),10);
     setShowLayoutList(false);
+    
     setTimeout(()=> window.open(`/page/${item._id}`, '_blank'),10);
+    // workbenchProps.setlayoutid(item._id);
+
     // loadLayoutFromSelected(item);
   };
 

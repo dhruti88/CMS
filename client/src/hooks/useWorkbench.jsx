@@ -141,6 +141,8 @@ const useWorkbench = () => {
 
 
   const [layoutid, setlayoutid] = useState(null);
+
+  const {layoutid: layoutID1} = useParams();
   //call useYjsManager 
   const {
     activeEditors,
@@ -271,7 +273,8 @@ const useWorkbench = () => {
       const bestPosition = findBestPositionForItem(newItem, section.items, section.sizeInfo);
 
       if (!bestPosition) {
-        alert('No space available in section!');
+        // alert('No space available in section!');
+        console.log("No space available in section!");
         return section;
       }
 
@@ -300,7 +303,8 @@ const useWorkbench = () => {
 
     const position = findBestPositionForBox(newSection, sections, columns, rows);
     if (!position) {
-      alert('No space available for new section');
+      // alert('No space available for new section');
+      console.log("No space available in section!");
       return;
     }
 
@@ -395,6 +399,7 @@ const useWorkbench = () => {
     grays: ['#202124', '#3c4043', '#5f6368', '#dadce0', '#f1f3f4']
   };
   const {layoutid: layoutID} = useParams();
+  // setlayoutid(layoutID);
   // Layout endpoints
   const saveLayout = async ({ e = 1 }) => {
     console.log(taskStatus);
@@ -566,10 +571,13 @@ const useWorkbench = () => {
       x: section.gridX * cellWidth + section.gridX * layout.gridSettings.gutterWidth,
       y: section.gridY * cellHeight
     }));
-
+    
     // Update sections and sync with Yjs in one go
+    // setlayoutid(layout._id);
+    
     updateSectionsAndSync(recalculatedSections);
     localStorage.setItem('layoutid', layout._id);
+
     setLayoutTitle(layout.title);
     setShowLayoutList(false);
     setShowSetupForm(false);

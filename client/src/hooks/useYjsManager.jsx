@@ -131,6 +131,8 @@ const useYjsManager = ({ layoutid, cellWidth, cellHeight, gutterWidth, userID, u
   //     // return;
   //   }
   let layoutId = layoutid;
+  console.log("manav:", layoutId);
+
   // useEffect(() => {
   //   layoutId = layoutid;
   //   // layoutDocsManager.setLayoutInitialized(layoutId);
@@ -157,7 +159,8 @@ const useYjsManager = ({ layoutid, cellWidth, cellHeight, gutterWidth, userID, u
   }, [layoutid, setSections]);
   
  
-  
+
+
   // Initialize WebSocket provider with proper error handling
   useEffect(() => {
     const handleSync = (isSynced) => {

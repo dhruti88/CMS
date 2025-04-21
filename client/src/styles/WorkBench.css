@@ -764,3 +764,30 @@ body {
   color: var(--text-color);
   cursor: pointer;
 }
+
+.size-section1 {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Upload button */
+.upload-button1 {
+  padding: 6px 10px;
+  font-size: 0.875rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  border-radius: 6px;   
+  display: flex;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+
+.upload-button1:hover {
+  transform: scale(1.05);
+  background-color: "solid #333";
+}
