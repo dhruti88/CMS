@@ -1,8 +1,8 @@
 import express from "express";
 import multer from "multer";
 import fs from "fs-extra";
-import { exec } from "child_process";
 import PDFDocument from "pdfkit";
+import path from "path";
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
@@ -12,19 +12,25 @@ router.post("/convert-cmyk", upload.single("image"), async (req, res) => {
         return res.status(400).send("No file uploaded.");
     }
 
+    
     const inputFilePath = req.file.path;
-    const tempPdfPath = `uploads/temp_${Date.now()}.pdf`;
-    const finalCmykPdfPath = `uploads/final_CMYK_${Date.now()}.pdf`;
 
     try {
-        const doc = new PDFDocument({ size: [1000, 1000] });
-        const writeStream = fs.createWriteStream(tempPdfPath);
-        doc.pipe(writeStream);
+        // Set headers for download
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", "attachment; filename=converted_CMYK.pdf");
 
-        doc.image(inputFilePath, 100,100, { width: 800 },{ align: 'center',valign: 'center'});
+        const doc = new PDFDocument({ size: [1000, 1000] });
+        doc.pipe(res); // Pipe directly to response
+
+        doc.image(inputFilePath, 100, 100, { width: 800 });
 
         doc.end();
-        
+
+        // Optional: cleanup uploaded image after use
+        doc.on("finish", () => {
+            fs.unlink(inputFilePath); // delete uploaded file
+        });
     } catch (error) {
         console.error("Error generating PDF:", error);
         res.status(500).send("Failed to generate PDF.");

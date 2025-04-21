@@ -44,15 +44,15 @@ const HomePage = () => {
 
   const carouselItems = [
     {
-      src: "/images/news-template-1.jpg",
+      src: "/1.jpg",
       caption: "Design Stunning Layouts",
     },
     {
-      src: "/images/news-template-2.jpg",
+      src: "/2.jpeg",
       caption: "Collaborate with Your Team",
     },
     {
-      src: "/images/news-template-3.jpg",
+      src: "/5.png",
       caption: "Publish with Confidence",
     },
   ];

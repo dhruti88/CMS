@@ -553,6 +553,7 @@ const useWorkbench = () => {
 
   const loadLayoutFromSelected = (layout) => {
     console.log("rendering layout");
+    console.log("layout--testing : -", layout);
 
     if (layout.gridSettings && layout.gridSettings.gutterWidth !== undefined) {
       setColumns(layout.gridSettings.columns);
@@ -1586,6 +1587,8 @@ const useWorkbench = () => {
 
   useEffect(() => {
     if (layoutid) {
+      console.log("layoutid : check===", layoutid);
+      
       fetchLayoutById();
     }
   }, [layoutid]);

@@ -127,20 +127,22 @@ const MyLayouts = () => {
 
   // Fixed function to handle image display from backend
   const getImageUrl = (item) => {
+    console.log("Image Item:", item);
     // Check if the image data is already a URL string
-    if (item.stageImage?.data && typeof item.stageImage.data === 'string') {
-      // Already a string URL or base64
-      return item.stageImage.data;
-    }
+    // if (item.stageImage?.data ) {
+    //   // Already a string URL or base64
+    //   return item.stageImage.data;
+    // }
     
-    // If image data is present but not as expected format
-    if (item.stageImage?.contentType) {
-      // Try to use the image directly if it's available as a URL
-      return `/api/layouts/image/${item._id}`;
-    }
+    // // If image data is present but not as expected format
+    // if (item.stageImage?.contentType) {
+    //   // Try to use the image directly if it's available as a URL
+    //   return `/api/layouts/image/${item._id}`;
+    // }
     
     // Fallback to placeholder
-    return '/placeholder-newspaper.jpg';
+  
+    return '/3.jpg';
   };
 
   return (
